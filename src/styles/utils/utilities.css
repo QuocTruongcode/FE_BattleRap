@@ -1,0 +1,170 @@
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+/* Flexbox Utilities */
+.flex {
+  display: flex;
+}
+
+.flex-row {
+  flex-direction: row;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.gap-2 {
+  gap: var(--spacing-8);
+}
+
+.gap-3 {
+  gap: var(--spacing-12);
+}
+
+.gap-4 {
+  gap: var(--spacing-16);
+}
+
+/* Padding Utilities */
+.p-2 {
+  padding: var(--spacing-8);
+}
+
+.p-3 {
+  padding: var(--spacing-12);
+}
+
+.p-4 {
+  padding: var(--spacing-16);
+}
+
+.px-3 {
+  padding-left: var(--spacing-12);
+  padding-right: var(--spacing-12);
+}
+
+.py-2 {
+  padding-top: var(--spacing-8);
+  padding-bottom: var(--spacing-8);
+}
+
+/* Margin Utilities */
+.m-0 {
+  margin: 0;
+}
+
+.mb-1 {
+  margin-bottom: var(--spacing-4);
+}
+
+.mb-2 {
+  margin-bottom: var(--spacing-8);
+}
+
+.mb-3 {
+  margin-bottom: var(--spacing-12);
+}
+
+/* Text Utilities */
+.text-sm {
+  font-size: var(--font-size-sm);
+}
+
+.text-base {
+  font-size: var(--font-size-base);
+}
+
+.text-lg {
+  font-size: var(--font-size-lg);
+}
+
+.font-medium {
+  font-weight: var(--font-weight-medium);
+}
+
+.font-semibold {
+  font-weight: var(--font-weight-semibold);
+}
+
+.text-gray-600 {
+  color: var(--color-text-secondary);
+}
+
+.text-gray-900 {
+  color: var(--color-text-primary);
+}
+
+/* Display Utilities */
+.hidden {
+  display: none;
+}
+
+.block {
+  display: block;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+/* Opacity Utilities */
+.opacity-0 {
+  opacity: 0;
+}
+
+.opacity-100 {
+  opacity: 1;
+}
+
+/* Cursor Utilities */
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.cursor-default {
+  cursor: default;
+}
+
+/* Overflow Utilities */
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.overflow-auto {
+  overflow: auto;
+}
+
+/* Responsive Utilities */
+@media (max-width: 768px) {
+  .hidden-mobile {
+    display: none;
+  }
+
+  .hidden-desktop {
+    display: block;
+  }
+}
+
+@media (min-width: 769px) {
+  .hidden-desktop {
+    display: none;
+  }
+
+  .hidden-mobile {
+    display: block;
+  }
+}

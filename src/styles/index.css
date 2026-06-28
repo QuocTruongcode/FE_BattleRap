@@ -1,0 +1,17 @@
+/* ============================================
+   GLOBAL STYLE IMPORTS
+   ============================================ */
+
+/* Design System - Variables & Utilities */
+@import './utils/variables.css';
+@import './utils/utilities.css';
+
+/* Global Styles */
+@import './global/base.css';
+
+/* Component Styles */
+@import './components/Header.css';
+@import './components/Sidebar.css';
+@import './components/VideoCard.css';
+@import './components/VideoGrid.css';
+@import './components/Home.css';
