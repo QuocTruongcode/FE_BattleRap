@@ -89,6 +89,27 @@ export const barService = {
         });
     },
 
+    getBarByVideoId(id) {
+        return apiRequest(`/api/bars/video/${id}`);
+    },
+
+    update(id, payload) {
+        return apiRequest(`/api/bars/${id}`, {
+            method: 'PUT',
+            body: payload,
+        });
+    },
+
+    deleteBar(id) {
+        return apiRequest(`/api/bars/${id}`, {
+            method: 'DELETE',
+        });
+    },
+    deleteAllBarByVideoId(id) {
+        return apiRequest(`/api/bars/video/${id}`, {
+            method: 'DELETE',
+        });
+    },
 };
 
 export default {

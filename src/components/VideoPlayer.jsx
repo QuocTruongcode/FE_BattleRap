@@ -1,14 +1,21 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 
-export default function VideoPlayer({ videoUrl, onTimeUpdate }) {
+const VideoPlayer = forwardRef(function VideoPlayer({ videoUrl, onTimeUpdate }, ref) {
     const playerRef = useRef(null);
     const intervalRef = useRef(null);
-    const onTimeUpdateRef = useRef(onTimeUpdate); // ← thêm cái này
+    const onTimeUpdateRef = useRef(onTimeUpdate);
 
-    // Giữ ref luôn cập nhật — tránh stale closure
     useEffect(() => {
         onTimeUpdateRef.current = onTimeUpdate;
     }, [onTimeUpdate]);
+
+    useImperativeHandle(ref, () => ({
+        seekTo: (time) => {
+            if (playerRef.current && typeof playerRef.current.seekTo === 'function') {
+                playerRef.current.seekTo(time, true);
+            }
+        }
+    }));
 
     function getYoutubeId(url) {
         try {
@@ -27,12 +34,10 @@ export default function VideoPlayer({ videoUrl, onTimeUpdate }) {
         const videoId = getYoutubeId(videoUrl);
         if (!videoId) return;
 
-        // Tạo div mới mỗi lần — tránh conflict
         const container = document.getElementById('yt-player');
         if (!container) return;
 
         const initPlayer = () => {
-            // Destroy player cũ nếu có
             if (playerRef.current && typeof playerRef.current.destroy === 'function') {
                 playerRef.current.destroy();
             }
@@ -55,7 +60,6 @@ export default function VideoPlayer({ videoUrl, onTimeUpdate }) {
                         if (e.data === window.YT.PlayerState.PLAYING) {
                             clearInterval(intervalRef.current);
                             intervalRef.current = setInterval(() => {
-                                // Kiểm tra kỹ trước khi gọi
                                 if (
                                     playerRef.current &&
                                     typeof playerRef.current.getCurrentTime === 'function'
@@ -72,17 +76,14 @@ export default function VideoPlayer({ videoUrl, onTimeUpdate }) {
             });
         };
 
-        // API đã load rồi → init luôn
         if (window.YT && window.YT.Player) {
             initPlayer();
         } else {
-            // Chưa load → gắn script
             if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
                 const script = document.createElement('script');
                 script.src = 'https://www.youtube.com/iframe_api';
                 document.body.appendChild(script);
             }
-            // Ghi đè hoặc chain với callback cũ
             const prevCallback = window.onYouTubeIframeAPIReady;
             window.onYouTubeIframeAPIReady = () => {
                 prevCallback?.();
@@ -100,4 +101,6 @@ export default function VideoPlayer({ videoUrl, onTimeUpdate }) {
             <div id="yt-player" style={{ width: '100%', height: '100%' }} />
         </div>
     );
-}
+});
+
+export default VideoPlayer;

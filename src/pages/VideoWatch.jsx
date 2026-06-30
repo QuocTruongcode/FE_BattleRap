@@ -95,12 +95,8 @@ export default function VideoWatch() {
         queryFn: async () => {
             try {
 
-                console.log('Start API');
-
                 const res =
                     await videoService.getById(videoId);
-
-                console.log('Success:', res);
 
                 return res.data;
 
@@ -113,7 +109,14 @@ export default function VideoWatch() {
 
                 throw err;
             }
-        }
+
+        },
+
+        // Dùng cache hoàn toàn trong 5 phút
+        staleTime: 5 * 60 * 1000,
+
+        // Giữ cache trong RAM 30 phút sau khi rời component
+        gcTime: 30 * 60 * 1000
 
     });
 
@@ -129,7 +132,7 @@ export default function VideoWatch() {
             <div className="watch-main">
 
                 <VideoPlayer
-                    videoId={videoId}
+                    // videoId={videoId}
                     videoUrl={video?.linkVideo}
                     onTimeUpdate={handleTimeUpdate}
                 />

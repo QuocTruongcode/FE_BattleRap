@@ -1,0 +1,219 @@
+/* BarInputPanel.css */
+
+.bar-input-panel {
+    background: #1e1e2e;
+    border: 1px solid #2a2a3e;
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+/* ── Time row ── */
+.bip-time-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.bip-time-block {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 90px;
+}
+
+.bip-time-label {
+    font-size: 11px;
+    color: #6b6b8a;
+    letter-spacing: 0.04em;
+}
+
+.bip-time-display {
+    font-size: 26px;
+    font-weight: 700;
+    color: #7c6af5;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+}
+
+/* ── Lock button ── */
+.bip-btn-lock {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 1px solid #3a3a5a;
+    border-radius: 6px;
+    padding: 7px 14px;
+    font-size: 13px;
+    color: #c0b8ff;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    white-space: nowrap;
+}
+
+.bip-btn-lock:hover {
+    background: #2a2a3e;
+    border-color: #7c6af5;
+}
+
+/* ── Shortcuts ── */
+.bip-shortcuts {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+    flex-wrap: wrap;
+}
+
+.bip-shortcut-label {
+    font-size: 11px;
+    color: #5a5a7a;
+}
+
+.bip-shortcut-item {
+    font-size: 11px;
+    color: #6b6b8a;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.bip-shortcut-item kbd {
+    background: #2a2a3e;
+    border: 1px solid #3a3a5a;
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-size: 10px;
+    font-family: monospace;
+    color: #8888aa;
+}
+
+/* ── Locked time ── */
+.bip-locked-time {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #6b6b8a;
+    background: #16162a;
+    border-radius: 6px;
+    padding: 6px 12px;
+    border: 1px solid #2a2a3e;
+}
+
+.bip-locked-time strong {
+    color: #7c6af5;
+    font-variant-numeric: tabular-nums;
+}
+
+.bip-editing-badge {
+    margin-left: 8px;
+    background: #2a2040;
+    border: 1px solid #7c6af5;
+    border-radius: 99px;
+    padding: 2px 8px;
+    font-size: 11px;
+    color: #b0a0ff;
+}
+
+/* ── Content section ── */
+.bip-content-section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: relative;
+}
+
+.bip-content-label {
+    font-size: 12px;
+    color: #6b6b8a;
+    letter-spacing: 0.03em;
+}
+
+.bip-textarea {
+    background: #12121e;
+    border: 1px solid #2a2a3e;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: #e0deff;
+    font-family: inherit;
+    resize: none;
+    outline: none;
+    transition: border-color 0.15s;
+    line-height: 1.6;
+}
+
+.bip-textarea::placeholder {
+    color: #3a3a5a;
+}
+
+.bip-textarea:focus {
+    border-color: #7c6af5;
+}
+
+.bip-char-count {
+    font-size: 11px;
+    color: #3a3a5a;
+    text-align: right;
+}
+
+/* ── Actions ── */
+.bip-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.bip-btn-clear {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 1px solid #3a1a1a;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 13px;
+    color: #e05a5a;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.bip-btn-clear:hover {
+    background: #2a1212;
+}
+
+.bip-btn-submit {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: #7c6af5;
+    border: none;
+    border-radius: 7px;
+    padding: 9px 22px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.15s, opacity 0.15s;
+    flex: 1;
+    justify-content: center;
+    max-width: 220px;
+    margin-left: auto;
+}
+
+.bip-btn-submit:hover:not(.disabled) {
+    background: #6a58e0;
+}
+
+.bip-btn-submit.disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
