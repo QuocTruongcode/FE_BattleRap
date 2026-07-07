@@ -6,7 +6,7 @@ export default function LyricPanel({ lyrics, currentTime, selectedId, onSelectLi
 
     const getActiveLine = () => {
         for (let i = lyrics.length - 1; i >= 0; i--) {
-            if (currentTime >= lyrics[i].timestamp) return lyrics[i].id;
+            if (currentTime >= lyrics[i].time) return lyrics[i].id;
         }
         return null;
     };
@@ -42,8 +42,8 @@ export default function LyricPanel({ lyrics, currentTime, selectedId, onSelectLi
                         ].join(' ')}
                         onClick={() => onSelectLine(line)}
                     >
-                        <span className="lyric-time">{formatTime(line.timestamp)}</span>
-                        <span className="lyric-text">{line.text}</span>
+                        <span className="lyric-time">{formatTime(line.time)}</span>
+                        <span className="lyric-content">{line.content}</span>
                     </div>
                 ))}
             </div>

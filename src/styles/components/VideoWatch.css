@@ -95,100 +95,117 @@
 /* ==========================
    LYRICS
 ========================== */
-
+/* ==========================
+   LYRICS
+========================== */
 .lyric-section {
     width: calc(100% - 32px);
-
     max-width: 1100px;
-
     margin: 0 auto;
-
     flex: 1;
-
     display: flex;
-
     flex-direction: column;
-
     background: white;
-
     overflow: hidden;
 }
 
 .lyric-header {
     padding: 5px 10px;
-
     border-bottom: 1px solid #eee;
-
     font-size: 13px;
-
     font-weight: 600;
-
     color: #666;
 }
 
 .lyric-list {
     flex: 1;
-
     overflow-y: auto;
+    overflow-x: hidden;
+    padding: 24px 0;
+    scroll-behavior: smooth;
 }
 
 .lyric-line {
     display: flex;
-
     gap: 14px;
-
-    padding: 10px 18px;
-
+    padding: 12px 18px;
+    margin: 2px 0;
     cursor: pointer;
-
     align-items: flex-start;
+    border-radius: 8px;
 
-    transition: background .15s;
+    /* Trạng thái mặc định: dòng chưa tới hoặc đã qua */
+    opacity: 0.35;
+    transform: scale(0.92);
+    filter: blur(0.3px);
+
+    transition:
+        opacity 0.8s cubic-bezier(0.25, 0.8, 0.25, 1),
+        transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1),
+        filter 0.8s ease,
+        background-color 0.4s ease,
+        border-color 0.4s ease;
+
+    transform-origin: left center;
+    will-change: transform, opacity, filter;
 }
 
 .lyric-line:hover {
     background: #f5f5f5;
+    opacity: 0.7;
 }
 
+/* Dòng đang phát: sáng rõ, đỏ, phóng to mượt mà */
 .lyric-line.active {
+    opacity: 1;
+    transform: scale(1.06);
+    filter: blur(0);
     background: #fff5f5;
-
     border-left: 4px solid #cc0000;
+    box-shadow: 0 2px 12px rgba(204, 0, 0, 0.15);
+}
+
+.lyric-line.active .lyric-time {
+    color: #cc0000;
+    font-weight: 700;
+}
+
+.lyric-line.active .lyric-content {
+    color: #111;
+    font-weight: 600;
 }
 
 .lyric-line.selected {
     background: #e8f0fe;
 }
 
+.lyric-line.active.selected {
+    background: #fff5f5;
+    outline: 2px solid #1a73e8;
+    outline-offset: -2px;
+}
+
 .lyric-time {
     min-width: 42px;
-
     font-size: 14px;
-
     color: #999;
+    transition: color 0.5s ease, font-weight 0.5s ease;
 }
 
-.lyric-text {
+.lyric-content {
     font-size: 17px;
-
     color: #222;
-
     line-height: 1.7;
+    transition: color 0.5s ease, font-weight 0.5s ease;
 }
 
-.has-note .lyric-text::after {
+.has-note .lyric-content::after {
     content: "";
-
     display: inline-block;
-
     width: 6px;
-
     height: 6px;
-
     margin-left: 8px;
-
     border-radius: 50%;
-
     background: red;
 }
 
