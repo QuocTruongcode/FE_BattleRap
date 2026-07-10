@@ -1,19 +1,28 @@
+import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-
+import './Sidebar.css';
+import {
+    FaHome,
+    FaFire,
+    FaVideo,
+    FaBook,
+    FaYoutube
+} from "react-icons/fa";
 const ROUTED_ITEMS = [
-    { icon: '🏠', label: 'Trang chủ', to: '/', end: true },
-    { icon: '➕', label: 'Video', to: '/crud' },
+    { icon: <FaHome />, label: 'Trang chủ', to: '/', end: true },
+    { icon: <FaVideo />, label: 'Video', to: '/crud' },
 ];
 
 const STATIC_ITEMS = [
-    { icon: '🔥', label: 'Thịnh hành' },
-    { icon: '📦', label: 'Đăng ký' },
-    { icon: '📚', label: 'Thư viện' },
+    { icon: <FaFire />, label: 'Thịnh hành' },
+    { icon: <FaYoutube />, label: 'Đăng ký' },
+    { icon: <FaBook />, label: 'Thư viện' },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ isCollapsed, onToggle }) {
     return (
-        <aside className="sidebar">
+        <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+
             <nav className="sidebar-nav">
                 {ROUTED_ITEMS.map((item) => (
                     <NavLink
@@ -26,7 +35,7 @@ export default function Sidebar() {
                         title={item.label}
                     >
                         <span className="sidebar-icon">{item.icon}</span>
-                        <span className="sidebar-label">{item.label}</span>
+                        {!isCollapsed && <span className="sidebar-label">{item.label}</span>}
                     </NavLink>
                 ))}
 
@@ -38,28 +47,11 @@ export default function Sidebar() {
                         type="button"
                     >
                         <span className="sidebar-icon">{item.icon}</span>
-                        <span className="sidebar-label">{item.label}</span>
+                        {!isCollapsed && <span className="sidebar-label">{item.label}</span>}
                     </button>
                 ))}
             </nav>
 
-            <hr className="sidebar-divider" />
-
-            <div className="sidebar-section">
-                <p className="sidebar-title">KÊNH CÓ NGƯỜI ĐĂNG KÝ</p>
-                <div className="channel-list">
-                    {['WebbattelRap', 'Tech Channel', 'Music Beats', 'Gaming Zone'].map(
-                        (channel, index) => (
-                            <button key={index} className="channel-item">
-                                <span className="channel-avatar">
-                                    {channel.charAt(0)}
-                                </span>
-                                <span>{channel}</span>
-                            </button>
-                        )
-                    )}
-                </div>
-            </div>
         </aside>
     );
 }

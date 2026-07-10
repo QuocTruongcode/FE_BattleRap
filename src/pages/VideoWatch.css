@@ -1,0 +1,340 @@
+.watch-page {
+    display: flex;
+    height: 100vh;
+    background: #f9f9f9;
+    overflow: auto;
+    height: 102%;
+    /* padding-bottom: 5px; */
+}
+
+/* ==========================
+   LEFT SIDE
+========================== */
+
+.watch-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow-y: auto;
+}
+
+/* ==========================
+   VIDEO
+========================== */
+.lyric-section{
+    height: 2100px;
+}
+
+.video-area {
+    position: relative;
+
+    width: calc(100% - 32px);
+    max-width: 1100px;
+
+    margin: 16px auto 0;
+
+    aspect-ratio: 16 / 9;
+
+    background: #000;
+
+    border-radius: 12px;
+
+    overflow: hidden;
+
+    flex-shrink: 0;
+}
+
+.video-frame {
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    border: none;
+}
+
+/* ==========================
+   VIDEO META
+========================== */
+
+.video-meta {
+    width: calc(100% - 32px);
+
+    max-width: 1100px;
+
+    margin: 0 auto;
+
+    background: #fff;
+
+    padding: 16px;
+
+    border-bottom: 1px solid #e5e5e5;
+
+}
+
+.video-meta h2 {
+    margin: 0 0 8px;
+
+    font-size: 22px;
+
+    font-weight: 600;
+
+    color: #0f0f0f;
+}
+
+.video-meta .stats {
+    color: #606060;
+
+    font-size: 14px;
+}
+
+/* ==========================
+   LYRICS
+========================== */
+/* ==========================
+   LYRICS
+========================== */
+.lyric-section {
+    width: calc(100% - 32px);
+    max-width: 1100px;
+    margin: 0 auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    overflow: hidden;
+}
+
+.lyric-header {
+    padding: 5px 10px;
+    border-bottom: 1px solid #eee;
+    font-size: 13px;
+    font-weight: 600;
+    color: #666;
+}
+
+.lyric-list {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 24px 0;
+    scroll-behavior: smooth;
+}
+
+.lyric-line {
+    display: flex;
+    gap: 14px;
+    padding: 12px 18px;
+    margin: 2px 0;
+    cursor: pointer;
+    align-items: flex-start;
+    border-radius: 8px;
+
+    /* Trạng thái mặc định: dòng chưa tới hoặc đã qua */
+    opacity: 0.35;
+    transform: scale(0.92);
+    filter: blur(0.3px);
+
+    transition:
+        opacity 0.8s cubic-bezier(0.25, 0.8, 0.25, 1),
+        transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1),
+        filter 0.8s ease,
+        background-color 0.4s ease,
+        border-color 0.4s ease;
+
+    transform-origin: left center;
+    will-change: transform, opacity, filter;
+}
+
+.lyric-line:hover {
+    background: #f5f5f5;
+    opacity: 0.7;
+}
+
+/* Dòng đang phát: sáng rõ, đỏ, phóng to mượt mà */
+.lyric-line.active {
+    opacity: 1;
+    transform: scale(1.06);
+    filter: blur(0);
+    background: #fff5f5;
+    border-left: 4px solid #cc0000;
+    box-shadow: 0 2px 12px rgba(204, 0, 0, 0.15);
+}
+
+.lyric-line.active .lyric-time {
+    color: #cc0000;
+    font-weight: 700;
+}
+
+.lyric-line.active .lyric-content {
+    color: #111;
+    font-weight: 600;
+}
+
+.lyric-line.selected {
+    background: #e8f0fe;
+}
+
+.lyric-line.active.selected {
+    background: #fff5f5;
+    outline: 2px solid #1a73e8;
+    outline-offset: -2px;
+}
+
+.lyric-time {
+    min-width: 42px;
+    font-size: 14px;
+    color: #999;
+    transition: color 0.5s ease, font-weight 0.5s ease;
+}
+
+.lyric-content {
+    font-size: 17px;
+    color: #222;
+    line-height: 1.7;
+    transition: color 0.5s ease, font-weight 0.5s ease;
+}
+
+.has-note .lyric-content::after {
+    content: "";
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-left: 8px;
+    border-radius: 50%;
+    background: red;
+}
+
+/* ==========================
+   RIGHT PANEL
+========================== */
+
+.explanation-panel {
+    width: 380px;
+
+    background: #fff;
+
+    border-left: 1px solid #e5e5e5;
+
+    display: flex;
+
+    flex-direction: column;
+
+    flex-shrink: 0;
+
+    overflow: hidden;
+}
+
+.explanation-panel.hidden {
+    width: 0;
+
+    border-left: none;
+}
+
+.panel-header {
+    padding: 16px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    border-bottom: 1px solid #eee;
+}
+
+.panel-header h3 {
+    flex: 1;
+
+    margin: 0;
+
+    font-size: 15px;
+
+    font-weight: 600;
+}
+
+.panel-close {
+    border: none;
+
+    background: transparent;
+
+    font-size: 18px;
+
+    cursor: pointer;
+}
+
+.panel-body {
+    flex: 1;
+
+    overflow-y: auto;
+}
+
+.quote-box {
+    margin: 16px;
+
+    padding: 14px;
+
+    border-left: 4px solid #cc0000;
+
+    background: #fafafa;
+
+    border-radius: 8px;
+}
+
+.panel-section {
+    padding: 0 16px 20px;
+}
+
+.panel-section-label {
+    margin-bottom: 8px;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    text-transform: uppercase;
+
+    color: #777;
+}
+
+.panel-section p {
+    line-height: 1.7;
+
+    color: #444;
+}
+
+.ref-tag {
+    display: inline-block;
+
+    margin-top: 10px;
+
+    padding: 5px 10px;
+
+    border-radius: 6px;
+
+    background: #e8f0fe;
+
+    color: #1a73e8;
+
+    font-size: 12px;
+}
+
+.why-box {
+    margin: 0 16px 20px;
+
+    padding: 14px;
+
+    background: #f0fdf4;
+
+    border-radius: 8px;
+}
+
+.why-box p {
+    color: #166534;
+
+    line-height: 1.7;
+}

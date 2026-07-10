@@ -8,10 +8,3 @@
 
 /* Global Styles */
 @import './global/base.css';
-
-/* Component Styles */
-@import './components/Header.css';
-@import './components/Sidebar.css';
-@import './components/VideoCard.css';
-@import './components/VideoGrid.css';
-@import './components/Home.css';

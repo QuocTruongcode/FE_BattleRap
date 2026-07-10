@@ -1,4 +1,4 @@
-
+import './VideoCard.css';
 
 export default function VideoCard({ video, onClick }) {
     const formatViews = (views = 0) => {
@@ -34,23 +34,23 @@ export default function VideoCard({ video, onClick }) {
             {/* Video Info */}
             <div className="video-info">
                 {/* Channel Avatar */}
-                <img
+                {/* <img
                     src={video.channelAvatar || video.thumbnailUrl}
                     alt={video.channel || video.title}
                     className="channel-avatar"
-                />
+                /> */}
 
                 {/* Video Details */}
                 <div className="video-details">
                     <h3 className="video-title" title={video.title}>
                         {video.title}
                     </h3>
-                    <p className="channel-name">{video.channel || 'WebbattelRap'}</p>
+                    {/* <p className="channel-name">{video.channel || 'WebbattelRap'}</p>
                     <div className="video-stats">
                         <span>{formatViews(video.views)} lượt xem</span>
                         <span className="separator">•</span>
                         <span>{formatDate(video.uploadedAt || video.createdAt)}</span>
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* Menu Button */}

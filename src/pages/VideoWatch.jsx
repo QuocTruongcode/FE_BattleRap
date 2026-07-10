@@ -8,7 +8,7 @@ import VideoPlayer from '../components/VideoPlayer';
 import LyricPanel from '../components/LyricPanel';
 import ExplanationPanel from '../components/ExplanationPanel';
 import { videoService, barService } from '../services/api';
-import '../styles/components/VideoWatch.css';
+import './VideoWatch.css';
 
 
 

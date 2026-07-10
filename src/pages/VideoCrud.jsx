@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import { videoService } from '../services/api';
+import './VideoCrud.css';
 
 const emptyForm = {
     title: '',
@@ -16,6 +17,7 @@ export default function VideoCrud() {
     const [searchQuery, setSearchQuery] = useState('');
     const [formData, setFormData] = useState(emptyForm);
     const [editingId, setEditingId] = useState(null);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
 
     const queryClient = useQueryClient();
 
@@ -133,9 +135,13 @@ export default function VideoCrud() {
 
     return (
         <div className="home-container">
-            <Header onSearch={(query) => setSearchQuery(query)} />
+            <Header
+                onSearch={(query) => setSearchQuery(query)}
+                onToggleSidebar={() => setIsSidebarCollapsed((prev) => !prev)}
+                isSidebarCollapsed={isSidebarCollapsed}
+            />
             <div className="home-content">
-                <Sidebar />
+                <Sidebar isCollapsed={isSidebarCollapsed} onToggle={() => setIsSidebarCollapsed((prev) => !prev)} />
 
                 <main className="video-crud-page">
                     <div className="crud-topbar">

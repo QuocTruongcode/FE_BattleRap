@@ -1,4 +1,5 @@
 import VideoCard from './VideoCard';
+import './VideoGrid.css';
 
 export default function VideoGrid({ videos, searchQuery, onVideoSelect }) {
     const query = searchQuery.toLowerCase();

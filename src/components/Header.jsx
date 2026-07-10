@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import './Header.css';
+import Logo from '../assets/Logo.jpg'; // Import the logo image
 
-export default function Header({ onSearch }) {
+export default function Header({ onSearch, onToggleSidebar, isSidebarCollapsed }) {
     const [searchValue, setSearchValue] = useState('');
 
     const handleSearch = (e) => {
@@ -16,16 +18,24 @@ export default function Header({ onSearch }) {
     return (
         <header className="header">
             <div className="header-container">
-                {/* Logo */}
-                <div className="logo">
-                    <svg
-                        viewBox="0 0 90 20"
-                        className="logo-icon"
+                <div className="header-left-group">
+                    <button
+                        type="button"
+                        className="header-sidebar-toggle"
+                        onClick={onToggleSidebar}
+                        title={isSidebarCollapsed ? 'Mở rộng sidebar' : 'Thu gọn sidebar'}
+                        aria-label={isSidebarCollapsed ? 'Mở rộng sidebar' : 'Thu gọn sidebar'}
                     >
-                        <text x="0" y="16" fontSize="20" fontWeight="bold" fill="#FF0000">
-                            WebbattelRap
-                        </text>
-                    </svg>
+                        <span className="header-toggle-icon" aria-hidden="true">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </span>
+                    </button>
+
+                    <div className="logo">
+                        <img src={Logo} alt="Logo" className="logo-icon" />
+                    </div>
                 </div>
 
                 {/* Search Bar */}
@@ -49,8 +59,7 @@ export default function Header({ onSearch }) {
                         </svg>
                     </button>
                 </div>
-
-                {/* Right Section */}
+                {/* Right Section
                 <div className="header-right">
                     <button className="icon-button" title="Upload">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -66,7 +75,7 @@ export default function Header({ onSearch }) {
                     <button className="user-avatar" title="Profile">
                         <img src="https://via.placeholder.com/32" alt="User" />
                     </button>
-                </div>
+                </div> */}
             </div>
         </header>
     );

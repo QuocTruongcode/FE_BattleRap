@@ -5,9 +5,11 @@ import VideoGrid from '../components/VideoGrid';
 import { videoService } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import './Home.css';
 
 export default function Home() {
     const [searchQuery, setSearchQuery] = useState('');
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
     const navigate = useNavigate();
 
     const { data: videos = [], isLoading, isError, error, refetch } = useQuery({
@@ -44,10 +46,14 @@ export default function Home() {
 
     return (
         <div className="home-container">
-            <Header onSearch={handleSearch} />
+            <Header
+                onSearch={handleSearch}
+                onToggleSidebar={() => setIsSidebarCollapsed((prev) => !prev)}
+                isSidebarCollapsed={isSidebarCollapsed}
+            />
 
             <div className="home-content">
-                <Sidebar />
+                <Sidebar isCollapsed={isSidebarCollapsed} onToggle={() => setIsSidebarCollapsed((prev) => !prev)} />
 
                 <VideoGrid
                     videos={videos}
