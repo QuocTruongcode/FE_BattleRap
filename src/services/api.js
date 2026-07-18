@@ -1,53 +1,61 @@
+import axios from 'axios';
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '';
 
-async function parseResponse(response) {
-    const contentType = response.headers.get('content-type') || '';
+const apiClient = axios.create({
+    baseURL: API_BASE_URL,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    timeout: 10000,
+});
 
-    if (contentType.includes('application/json')) {
-        return response.json();
+function getErrorMessage(error) {
+    if (axios.isAxiosError(error)) {
+        if (!error.response) {
+            return `Không kết nối được API tại ${API_BASE_URL || '(chưa cấu hình VITE_API_BASE_URL)'}. Hãy chạy backend (port 3001) và SQL Server.`;
+        }
+
+        const data = error.response.data;
+
+        if (typeof data === 'string' && data.trim()) {
+            return data;
+        }
+
+        if (typeof data === 'object' && data !== null) {
+            if (typeof data.message === 'string' && data.message.trim()) {
+                return data.message;
+            }
+
+            if (typeof data.error === 'string' && data.error.trim()) {
+                return data.error;
+            }
+        }
+
+        return `Request failed with status ${error.response.status}`;
     }
 
-    return response.text();
+    return error instanceof Error ? error.message : 'Request failed';
 }
 
 export async function apiRequest(path, options = {}) {
     const { method = 'GET', body, headers = {}, timeout = 10000 } = options;
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
 
     try {
-        const response = await fetch(`${API_BASE_URL}${path}`, {
+        const response = await apiClient.request({
+            url: path,
             method,
             headers: {
                 'Content-Type': 'application/json',
                 ...headers,
             },
-            body: body === undefined ? undefined : JSON.stringify(body),
-            signal: controller.signal,
+            timeout,
+            data: body === undefined ? undefined : body,
         });
 
-        const data = await parseResponse(response);
-
-        if (!response.ok) {
-            const message =
-                typeof data === 'object' && data !== null && 'message' in data
-                    ? data.message
-                    : `Request failed with status ${response.status}`;
-
-            throw new Error(message);
-        }
-
-        return data;
+        return response.data;
     } catch (error) {
-        if (error.name === 'AbortError') {
-            throw new Error(
-                `Không kết nối được API tại ${API_BASE_URL || '(chưa cấu hình VITE_API_BASE_URL)'}. Hãy chạy backend (port 3001) và SQL Server.`
-            );
-        }
-
-        throw error;
-    } finally {
-        clearTimeout(timeoutId);
+        throw new Error(getErrorMessage(error));
     }
 }
 
@@ -112,8 +120,17 @@ export const barService = {
     },
 };
 
+export const reviewService = {
+    getReviewsAI(IDvideoYt) {
+        return apiRequest(`/api/youtube?videoId=${IDvideoYt}`, {
+            timeout: 180000, // 3 phút, chỉ áp dụng riêng cho request này
+        });
+    },
+};
+
 export default {
     apiRequest,
     videoService,
     barService,
+    reviewService,
 };
