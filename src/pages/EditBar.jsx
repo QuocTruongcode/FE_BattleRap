@@ -126,7 +126,7 @@ export default function EditBar() {
         setEditingBar(null);
     }, [savedBars, videoId, queryClient]);
 
-    // Xoá bar
+    // Xoá  
     const handleDelete = useCallback(async (id) => {
         const isSaved = savedBars.some(b => b.id === id);
         if (isSaved) {
@@ -182,26 +182,30 @@ export default function EditBar() {
     }, [pendingBars, saveMutation]);
 
     // Xuất lyric
-    const handleExportLyric = useCallback(() => {
-        const text = [...allBars]
-            .filter(b => !b._deleted)
-            .sort((a, b) => a.time - b.time)
-            .map(b => `[${formatTime(b.time)}] ${b.content}`)
-            .join('\n');
-        const blob = new Blob([text], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `lyric_video_${videoId}.lrc`;
-        a.click();
-        URL.revokeObjectURL(url);
-    }, [allBars, videoId]);
+    // const handleExportLyric = useCallback(() => {
+    //     const text = [...allBars]
+    //         .filter(b => !b._deleted)
+    //         .sort((a, b) => a.time - b.time)
+    //         .map(b => `[${formatTime(b.time)}] ${b.content}`)
+    //         .join('\n');
+    //     const blob = new Blob([text], { type: 'text/plain' });
+    //     const url = URL.createObjectURL(blob);
+    //     const a = document.createElement('a');
+    //     a.href = url;
+    //     a.download = `lyric_video_${videoId}.lrc`;
+    //     a.click();
+    //     URL.revokeObjectURL(url);
+    // }, [allBars, videoId]);
 
-    const formatTime = (secs) => {
-        const m = Math.floor(secs / 60);
-        const s = (secs % 60).toFixed(2).padStart(5, '0');
-        return `${m}:${s}`;
-    };
+    // const formatTime = (secs) => {
+    //     const m = Math.floor(secs / 60);
+    //     const s = (secs % 60).toFixed(2).padStart(5, '0');
+    //     return `${m}:${s}`;
+    // };
+
+    const handleOpenGrap = useCallback(() => {
+        navigate('/knowledgeGraph');
+    }, [navigate]);
 
     // ── Render ────────────────────────────────────────────────────────────────
     return (
@@ -234,10 +238,10 @@ export default function EditBar() {
                         {saveMutation.isPending ? 'Đang lưu...' : '💾 Lưu nháp'}
                     </button>
                     <button
-                        type="button"
+                        // type="button"
                         className="edit-bar-btn-export"
-                        onClick={handleExportLyric}
-                        disabled={!allBars.filter(b => !b._deleted).length}
+                        onClick={handleOpenGrap}
+                    // disabled={!allBars.filter(b => !b._deleted).length}
                     >
                         ✦ Xuất lyric
                     </button>
@@ -270,7 +274,7 @@ export default function EditBar() {
                         onEdit={handleEdit}
                         onDelete={handleDeleteAll}
                         onSaveDraft={handleSaveDraft}
-                        onExportLyric={handleExportLyric}
+                        handleOpenGrap={handleOpenGrap}
                         isSaving={saveMutation.isPending}
                         lastSavedAt={lastSavedAt}
                         videoTitle={video?.title}

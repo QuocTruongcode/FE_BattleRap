@@ -120,11 +120,58 @@ export const barService = {
     },
 };
 
+// reviewService.js
+
 export const reviewService = {
-    getReviewsAI(IDvideoYt) {
-        return apiRequest(`/api/youtube?videoId=${IDvideoYt}`, {
-            timeout: 180000, // 3 phút, chỉ áp dụng riêng cho request này
+    // Giữ cách gọi cũ cho các API bình thường khác
+
+    // Hàm mới dành riêng cho SSE — không return data, mà nhận callback
+    getReviewsAI(videoId, { onStep, onResult, onError, onCancelled }) {
+        const baseURL = import.meta.env.VITE_API_BASE_URL || "";
+
+        // 1. Tự sinh jobId ở phía client
+        const jobId = crypto.randomUUID();
+
+        // 2. Gửi kèm jobId lên server khi mở kết nối SSE
+        const source = new EventSource(
+            `${baseURL}/api/review?videoId=${videoId}&jobId=${jobId}`
+        );
+
+        source.addEventListener('step', (e) => {
+            onStep?.(JSON.parse(e.data));
         });
+
+        source.addEventListener('result', (e) => {
+            onResult?.(JSON.parse(e.data));
+            source.close();
+        });
+
+        source.addEventListener('error', (e) => {
+            onError?.(e.data ? JSON.parse(e.data) : { message: 'Mất kết nối' });
+            source.close();
+        });
+
+        // 3. Lắng nghe event 'cancelled' — khi job bị hủy
+        source.addEventListener('cancelled', (e) => {
+            onCancelled?.(e.data ? JSON.parse(e.data) : { message: 'Đã hủy' });
+            source.close();
+        });
+
+        // 4. Hàm hủy — khớp với route POST /api/review/:jobId/cancel
+        const cancel = async () => {
+            try {
+                await fetch(`${baseURL}/api/review/${jobId}/cancel`, {
+                    method: 'POST'
+                });
+            } catch (err) {
+                console.error('Lỗi khi gọi API hủy:', err);
+            } finally {
+                source.close();
+            }
+        };
+
+        // Trả về cả source (để tự đóng khi unmount) và cancel (để bấm nút Hủy)
+        return { source, jobId, cancel };
     },
 };
 

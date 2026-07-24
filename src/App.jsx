@@ -8,7 +8,7 @@ import Home from './pages/Home'
 import VideoCrud from './pages/VideoCrud'
 import VideoWatch from './pages/VideoWatch'
 import EditBar from './pages/EditBar'
-
+import CRUDKnowledgeGraph from './pages/CRUDKnowledgeGraph'
 function App() {
   return (
     <BrowserRouter>
@@ -32,6 +32,11 @@ function App() {
         <Route
           path="/edit/:videoId"
           element={<EditBar />}
+        />
+
+        <Route
+          path="/knowledgeGraph"
+          element={<CRUDKnowledgeGraph />}
         />
 
       </Routes>

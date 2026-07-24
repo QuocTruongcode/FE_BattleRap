@@ -27,7 +27,9 @@ export default function VideoCrud() {
     const [reviewContent, setReviewContent] = useState(''); // state for review content
     const formRef = useRef(null);
     const editorRef = useRef(null);
-
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [progressMessage, setProgressMessage] = useState("");
+    const sseRef = useRef(null);
 
 
     // ✅ Fetch videos — tự cache, chuyển màn về không gọi lại
@@ -175,32 +177,39 @@ export default function VideoCrud() {
             setReviewContent(formData.review || "Video chưa được thực hiện đánh giá");
         }
     }
-
     const handleReviewAi = async () => {
-        setReviewContent(null); // reset review content trước khi gọi API
+        setReviewContent(null);
         const IdvideoYt = getYoutubeVideoId(formData.linkVideo);
         if (!IdvideoYt) {
             alert("Link video không hợp lệ. Vui lòng nhập link video YouTube hợp lệ.");
             return;
         }
         const isConfirmed = window.confirm("Bạn có chắc chắn muốn dùng AI để đánh giá video này không?");
-        if (!isConfirmed) {
-            return; // người dùng bấm Cancel thì dừng lại, không chạy tiếp
-        }
-        else {
-            const res = await reviewService.getReviewsAI(IdvideoYt);
-            console.log("Review AI:", res);
-            if (!res || !res.textList || res.textList.errCode !== 0) {
-                alert("Có lỗi trong quá trình lấy đánh giá từ AI. Vui lòng thử lại sau.");
-            }
-            else {
-                const newContent = res.textList.message || "Không có đánh giá từ AI";
-                setReviewContent(newContent);
-                editorRef.current?.setMarkdown(newContent); // set trực tiếp vào editor
-            }
-        }
+        if (!isConfirmed) return;
+        setIsAnalyzing(true);
+        setProgressMessage("");
+        sseRef.current = reviewService.getReviewsAI(IdvideoYt, {
+            onStep: (data) => {
+                setProgressMessage(data.message);
+            },
+            onResult: (data) => {
+                if (!data || !data.textList || data.textList.errCode !== 0) {
+                    alert("Có lỗi trong quá trình lấy đánh giá từ AI. Vui lòng thử lại sau.");
+                } else {
+                    const newContent = data.textList.message || "Không có đánh giá từ AI";
+                    setReviewContent(newContent);
+                    editorRef.current?.setMarkdown(newContent);
+                }
+                setIsAnalyzing(false);
+                setProgressMessage("");
+            },
+            onError: (err) => {
+                alert(`Lỗi: ${err.message}`);
+                setIsAnalyzing(false);
+                setProgressMessage("");
+            },
+        });
     };
-
     // Lấy id từ link youtube, ví dụ: https://www.youtube.com/watch?v=abc123xyz => abc123xyz
     const getYoutubeVideoId = (url) => {
         if (!url) return null;
@@ -216,6 +225,20 @@ export default function VideoCrud() {
         setIsOpen(false); // đóng modal sau khi submit  
     };
 
+    const handleCancel = () => {
+        if (!sseRef.current) return;
+
+        const isConfirmed = window.confirm(
+            "Bạn có muốn hủy tiến trình đánh giá bằng AI không?"
+        );
+
+        if (isConfirmed) {
+            sseRef.current.cancel();
+            setIsAnalyzing(false);
+
+        }
+    };
+
     return (
         console.log("reviewContent", reviewContent),
         // console.log("videos:", videos),
@@ -228,7 +251,9 @@ export default function VideoCrud() {
                 isSidebarCollapsed={isSidebarCollapsed}
             />
             {/* //modal review */}
-            <ModalReview isOpen={isOpen} onClose={() => { setIsOpen(false); setReviewContent(null); }} onReviewAi={() => handleReviewAi()} onSave={() => triggerSubmitFromModal()}>
+            <ModalReview isOpen={isOpen} onClose={() => { setIsOpen(false); setReviewContent(null); }}
+                onReviewAi={() => handleReviewAi()} onSave={() => triggerSubmitFromModal()}
+                isAnalyzing={isAnalyzing} progressMessage={progressMessage} onCancel={handleCancel}>
                 <EditReview ref={editorRef}
                     markdown={reviewContent} onChange={setReviewContent} />
             </ModalReview>

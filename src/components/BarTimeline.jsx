@@ -18,7 +18,7 @@ export default function BarTimeline({
     onEdit,
     onDelete,
     onSaveDraft,
-    onExportLyric,
+    handleOpenGrap,
     isSaving = false,
     lastSavedAt = null,
     videoTitle = '',
@@ -111,7 +111,7 @@ export default function BarTimeline({
                     <button
                         type="button"
                         className="bt-btn-export"
-                        onClick={onExportLyric}
+                        onClick={handleOpenGrap}
                         disabled={bars.length === 0}
                     >
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
