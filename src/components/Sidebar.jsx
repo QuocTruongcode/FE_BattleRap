@@ -6,11 +6,13 @@ import {
     FaFire,
     FaVideo,
     FaBook,
-    FaYoutube
+    FaYoutube, FaProjectDiagram
 } from "react-icons/fa";
 const ROUTED_ITEMS = [
     { icon: <FaHome />, label: 'Trang chủ', to: '/', end: true },
     { icon: <FaVideo />, label: 'Video', to: '/crud' },
+    { icon: <FaProjectDiagram />, label: 'Tri thức Rap', to: '/knowledgeGraph' },
+
 ];
 
 const STATIC_ITEMS = [

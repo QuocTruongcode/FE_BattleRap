@@ -1,0 +1,14 @@
+.graph-container{
+    height: 100vh;
+    width:  60vw;
+}
+
+.graph-header{
+    background-color: #000000;
+    height: 8vh;
+}
+
+.graph-header > h2{
+    color: #ffffff;
+    padding: 10px 20px;
+}

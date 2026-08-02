@@ -1,127 +1,81 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import ModalReview from '../components/ModalReview';
 import EditReview from '../components/EditReview';
-import { videoService, reviewService } from '../services/api';
+import { useVideoCrudForm } from '../hooks/useVideoCrudForm';
+import { useVideoCrudQueries } from '../hooks/useVideoCrudQueries';
+import { useVideoReview } from '../hooks/useVideoReview';
 import './VideoCrud.css';
 import { useRef } from 'react';
-
-const emptyForm = {
-    title: '',
-    linkVideo: '',
-    thumbnailUrl: '',
-    review: '',
-};
 
 export default function VideoCrud() {
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
-    const [formData, setFormData] = useState(emptyForm);
-    const [editingId, setEditingId] = useState(null);
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
-    const [isOpen, setIsOpen] = useState(false); // state for modal review
-    const queryClient = useQueryClient();
-    const [reviewContent, setReviewContent] = useState(''); // state for review content
     const formRef = useRef(null);
-    const editorRef = useRef(null);
-    const [isAnalyzing, setIsAnalyzing] = useState(false);
-    const [progressMessage, setProgressMessage] = useState("");
-    const sseRef = useRef(null);
 
+    const {
+        formData,
+        editingId,
+        handleChange,
+        resetForm,
+        startEdit,
+    } = useVideoCrudForm();
 
-    // ✅ Fetch videos — tự cache, chuyển màn về không gọi lại
-    const { data: videos = [], isLoading, isError, error, refetch } = useQuery({
-        queryKey: ['videos'],
-        queryFn: async () => {
-            const res = await videoService.getAll();
-            return res.data ?? [];
-        },
-        staleTime: Infinity, // giữ cache mãi, không tự refetch
-    });
+    const {
+        videos,
+        filteredVideos,
+        isLoading,
+        isError,
+        error,
+        refetch,
+        createMutation,
+        updateMutation,
+        deleteMutation,
+    } = useVideoCrudQueries(searchQuery);
 
-    // ✅ Thêm video — xong thì gọi lại API 1 lần để đồng bộ
-    const createMutation = useMutation({
-        mutationFn: (formData) => videoService.create(formData),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['videos'] });
-            alert('Thêm video thành công!');
-            resetForm();
-        },
-        onError: () => alert('Thêm video không thành công!'),
-    });
-
-    // ✅ Sửa video — cập nhật cache trực tiếp, không gọi lại API
-    const updateMutation = useMutation({
-        mutationFn: ({ id, formData }) => videoService.update(id, formData),
-        onSuccess: (_, { id, formData }) => {
-            queryClient.setQueryData(['videos'], (old) =>
-                old.map((v) => v.id === id ? { ...v, ...formData } : v)
-            );
-            alert('Sửa video thành công!');
-            resetForm();
-        },
-        onError: () => alert('Sửa video không thành công!'),
-    });
-
-    // ✅ Xóa video — cập nhật cache trực tiếp, không gọi lại API
-    const deleteMutation = useMutation({
-        mutationFn: (id) => videoService.remove(id),
-        onSuccess: (_, id) => {
-            queryClient.setQueryData(['videos'], (old) =>
-                old.filter((v) => v.id !== id)
-            );
-            alert('Xoá thành công!');
-        },
-        onError: () => alert('Xoá không thành công!'),
-    });
-
-    // ===== Phần còn lại giữ nguyên =====
-
-    const filteredVideos = useMemo(() => {
-        const query = searchQuery.trim().toLowerCase();
-        if (!query) return videos;
-        return videos.filter((video) =>
-            [video.title, video.linkVideo, video.thumbnailUrl].some((value) =>
-                value.toLowerCase().includes(query)
-            )
-        );
-    }, [searchQuery, videos]);
-
-    const handleChange = (event) => {
-        const { name, value } = event.target;
-        setFormData((cur) => ({ ...cur, [name]: value }));
-    };
-
-    const resetForm = () => {
-        setFormData(emptyForm);
-        setEditingId(null);
-    };
+    const {
+        isOpen,
+        setIsOpen,
+        reviewContent,
+        setReviewContent,
+        editorRef,
+        isAnalyzing,
+        progressMessage,
+        openModalReview,
+        handleReviewAi,
+        triggerSubmitFromModal,
+        handleCancel,
+    } = useVideoReview();
 
     const handleSubmit = (event) => {
         event.preventDefault();
 
-        const submitter = event.nativeEvent.submitter; // nút vừa được bấm
-        const action = submitter?.value; // hoặc dùng name/value tự đặt
+        const submitter = event.nativeEvent.submitter;
+        const action = submitter?.value;
 
         if (action === 'Review') {
-            openModalReview();
+            openModalReview({ formData, editingId });
             return;
         }
+
         const nextVideo = {
             title: formData.title.trim(),
             linkVideo: formData.linkVideo.trim(),
             thumbnailUrl: formData.thumbnailUrl.trim(),
             review: reviewContent.trim(),
         };
+
         if (!nextVideo.title || !nextVideo.linkVideo || !nextVideo.thumbnailUrl) return;
 
         if (editingId) {
             updateMutation.mutate({ id: editingId, formData: nextVideo });
+            resetForm();
         } else {
             createMutation.mutate(nextVideo);
+            resetForm();
         }
     };
 
@@ -133,13 +87,7 @@ export default function VideoCrud() {
 
     const handleEdit = (video, event) => {
         event?.stopPropagation();
-        setEditingId(video.id);
-        setFormData({
-            title: video.title,
-            linkVideo: video.linkVideo,
-            thumbnailUrl: video.thumbnailUrl,
-            review: video.review || '',
-        });
+        startEdit(video);
     };
 
     const handleDelete = (id) => {
@@ -160,90 +108,7 @@ export default function VideoCrud() {
         );
     }
 
-    const openModalReview = () => {
-        if (!formData.linkVideo || !formData.title || !formData.thumbnailUrl) {
-            return;
-        }
-        else {
-            setIsOpen(true);
-            getReviewContent();
-        }
-    }
-
-    const getReviewContent = () => {
-        if (editingId === null) {
-            setReviewContent("Video chưa được thực hiện đánh giá");
-        } else {
-            setReviewContent(formData.review || "Video chưa được thực hiện đánh giá");
-        }
-    }
-    const handleReviewAi = async () => {
-        setReviewContent(null);
-        const IdvideoYt = getYoutubeVideoId(formData.linkVideo);
-        if (!IdvideoYt) {
-            alert("Link video không hợp lệ. Vui lòng nhập link video YouTube hợp lệ.");
-            return;
-        }
-        const isConfirmed = window.confirm("Bạn có chắc chắn muốn dùng AI để đánh giá video này không?");
-        if (!isConfirmed) return;
-        setIsAnalyzing(true);
-        setProgressMessage("");
-        sseRef.current = reviewService.getReviewsAI(IdvideoYt, {
-            onStep: (data) => {
-                setProgressMessage(data.message);
-            },
-            onResult: (data) => {
-                if (!data || !data.textList || data.textList.errCode !== 0) {
-                    alert("Có lỗi trong quá trình lấy đánh giá từ AI. Vui lòng thử lại sau.");
-                } else {
-                    const newContent = data.textList.message || "Không có đánh giá từ AI";
-                    setReviewContent(newContent);
-                    editorRef.current?.setMarkdown(newContent);
-                }
-                setIsAnalyzing(false);
-                setProgressMessage("");
-            },
-            onError: (err) => {
-                alert(`Lỗi: ${err.message}`);
-                setIsAnalyzing(false);
-                setProgressMessage("");
-            },
-        });
-    };
-    // Lấy id từ link youtube, ví dụ: https://www.youtube.com/watch?v=abc123xyz => abc123xyz
-    const getYoutubeVideoId = (url) => {
-        if (!url) return null;
-
-        const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
-        const match = url.match(regex);
-
-        return match ? match[1] : null;
-    }
-
-    const triggerSubmitFromModal = () => {
-        formRef.current?.requestSubmit(); // sẽ tự động chạy handleSubmit
-        setIsOpen(false); // đóng modal sau khi submit  
-    };
-
-    const handleCancel = () => {
-        if (!sseRef.current) return;
-
-        const isConfirmed = window.confirm(
-            "Bạn có muốn hủy tiến trình đánh giá bằng AI không?"
-        );
-
-        if (isConfirmed) {
-            sseRef.current.cancel();
-            setIsAnalyzing(false);
-
-        }
-    };
-
     return (
-        console.log("reviewContent", reviewContent),
-        // console.log("videos:", videos),
-        // console.log("check editingId:", editingId),
-
         <div className="home-container">
             <Header
                 onSearch={(query) => setSearchQuery(query)}
@@ -252,7 +117,7 @@ export default function VideoCrud() {
             />
             {/* //modal review */}
             <ModalReview isOpen={isOpen} onClose={() => { setIsOpen(false); setReviewContent(null); }}
-                onReviewAi={() => handleReviewAi()} onSave={() => triggerSubmitFromModal()}
+                onReviewAi={() => handleReviewAi({ formData })} onSave={() => triggerSubmitFromModal(formRef)}
                 isAnalyzing={isAnalyzing} progressMessage={progressMessage} onCancel={handleCancel}>
                 <EditReview ref={editorRef}
                     markdown={reviewContent} onChange={setReviewContent} />

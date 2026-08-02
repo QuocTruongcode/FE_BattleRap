@@ -1,0 +1,7 @@
+/* Chỉ áp dụng flex layout cho .main-area khi nó nằm trong page này */
+.crud-knowledge-graph-page .main-area {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    align-items: stretch;
+}

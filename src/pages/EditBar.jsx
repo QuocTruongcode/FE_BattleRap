@@ -210,6 +210,9 @@ export default function EditBar() {
     // ── Render ────────────────────────────────────────────────────────────────
     return (
         console.log("Check pendingBars:", pendingBars),
+        console.log("Check all quẻy Key",
+            queryClient.getQueryCache().getAll().map(q => q.queryKey)
+        ),
         <div className="edit-bar-page">
             {/* Top bar */}
             <div className="edit-bar-topbar">

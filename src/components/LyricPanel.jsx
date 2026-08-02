@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
+import styles from './LyricPanel.module.css';
 
 export default function LyricPanel({ lyrics, currentTime, selectedId, onSelectLine }) {
     const activeRef = useRef(null);
-
 
     const getActiveLine = () => {
         for (let i = lyrics.length - 1; i >= 0; i--) {
@@ -13,11 +13,9 @@ export default function LyricPanel({ lyrics, currentTime, selectedId, onSelectLi
 
     const activeId = getActiveLine();
 
-    // Auto-scroll đến dòng đang phát
     useEffect(() => {
         activeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, [activeId]);
-
 
     const formatTime = (seconds) => {
         const m = Math.floor(seconds / 60);
@@ -26,24 +24,23 @@ export default function LyricPanel({ lyrics, currentTime, selectedId, onSelectLi
     };
 
     return (
-        console.log(':', currentTime),
-        <div className="lyric-section">
-            <div className="lyric-header">Lyric</div>
-            <div className="lyric-list">
+        <div className={styles.lyricSection}>
+            <div className={styles.lyricHeader}>Lyric</div>
+            <div className={styles.lyricList}>
                 {lyrics.map((line) => (
                     <div
                         key={line.id}
                         ref={line.id === activeId ? activeRef : null}
                         className={[
-                            'lyric-line',
-                            line.id === activeId ? 'active' : '',
-                            line.id === selectedId ? 'selected' : '',
-                            line.explanation ? 'has-note' : '',
+                            styles.lyricLine,
+                            line.id === activeId ? styles.active : '',
+                            line.id === selectedId ? styles.selected : '',
+                            line.explanation ? styles.hasNote : '',
                         ].join(' ')}
                         onClick={() => onSelectLine(line)}
                     >
-                        <span className="lyric-time">{formatTime(line.time)}</span>
-                        <span className="lyric-content">{line.content}</span>
+                        <span className={styles.lyricTime}>{formatTime(line.time)}</span>
+                        <span className={styles.lyricContent}>{line.content}</span>
                     </div>
                 ))}
             </div>

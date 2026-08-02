@@ -39,7 +39,7 @@ function getErrorMessage(error) {
 }
 
 export async function apiRequest(path, options = {}) {
-    const { method = 'GET', body, headers = {}, timeout = 10000 } = options;
+    const { method = 'GET', body, headers = {}, timeout = 10000, params, signal } = options;
 
     try {
         const response = await apiClient.request({
@@ -51,6 +51,7 @@ export async function apiRequest(path, options = {}) {
             },
             timeout,
             data: body === undefined ? undefined : body,
+            params, signal,
         });
 
         return response.data;
@@ -175,9 +176,22 @@ export const reviewService = {
     },
 };
 
+
+// services/api.js
+export const searchService = {
+    search(keyword, { signal } = {}) {
+        return apiRequest('/api/search', {
+            method: 'GET',
+            params: { keyword },
+            signal,
+        });
+    },
+};
+
 export default {
     apiRequest,
     videoService,
     barService,
     reviewService,
+    searchService
 };
