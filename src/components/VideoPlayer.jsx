@@ -1,10 +1,11 @@
-import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
-
-const VideoPlayer = forwardRef(function VideoPlayer({ videoUrl, onTimeUpdate }, ref) {
+import { useEffect, useRef, forwardRef, useImperativeHandle, memo, useState } from 'react';
+import VideoStage from './VideoStage';
+const VideoPlayer = forwardRef(function VideoPlayer({ videoUrl, onTimeUpdate, children }, ref) {
+    const [isPlaying, setIsPlaying] = useState(false); // local, không cần đẩy ra ngoài
     const playerRef = useRef(null);
     const intervalRef = useRef(null);
     const onTimeUpdateRef = useRef(onTimeUpdate);
-
+    const stageRef = useRef(null);
     useEffect(() => {
         onTimeUpdateRef.current = onTimeUpdate;
     }, [onTimeUpdate]);
@@ -14,7 +15,16 @@ const VideoPlayer = forwardRef(function VideoPlayer({ videoUrl, onTimeUpdate }, 
             if (playerRef.current && typeof playerRef.current.seekTo === 'function') {
                 playerRef.current.seekTo(time, true);
             }
-        }
+        },
+        // requestFullscreen: () => stageRef.current?.requestFullscreen(),
+        togglePlay: () => {
+            if (!playerRef.current) return;
+            if (isPlaying) {
+                playerRef.current.pauseVideo();
+            } else {
+                playerRef.current.playVideo();
+            }
+        },
     }));
 
     function getYoutubeId(url) {
@@ -51,25 +61,33 @@ const VideoPlayer = forwardRef(function VideoPlayer({ videoUrl, onTimeUpdate }, 
                     controls: 1,
                     rel: 0,
                     modestbranding: 1,
+                    fs: 0,
                 },
                 events: {
                     onReady: (e) => {
                         console.log('YouTube Player ready ✅', e.target);
                     },
                     onStateChange: (e) => {
-                        if (e.data === window.YT.PlayerState.PLAYING) {
-                            clearInterval(intervalRef.current);
-                            intervalRef.current = setInterval(() => {
-                                if (
-                                    playerRef.current &&
-                                    typeof playerRef.current.getCurrentTime === 'function'
-                                ) {
-                                    const time = playerRef.current.getCurrentTime();
-                                    onTimeUpdateRef.current?.(time);
-                                }
-                            }, 100);
-                        } else {
-                            clearInterval(intervalRef.current);
+                        switch (e.data) {
+                            case window.YT.PlayerState.PLAYING:
+                                clearInterval(intervalRef.current);
+                                intervalRef.current = setInterval(() => {
+                                    if (playerRef.current?.getCurrentTime) {
+                                        onTimeUpdateRef.current?.(playerRef.current.getCurrentTime());
+                                    }
+                                }, 100);
+                                setIsPlaying(true);
+                                break;
+
+                            case window.YT.PlayerState.PAUSED:
+                            case window.YT.PlayerState.ENDED:
+                                clearInterval(intervalRef.current);
+                                setIsPlaying(false);
+                                break;
+
+                            default:
+                                clearInterval(intervalRef.current);
+                                break;
                         }
                     },
                 },
@@ -97,10 +115,16 @@ const VideoPlayer = forwardRef(function VideoPlayer({ videoUrl, onTimeUpdate }, 
     }, [videoUrl]);
 
     return (
-        <div className="video-area" style={{ width: '100%', aspectRatio: '16/9' }}>
-            <div id="yt-player" style={{ width: '100%', height: '100%' }} />
-        </div>
+        <VideoStage
+            ref={stageRef}
+            playerNode={<div id="yt-player" style={{ width: '100%', height: '100%' }}
+            />}
+            isPlaying={isPlaying}
+
+        >
+            {children}
+        </VideoStage>
     );
 });
 
-export default VideoPlayer;
+export default memo(VideoPlayer);

@@ -3,6 +3,7 @@ import { useState } from 'react';
 export const emptyForm = {
     title: '',
     linkVideo: '',
+    linkBunny: '',
     thumbnailUrl: '',
     review: '',
 };
@@ -26,6 +27,7 @@ export function useVideoCrudForm() {
         setFormData({
             title: video.title,
             linkVideo: video.linkVideo,
+            linkBunny: video.linkBunny || '',
             thumbnailUrl: video.thumbnailUrl,
             review: video.review || '',
         });

@@ -1,0 +1,171 @@
+/* =========================================================
+   REACTION BAR
+   ========================================================= */
+
+/* ---- 1. Container mặc định (không fullscreen) ---- */
+.reactionBar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: auto;
+    bottom: auto;
+    margin: 0;
+    width: 11vw;
+    height: 100vh;
+    border: none;
+    display: flex;
+    justify-content: center;
+    background: #020202;
+    color: #f4f0f0;
+    z-index: 1000;
+
+    
+}
+
+/* ---- 2. Container khi .video-area đang fullscreen ---- */
+.video-area--fs .reactionBar {
+    position: fixed;
+    inset: 7vh 0 auto auto;
+    width: 10vw;
+    min-width: 170px;
+    height: 100vh;  
+    border: none;
+    background: linear-gradient(
+        to left,
+        rgba(17, 19, 24, 0.55) 0%,
+        rgba(17, 19, 24, 0.25) 60%,
+        rgba(17, 19, 24, 0) 100%
+    );
+    box-shadow: none;
+    z-index: 1000;
+    pointer-events: none; /* nền trong suốt, không chặn click */
+}
+
+/* ---- 3. Danh sách button ---- */
+.reactionBar__list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    padding: 24px 12px;
+    pointer-events: none; /* khoảng gap giữa các nút cũng xuyên click được */
+}
+
+/* ---- 4. Từng button ---- */
+.reactionBar__item {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 18px 10px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(6px); /* hiệu ứng kính mờ */
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    pointer-events: auto; /* nút luôn click được, kể cả khi cha là pointer-events:none */
+    transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+
+        /* 👇 thêm mới: chuẩn bị chỗ cho viền sáng chạy vòng */
+    position: relative;
+    isolation: isolate; /* để ::before không bị các layer khác đè lên sai lớp */
+}
+
+/* Trong fullscreen, mỗi nút vẫn phải giữ nền kính mờ + click được */
+.video-area--fs .reactionBar__item {
+    pointer-events: auto;
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(6px);
+}
+
+/* Lớp viền sáng chạy vòng — dùng conic-gradient xoay + mask để chỉ hiện viền, không lấp đầy */
+.reactionBar__item::before {
+    content: '';
+    position: absolute;
+    inset: -2px; /* độ dày viền nhô ra ngoài */
+    border-radius: inherit;
+    padding: 2px; /* độ dày viền thực tế */
+    background: conic-gradient(
+        from var(--angle, 0deg),
+        transparent 0%,
+        transparent 60%,
+        #58d6b0 75%,
+        #ffffff 82%,
+        #58d6b0 89%,
+        transparent 100%
+    );
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    animation: reactionBar-spin 2.5s linear infinite;
+    pointer-events: none;
+}
+
+
+.reactionBar__item:hover,
+.reactionBar__item:focus-visible,
+.reactionBar__item--active {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.28);
+    outline: none;
+    /* glow toả sáng ra ngoài viền */
+    box-shadow:
+        0 0 12px rgba(88, 214, 176, 0.45),
+        0 0 24px rgba(88, 214, 176, 0.25),
+        0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+.reactionBar__item:hover::before,
+.reactionBar__item:focus-visible::before,
+.reactionBar__item--active::before {
+    opacity: 1;
+}
+
+/* Đăng ký custom property để trình duyệt biết nội suy góc quay mượt (bắt buộc cho animation ở trên) */
+@property --angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+}
+
+@keyframes reactionBar-spin {
+    to {
+        --angle: 360deg;
+    }
+}
+
+/* ---- 5. Icon & label bên trong button ---- */
+.reactionBar__icon {
+    font-size: 2.4rem;
+    line-height: 1;
+}
+
+.reactionBar__label {
+    font-size: 0.96rem;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+/* ---- 6. Đường kẻ phân cách giữa các nhóm button ---- */
+.reactionBar__divider {
+    width: 60%;
+    height: 1px;
+    margin: 8px 0;
+    background: rgba(255, 255, 255, 0.16);
+    pointer-events: none;
+}

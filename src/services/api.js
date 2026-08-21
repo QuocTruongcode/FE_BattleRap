@@ -188,10 +188,38 @@ export const searchService = {
     },
 };
 
+export const barReactoin = {
+    create(payload) {
+        return apiRequest('/api/bar-reactions', {
+            method: 'POST',
+            body: payload,
+        });
+    },
+
+    update(id, payload) {
+        return apiRequest(`/api/bar-reactions/${id}`, {
+            method: 'PUT',
+            body: payload,
+        });
+    },
+
+    deleteBarReaction(id) {
+        return apiRequest(`/api/bar-reactions/${id}`, {
+            method: 'DELETE',
+        });
+    },
+    deleteAllBarReactionsByVideoId(id) {
+        return apiRequest(`/api/bar-reactions/video/${id}`, {
+            method: 'DELETE',
+        });
+    },
+};
+
 export default {
     apiRequest,
     videoService,
     barService,
     reviewService,
-    searchService
+    searchService,
+    barReactoin
 };

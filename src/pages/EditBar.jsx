@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import './EditBar.css';
 import VideoPlayer from '../components/VideoPlayer';
+import BunnyPlayer from '../components/BunnyPlayer';
 import { videoService, barService } from '../services/api';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, useCallback, useRef } from 'react';
@@ -209,10 +210,10 @@ export default function EditBar() {
 
     // ── Render ────────────────────────────────────────────────────────────────
     return (
-        console.log("Check pendingBars:", pendingBars),
-        console.log("Check all quẻy Key",
-            queryClient.getQueryCache().getAll().map(q => q.queryKey)
-        ),
+        // console.log("Check pendingBars:", pendingBars),
+        // console.log("Check all quẻy Key",
+        //     queryClient.getQueryCache().getAll().map(q => q.queryKey)
+        // ),
         <div className="edit-bar-page">
             {/* Top bar */}
             <div className="edit-bar-topbar">
@@ -255,11 +256,19 @@ export default function EditBar() {
             <div className="edit-bar-layout">
                 {/* Cột trái: video + input */}
                 <div className="edit-bar-left">
-                    <VideoPlayer
-                        ref={videoPlayerRef}
-                        videoUrl={video?.linkVideo}
-                        onTimeUpdate={handleTimeUpdate}
-                    />
+                    {video?.linkBunny ? (
+                        <BunnyPlayer
+                            ref={videoPlayerRef}
+                            videoUrl={video.linkBunny}
+                            onTimeUpdate={handleTimeUpdate}
+                        />
+                    ) : (
+                        <VideoPlayer
+                            ref={videoPlayerRef}
+                            videoUrl={video?.linkVideo}
+                            onTimeUpdate={handleTimeUpdate}
+                        />
+                    )}
                     <BarInputPanel
                         currentTime={currentTime}
                         editingBar={editingBar}

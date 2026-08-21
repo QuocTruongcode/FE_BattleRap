@@ -1,27 +1,35 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import {
     useParams,
     useNavigate
 } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import VideoPlayer from '../components/VideoPlayer';
+import BunnyPlayer from '../components/BunnyPlayer';
 import LyricPanel from '../components/LyricPanel';
 import ExplanationPanel from '../components/ExplanationPanel';
 import { videoService, barService } from '../services/api';
+import '../components/LyricsPanel.css';
 import './VideoWatch.css';
-
-
+import ReactionBar from '../components/ReactionBar';
+import VideoStage from '../components/VideoStage';
 
 export default function VideoWatch() {
-    const [currentTime, setCurrentTime] = useState(0);
+    const currentTimeRef = useRef(0);
     const [selectedLine, setSelectedLine] = useState(null);
+    const [selectedReactionID, setSelectedReactionID] = useState(null);
+    const [selectedReactionsByLine, setSelectedReactionsByLine] = useState({});
 
+    const activeLineIdRef = useRef(null);
+    const playerRef = useRef(null);
     const { videoId } = useParams();
     const navigate = useNavigate();
 
-    const handleTimeUpdate = (time) => {
-        setCurrentTime(time);
-    };
+    const handleTimeUpdate = useCallback((time) => {
+        currentTimeRef.current = time; // ghi liên tục mỗi 100ms, KHÔNG re-render
+    }, []);
+
+    const getCurrentTime = useCallback(() => currentTimeRef.current, []); // 👈 hàm "cửa sổ" để đọc ref từ bên ngoài
 
     const handleSelectLine = (line) => {
         setSelectedLine(line);
@@ -76,28 +84,63 @@ export default function VideoWatch() {
         staleTime: 2 * 60 * 1000,
     });
 
+    const handleSpaceKey = () => {
+        playerRef.current?.togglePlay();
+    };
+
+    const handleSelectReaction = (reactionId) => {
+        const lineId = activeLineIdRef.current;
+        if (!lineId) return;
+
+        setSelectedReactionsByLine(prev => ({
+            ...prev,
+            [lineId]: reactionId,
+        }));
+        setSelectedReactionID(reactionId);
+    };
+
     return (
-        console.log('VideoWatch render with savedBars:', savedBars),
+        // console.log("Check line active id: ", activeLineIdRef.current),
+        console.log("Check selectedReactionsByLine: ", selectedReactionsByLine),
         <div className="watch-page">
             {/* 
-            <button onClick={() => navigate(-1)}>
-                ← Back
-            </button> */}
+                <button onClick={() => navigate(-1)}>
+                    ← Back
+                </button> */}
 
             <div className="watch-main">
 
-                <VideoPlayer
-                    // videoId={videoId}
-                    videoUrl={video?.linkVideo}
-                    onTimeUpdate={handleTimeUpdate}
-                />
+                {video?.linkBunny ? (
+                    <BunnyPlayer
+                        ref={playerRef}
+                        videoUrl={video.linkBunny}
+                        onTimeUpdate={handleTimeUpdate}
+                    >
+                        <ReactionBar onSpaceKey={handleSpaceKey} onSelect={handleSelectReaction} />
+
+                    </BunnyPlayer>
+                ) : (
+                    <VideoPlayer
+                        ref={playerRef}
+                        videoUrl={video?.linkVideo}
+                        onTimeUpdate={handleTimeUpdate}
+                    >
+                        <ReactionBar onSpaceKey={handleSpaceKey} onSelect={handleSelectReaction} />
+                    </VideoPlayer>
+                )}
 
                 <LyricPanel
                     lyrics={savedBars}
-                    currentTime={currentTime}
-                    selectedId={selectedLine?.id}
+                    getCurrentTime={getCurrentTime}
+                    // selectedId={selectedLine?.id}
                     onSelectLine={handleSelectLine}
+                    usePlainCss
+                    onActiveLineChange={(id) => { activeLineIdRef.current = id; }}
+                    selectedReactionID={selectedReactionID}
+                    activeLineId={activeLineIdRef.current}
+                    selectedReactionsByLine={selectedReactionsByLine}
                 />
+
 
             </div>
 
@@ -105,6 +148,7 @@ export default function VideoWatch() {
                 line={selectedLine}
                 onClose={() => setSelectedLine(null)}
             />
+
 
         </div>
     );

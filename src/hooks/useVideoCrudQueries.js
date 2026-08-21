@@ -56,7 +56,7 @@ export function useVideoCrudQueries(searchQuery) {
         if (!query) return videos;
 
         return videos.filter((video) =>
-            [video.title, video.linkVideo, video.thumbnailUrl].some((value) =>
+            [video.title, video.linkVideo, video.linkBunny, video.thumbnailUrl].some((value) =>
                 value?.toLowerCase().includes(query)
             )
         );

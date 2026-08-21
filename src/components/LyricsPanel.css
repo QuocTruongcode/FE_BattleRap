@@ -42,7 +42,7 @@
     border-radius: 8px;
 
     /* Trạng thái mặc định: dòng chưa tới hoặc đã qua */
-    opacity: 0.35;
+    /* opacity: 0.95; */
     transform: scale(0.92);
     filter: blur(0.3px);
 

@@ -1,0 +1,62 @@
+.video-area {
+  position: relative; 
+  width: 100%;
+  
+}
+
+/* Default 16:9 aspect ratio */
+.video-area--16-9 {
+  aspect-ratio: 16/9;
+}
+
+/* Fullscreen: allow natural sizing */
+.video-area--fs {
+  aspect-ratio: auto;
+}
+
+.video-stage__fs-btn {
+  position: absolute;
+  bottom: 80px;
+  right: 28px;
+  z-index: 50;
+  color: white;
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  padding: 6px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  cursor: pointer;
+  transition: background 0.12s ease, transform 0.08s ease;
+}
+
+.video-stage__fs-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
+}
+
+.video-stage__fs-btn:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.12);
+  outline-offset: 2px;
+}
+
+.video-stage__fs-btn svg {
+  display: block;
+  color: currentColor;
+}
+
+.video-stage__overlay {
+    /* để children (vốn dùng position: fixed) không bị ảnh hưởng layout */
+    position: absolute;
+    inset: 0;
+    pointer-events: none; /* để lớp overlay không chặn click video/nút fullscreen ở dưới */
+    transition: opacity 0.2s ease;
+}
+
+/* button bên trong ReactionBar vẫn phải click được dù overlay có pointer-events: none */
+.video-stage__overlay > * {
+    pointer-events: auto;
+}

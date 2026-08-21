@@ -64,11 +64,12 @@ export default function VideoCrud() {
         const nextVideo = {
             title: formData.title.trim(),
             linkVideo: formData.linkVideo.trim(),
+            linkBunny: formData.linkBunny.trim(),
             thumbnailUrl: formData.thumbnailUrl.trim(),
             review: reviewContent.trim(),
         };
 
-        if (!nextVideo.title || !nextVideo.linkVideo || !nextVideo.thumbnailUrl) return;
+        if (!nextVideo.title || !nextVideo.linkVideo || !nextVideo.linkBunny || !nextVideo.thumbnailUrl) return;
 
         if (editingId) {
             updateMutation.mutate({ id: editingId, formData: nextVideo });
@@ -193,11 +194,23 @@ export default function VideoCrud() {
                                 </label>
 
                                 <label>
-                                    <span>LinkVideo</span>
+                                    <span>Link Video</span>
                                     <input
                                         type="url"
                                         name="linkVideo"
                                         value={formData.linkVideo}
+                                        onChange={handleChange}
+                                        placeholder="https://..."
+                                        required
+                                    />
+                                </label>
+
+                                <label>
+                                    <span>Link Bunny</span>
+                                    <input
+                                        type="url"
+                                        name="linkBunny"
+                                        value={formData.linkBunny}
                                         onChange={handleChange}
                                         placeholder="https://..."
                                         required
