@@ -4,15 +4,14 @@ import {
     useNavigate
 } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import VideoPlayer from '../components/VideoPlayer';
-import BunnyPlayer from '../components/BunnyPlayer';
-import LyricPanel from '../components/LyricPanel';
-import ExplanationPanel from '../components/ExplanationPanel';
+import { VideoPlayer, BunnyPlayer } from '../components/video';
+import { LyricPanel } from '../components/bar';
+import { ExplanationPanel } from '../components/review';
 import { videoService, barService } from '../services/api';
-import '../components/LyricsPanel.css';
+import '../components/bar/LyricsPanel.css';
 import './VideoWatch.css';
-import ReactionBar from '../components/ReactionBar';
-import VideoStage from '../components/VideoStage';
+import { ReactionBar } from '../components/bar-reaction';
+import { VideoStage } from '../components/video';
 
 export default function VideoWatch() {
     const currentTimeRef = useRef(0);
@@ -48,7 +47,7 @@ export default function VideoWatch() {
 
                 const res =
                     await videoService.getById(videoId);
-
+                console.log('Video data:', res.data);
                 return res.data;
 
             } catch (err) {

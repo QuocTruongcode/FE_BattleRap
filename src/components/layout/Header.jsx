@@ -1,9 +1,14 @@
 import { useState } from 'react';
 import './Header.css';
-import Logo from '../assets/Logo.jpg'; // Import the logo image
+import Logo from '../../assets/Logo.jpg'; // Import the logo image
+import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function Header({ onSearch, onToggleSidebar, isSidebarCollapsed }) {
     const [searchValue, setSearchValue] = useState('');
+    const navigate = useNavigate();
+
+    const { user } = useAuth();
 
     const handleSearch = (e) => {
         if (e.key === 'Enter' || e.type === 'click') {
@@ -14,6 +19,12 @@ export default function Header({ onSearch, onToggleSidebar, isSidebarCollapsed }
     const handleInputChange = (e) => {
         setSearchValue(e.target.value);
     };
+
+    const handleSwitchPage = () => {
+        navigate('/Login')
+    }
+
+    console.log('Header render, user:', user);
 
     return (
         <header className="header">
@@ -59,23 +70,16 @@ export default function Header({ onSearch, onToggleSidebar, isSidebarCollapsed }
                         </svg>
                     </button>
                 </div>
-                {/* Right Section
+                {/* Right Section */}
                 <div className="header-right">
-                    <button className="icon-button" title="Upload">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M19 14c1.49-1.46 3-3.5 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2 1.51 4.04 3 5.5"></path>
-                        </svg>
+
+                    <h2 className='user-name'>{user?.UserName || 'User'}</h2>
+
+                    <button className="icon-button" onClick={() => handleSwitchPage()}>
+                        Đăng xuất
                     </button>
-                    <button className="icon-button" title="Notifications">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                        </svg>
-                    </button>
-                    <button className="user-avatar" title="Profile">
-                        <img src="https://via.placeholder.com/32" alt="User" />
-                    </button>
-                </div> */}
+
+                </div>
             </div>
         </header>
     );

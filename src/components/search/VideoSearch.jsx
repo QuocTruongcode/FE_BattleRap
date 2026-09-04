@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import './VideoSearch.css';
-import VideoCard from './VideoCard';
-import { searchService } from '../services/api';
+import { VideoCard } from '../video';
+import { searchService } from '../../services/api';
 
 const DEBOUNCE_MS = 300;
 const MIN_LENGTH = 1; // đổi thành 2 nếu bạn muốn gõ tối thiểu 2 ký tự mới search

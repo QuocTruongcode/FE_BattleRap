@@ -1,0 +1,58 @@
+.login-background {
+	--login-background-min-height: 100svh;
+	position: relative;
+	isolation: isolate;
+	display: flex;
+	min-height: var(--login-background-min-height);
+	overflow: hidden;
+	background-color: #080808;
+	background-image: var(--login-background-image);
+	background-position: center;
+	background-size: cover;
+}
+
+.login-background__shade {
+	position: absolute;
+	z-index: -1;
+	inset: 0;
+background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.55) 45%, rgba(0, 0, 0, 0.88) 100%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.45), transparent 50%, rgba(0, 0, 0, 0.45));
+}
+
+.login-background__content {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	width: min(100%, 960px);
+	min-height: var(--login-background-min-height);
+	margin: 0 auto;
+	align-items: center;
+	justify-content: center;
+	padding: 6rem 1.5rem 8rem;
+}
+
+.login-background__edge {
+	position: absolute;
+	z-index: 2;
+	right: -5%;
+	bottom: -4.5rem;
+	left: -5%;
+	height: 15rem;
+	border-top: 4px solid #e50914;
+	border-radius: 50% 50% 0 0 / 40% 40% 0 0;
+	background: #050505;
+	box-shadow: 0 -12px 28px rgba(29, 35, 85, 0.75);
+	transform: rotate(-1deg);
+}
+
+@media (max-width: 600px) {
+	.login-background__content {
+		padding: 5rem 1rem 7rem;
+	}
+
+	.login-background__edge {
+		bottom: -5rem;
+		height: 6.5rem;
+	}
+}

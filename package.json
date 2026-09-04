@@ -11,9 +11,11 @@
   },
   "dependencies": {
     "@mdxeditor/editor": "^4.0.4",
+    "@react-oauth/google": "^0.13.5",
     "@tanstack/react-query": "^5.101.0",
     "@toast-ui/editor": "^3.2.2",
     "axios": "^1.18.1",
+    "jwt-decode": "^4.0.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-icons": "^5.7.0",

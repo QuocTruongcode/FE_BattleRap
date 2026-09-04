@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { redirectToLogin } from '../styles/utils/navigation'; // 👈 file mới, sẽ tạo bên dưới
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '';
 
@@ -9,6 +10,32 @@ const apiClient = axios.create({
     },
     timeout: 10000,
 });
+
+// 👇 Thêm đoạn này
+apiClient.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('token');
+        console.log('Token from localStorage:', token); // Debug: Log the token
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        console.log('Request config:', config);
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
+
+// 👇 THÊM ĐOẠN NÀY — xử lý kiểm tra response và điều hướng
+apiClient.interceptors.response.use(
+    (response) => response, // không lỗi → trả về bình thường
+    (error) => {
+        if (error.response?.status === 401) {
+            localStorage.removeItem('token');
+            redirectToLogin();
+        }
+        return Promise.reject(error); // vẫn ném lỗi ra để apiRequest xử lý message tiếp
+    }
+);
 
 function getErrorMessage(error) {
     if (axios.isAxiosError(error)) {
@@ -215,11 +242,29 @@ export const barReactoin = {
     },
 };
 
+export const authService = {
+    getMe() {
+        return apiRequest('/api/auth/me', {
+            method: 'GET',
+        });
+    },
+};
+
+export const loginService = {
+    loginAsGuest() {
+        return apiRequest('/api/auth/guest', {
+            method: 'POST',
+        });
+    },
+};
+
 export default {
     apiRequest,
     videoService,
     barService,
     reviewService,
     searchService,
-    barReactoin
+    barReactoin,
+    authService,
+    loginService
 };

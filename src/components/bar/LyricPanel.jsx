@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import styles from './LyricPanel.module.css';
-import { REACTIONS_ICONS } from "../constants/const.js";
+import { REACTIONS_ICONS } from "../../constants/const.js";
 
 export default function LyricPanel({ lyrics, getCurrentTime, selectedId, onSelectLine, usePlainCss = false, onActiveLineChange, selectedReactionID, activeLineId, selectedReactionsByLine = {} }) {
     const activeRef = useRef(null);

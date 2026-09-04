@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
-import Sidebar from '../components/Sidebar';
-import ModalReview from '../components/ModalReview';
-import EditReview from '../components/EditReview';
+import { Header, Sidebar } from '../components/layout';
+import { ModalReview, EditReview } from '../components/review';
 import { useVideoCrudForm } from '../hooks/useVideoCrudForm';
 import { useVideoCrudQueries } from '../hooks/useVideoCrudQueries';
 import { useVideoReview } from '../hooks/useVideoReview';

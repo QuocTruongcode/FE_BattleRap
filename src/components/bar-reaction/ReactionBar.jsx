@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, Fragment } from 'react';
 import './ReactionBar.css';
-import { REACTION_KEY_MAP } from '../constants/const.js';
-import { REACTIONS_ICONS } from "../constants/const.js";
+import { REACTION_KEY_MAP } from '../../constants/const.js';
+import { REACTIONS_ICONS } from "../../constants/const.js";
 
 
 const reactions = REACTIONS_ICONS; // sử dụng mảng REACTIONS_ICONS từ const.js

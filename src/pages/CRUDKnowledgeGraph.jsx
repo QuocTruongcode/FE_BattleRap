@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import MainLayout from '../components/MainLayout';
-import VideoSearch from '../components/VideoSearch';
+import { MainLayout } from '../components/layout';
+import { VideoSearch } from '../components/search';
 import { barService, videoService } from '../services/api';
-import LyricPanel from '../components/LyricPanel';
-import Graph from '../components/Graph';
+import { LyricPanel } from '../components/bar';
+import { Graph } from '../components/knowledge-graph';
 import './CRUDKnowledgeGraph.css';
 const LAST_VIDEO_KEY = 'lastVideoId';
 

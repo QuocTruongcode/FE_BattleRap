@@ -9,37 +9,52 @@ import VideoCrud from './pages/VideoCrud'
 import VideoWatch from './pages/VideoWatch'
 import EditBar from './pages/EditBar'
 import CRUDKnowledgeGraph from './pages/CRUDKnowledgeGraph'
+import Login from './pages/Login'
+import { AuthProvider } from './contexts/AuthContext'
+import ProtectedRoute from './components/auth/ProtectedRoute'
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
+      <AuthProvider>          {/* 👈 Thêm vào đây, TRONG BrowserRouter */}
 
-        <Route
-          path="/"
-          element={<Home />}
-        />
+        <Routes>
 
-        <Route
-          path="/crud"
-          element={<VideoCrud />}
-        />
+          <Route
+            path="/"
+            element={<Home />}
+          />
 
-        <Route
-          path="/watch/:videoId"
-          element={<VideoWatch />}
-        />
+          <Route
+            path="/crud"
+            element={
+              <ProtectedRoute allowedRoles={['U0']}>
+                <VideoCrud />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/edit/:videoId"
-          element={<EditBar />}
-        />
+          <Route
+            path="/watch/:videoId"
+            element={<VideoWatch />}
+          />
 
-        <Route
-          path="/knowledgeGraph"
-          element={<CRUDKnowledgeGraph />}
-        />
+          <Route
+            path="/edit/:videoId"
+            element={<EditBar />}
+          />
 
-      </Routes>
+          <Route
+            path="/knowledgeGraph"
+            element={<CRUDKnowledgeGraph />}
+          />
+
+          <Route
+            path="/login"
+            element={<Login />}
+          />
+        </Routes>
+      </AuthProvider>
+
     </BrowserRouter>
   )
 }

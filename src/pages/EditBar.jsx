@@ -1,12 +1,10 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import './EditBar.css';
-import VideoPlayer from '../components/VideoPlayer';
-import BunnyPlayer from '../components/BunnyPlayer';
+import { VideoPlayer, BunnyPlayer } from '../components/video';
 import { videoService, barService } from '../services/api';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, useCallback, useRef } from 'react';
-import BarInputPanel from '../components/BarInputPanel';
-import BarTimeline from '../components/BarTimeline';
+import { BarInputPanel, BarTimeline } from '../components/bar';
 /**
  * EditBar page
  * Layout: 2 cột
