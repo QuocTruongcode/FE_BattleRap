@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import {
     useParams,
     useNavigate
@@ -7,11 +7,13 @@ import { useQuery } from '@tanstack/react-query';
 import { VideoPlayer, BunnyPlayer } from '../components/video';
 import { LyricPanel } from '../components/bar';
 import { ExplanationPanel } from '../components/review';
-import { videoService, barService } from '../services/api';
+import { videoService, barService, barReaction } from '../services/api';
 import '../components/bar/LyricsPanel.css';
 import './VideoWatch.css';
 import { ReactionBar } from '../components/bar-reaction';
 import { VideoStage } from '../components/video';
+import { useAuth } from "../contexts/AuthContext"; // context bạn đang có user, loading
+
 
 export default function VideoWatch() {
     const currentTimeRef = useRef(0);
@@ -34,6 +36,9 @@ export default function VideoWatch() {
         setSelectedLine(line);
     };
 
+    const { user } = useAuth(); // lấy user
+
+
     const {
         data: video,
         isLoading,
@@ -47,7 +52,6 @@ export default function VideoWatch() {
 
                 const res =
                     await videoService.getById(videoId);
-                console.log('Video data:', res.data);
                 return res.data;
 
             } catch (err) {
@@ -83,6 +87,33 @@ export default function VideoWatch() {
         staleTime: 2 * 60 * 1000,
     });
 
+
+    const { data: reactionBarByVideo = [] } = useQuery({
+        queryKey: ['bar-reactions', videoId, user?.userId],
+        queryFn: async () => {
+            if (!user?.userId) return [];
+            const res = await barReaction.getReactionBarByUserAndVideo(user.userId, videoId);
+            return res.data;
+        },
+        enabled: !!user?.userId && !!videoId,
+        staleTime: 2 * 60 * 1000,
+    });
+
+
+
+    // Lưu selectedReactionsByLine vào localStorage mỗi khi nó thay đổi, nhưng chỉ khi user đã đăng nhập
+
+    useEffect(() => {
+        if (!user?.userId) return;
+        if (Object.keys(selectedReactionsByLine).length === 0) return;
+
+        localStorage.setItem(
+            `pending_reactions_${user.userId}`,
+            JSON.stringify(selectedReactionsByLine)
+        );
+    }, [selectedReactionsByLine, user?.userId]);
+    // Kêt thúc useEffect
+
     const handleSpaceKey = () => {
         playerRef.current?.togglePlay();
     };
@@ -99,6 +130,9 @@ export default function VideoWatch() {
     };
 
     return (
+        console.log("Check reactionBarByVideo: ", reactionBarByVideo),
+        console.log("check user: ", user),
+        // console.log("check selectedReactionID: ", selectedReactionID),
         // console.log("Check line active id: ", activeLineIdRef.current),
         console.log("Check selectedReactionsByLine: ", selectedReactionsByLine),
         <div className="watch-page">
@@ -138,6 +172,7 @@ export default function VideoWatch() {
                     selectedReactionID={selectedReactionID}
                     activeLineId={activeLineIdRef.current}
                     selectedReactionsByLine={selectedReactionsByLine}
+                    reactionBarByVideo={reactionBarByVideo}
                 />
 
 

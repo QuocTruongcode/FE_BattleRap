@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header, Sidebar } from '../components/layout';
 import { ModalReview, EditReview } from '../components/review';
@@ -6,12 +6,16 @@ import { useVideoCrudForm } from '../hooks/useVideoCrudForm';
 import { useVideoCrudQueries } from '../hooks/useVideoCrudQueries';
 import { useVideoReview } from '../hooks/useVideoReview';
 import './VideoCrud.css';
-import { useRef } from 'react';
+import { searchBattler, Video_battler } from '../services/api';
+import BattlerTag from '../components/battler/BattlerTag';
 
 export default function VideoCrud() {
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
-    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+    const [battlerSearch, setBattlerSearch] = useState('');
+    const [battlerResults, setBattlerResults] = useState([]);
+    const [selectedBattlers, setSelectedBattlers] = useState([]);
     const formRef = useRef(null);
 
     const {
@@ -67,14 +71,15 @@ export default function VideoCrud() {
             review: reviewContent.trim(),
         };
 
-        if (!nextVideo.title || !nextVideo.linkVideo || !nextVideo.linkBunny || !nextVideo.thumbnailUrl) return;
+
+        if (!nextVideo.title || !nextVideo.linkVideo || !nextVideo.thumbnailUrl) return;
 
         if (editingId) {
             updateMutation.mutate({ id: editingId, formData: nextVideo });
-            resetForm();
+            handleResetForm();
         } else {
             createMutation.mutate(nextVideo);
-            resetForm();
+            handleResetForm();
         }
     };
 
@@ -94,6 +99,153 @@ export default function VideoCrud() {
         deleteMutation.mutate(id);
     };
 
+    const getBattlerId = (battler) => {
+        return battler?.battlerId ?? battler?.BattlerId ?? battler?.BattlerID ?? battler?.battler?.id ?? battler?.Battler?.id ?? battler?.id ?? null;
+    };
+
+    const getVideoBattlerId = (battler) => {
+        return battler?.videoBattlerId ?? battler?.VideoBattlerId ?? battler?.VideoBattlerID ?? battler?.video_battler_id ?? battler?.id ?? null;
+    };
+
+    const normalizeBattler = (battler) => {
+        const rawBattler = battler?.battler || battler?.Battler || battler || {};
+        const battlerId = getBattlerId({ ...rawBattler, ...battler });
+
+        return {
+            ...rawBattler,
+            ...battler,
+            id: battlerId,
+            battlerId,
+        };
+    };
+
+    const resetBattlerState = () => {
+        setBattlerSearch('');
+        setBattlerResults([]);
+        setSelectedBattlers([]);
+    };
+
+    const handleResetForm = () => {
+        resetForm();
+        resetBattlerState();
+    };
+
+    const handleBattlerSelect = async (battler) => {
+        if (!editingId) return;
+
+        const battlerId = getBattlerId(battler);
+        if (!battlerId) return;
+
+        try {
+            const created = await Video_battler.create({
+                videoID: editingId,
+                battlerID: battlerId,
+            });
+
+            const createdRecord = created?.data ?? created;
+            const nextBattler = normalizeBattler({
+                ...battler,
+                ...createdRecord,
+                battlerId,
+                videoBattlerId: createdRecord?.id ?? createdRecord?.videoBattlerId ?? createdRecord?.VideoBattlerId ?? createdRecord?.video_battler_id ?? null,
+            });
+
+            setSelectedBattlers((current) => {
+                const exists = current.some((item) => getBattlerId(item) === String(battlerId));
+                if (exists) return current;
+
+                return [...current, nextBattler];
+            });
+        } catch (error) {
+            console.error('Create video battler error:', error);
+        }
+    };
+
+    const handleBattlerRemove = async (battler) => {
+        if (!editingId) return;
+
+        const battlerId = getBattlerId(battler);
+        if (!battlerId) return;
+
+        const previousSelected = selectedBattlers;
+        const normalizedBattlerId = String(battlerId);
+
+        setSelectedBattlers((current) =>
+            current.filter((item) => String(getBattlerId(item) ?? '') !== normalizedBattlerId)
+        );
+
+        try {
+            await Video_battler.remove(editingId, battlerId);
+        } catch (error) {
+            console.error('Remove video battler error:', error);
+            setSelectedBattlers(previousSelected);
+            alert('Xóa battler khỏi video thất bại. Vui lòng thử lại.');
+        }
+    };
+
+    useEffect(() => {
+        if (!editingId) {
+            setSelectedBattlers([]);
+            return;
+        }
+
+        let isMounted = true;
+
+        Video_battler.getBattlerByVideoId(editingId)
+            .then((result) => {
+                const list = Array.isArray(result?.data)
+                    ? result.data
+                    : Array.isArray(result)
+                        ? result
+                        : [];
+
+                if (!isMounted) return;
+
+                const normalized = list.map((item) => {
+                    const battler = item?.battler || item?.Battler || item;
+                    return normalizeBattler({ ...battler, ...item, battlerId: battler?.id ?? item?.battlerId ?? item?.BattlerId ?? item?.BattlerID });
+                });
+
+                setSelectedBattlers(normalized.slice(0, 2));
+            })
+            .catch((error) => {
+                console.error('Get battlers by video error:', error);
+                if (isMounted) setSelectedBattlers([]);
+            });
+
+        return () => {
+            isMounted = false;
+        };
+    }, [editingId]);
+
+    useEffect(() => {
+        const keyword = battlerSearch.trim();
+
+        if (!keyword) {
+            setBattlerResults([]);
+            return;
+        }
+
+        const timer = setTimeout(() => {
+            searchBattler
+                .search(keyword)
+                .then((result) => {
+                    const list = Array.isArray(result?.data)
+                        ? result.data
+                        : Array.isArray(result)
+                            ? result
+                            : [];
+                    setBattlerResults(list);
+                })
+                .catch((error) => {
+                    console.error('Search battler error:', error);
+                    setBattlerResults([]);
+                });
+        }, 400);
+
+        return () => clearTimeout(timer);
+    }, [battlerSearch]);
+
     if (isLoading) return <div>Đang tải...</div>;
 
     if (isError) {
@@ -108,6 +260,7 @@ export default function VideoCrud() {
     }
 
     return (
+        console.log("Editing ID:", editingId),
         <div className="home-container">
             <Header
                 onSearch={(query) => setSearchQuery(query)}
@@ -163,7 +316,7 @@ export default function VideoCrud() {
                                 </div>
 
                                 {editingId ? (
-                                    <button type="button" className="secondary-button" onClick={resetForm}>
+                                    <button type="button" className="secondary-button" onClick={handleResetForm}>
                                         Hủy sửa
                                     </button>
                                 ) : null}
@@ -211,7 +364,6 @@ export default function VideoCrud() {
                                         value={formData.linkBunny}
                                         onChange={handleChange}
                                         placeholder="https://..."
-                                        required
                                     />
                                 </label>
 
@@ -232,14 +384,78 @@ export default function VideoCrud() {
                                         {editingId ? 'Cập nhật video' : 'Thêm video'}
                                     </button>
 
-                                    <button type="button" className="ghost-button" onClick={resetForm}>
+                                    <button type="button" className="ghost-button" onClick={handleResetForm}>
                                         Làm mới
                                     </button>
 
-                                    <button type="submit" value="Review" className="ghost-button">
+                                    <button type="submit" value="Review" className="ghost-button-review">
                                         Review
                                     </button>
                                 </div>
+
+                                {editingId ? (
+                                    <>
+                                        <div className="battler-search-row">
+                                            <div className="battler-search-field">
+                                                <label>
+                                                    <span>Search Battler</span>
+                                                    <input
+                                                        type="text"
+                                                        value={battlerSearch}
+                                                        onChange={(event) => setBattlerSearch(event.target.value)}
+                                                        placeholder="Nhập tên battler..."
+                                                    />
+                                                </label>
+
+                                                <div className="battler-tag-result">
+                                                    {battlerResults.length > 0 ? (
+                                                        battlerResults.map((battler) => (
+                                                            <BattlerTag
+                                                                key={getBattlerId(battler) ?? `${battler.FullName}-${battler.RapName}`}
+                                                                image={battler.image}
+                                                                alt={battler.FullName || 'Battler'}
+                                                                type="Battler"
+                                                                title={battler.RapName || 'Unnamed battler'}
+                                                                artist={battler.FullName || 'Unknown name'}
+                                                                meta="Battler search result"
+                                                                description={battler.Describe || 'Chưa có mô tả'}
+                                                                onClick={() => handleBattlerSelect(battler)}
+                                                            />
+                                                        ))
+                                                    ) : (
+                                                        <div className="battler-tag-empty">
+                                                            <p>Nhập tên battler để tìm kiếm.</p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="battler-selected-stack">
+                                            <p className="panel-kicker">Selected battlers</p>
+                                            {selectedBattlers.length > 0 ? (
+                                                selectedBattlers.map((battler) => (
+                                                    <BattlerTag
+                                                        key={getBattlerId(battler) ?? `${battler.FullName}-${battler.RapName}`}
+                                                        image={battler.image}
+                                                        alt={battler.FullName || 'Battler'}
+                                                        type="Battler"
+                                                        title={battler.RapName || 'Unnamed battler'}
+                                                        artist={battler.FullName || 'Unknown name'}
+                                                        meta="Video battler"
+                                                        description={battler.Describe || 'Chưa có mô tả'}
+                                                        showRemoveButton
+                                                        onRemove={() => handleBattlerRemove(battler)}
+                                                    />
+                                                ))
+                                            ) : (
+                                                <div className="battler-tag-empty">
+                                                    <p>Chưa có battler nào được gắn với video này.</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </>
+                                ) : null}
                             </form>
                         </section>
 

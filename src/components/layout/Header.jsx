@@ -24,7 +24,7 @@ export default function Header({ onSearch, onToggleSidebar, isSidebarCollapsed }
         navigate('/Login')
     }
 
-    console.log('Header render, user:', user);
+    // console.log('Header render, user:', user);
 
     return (
         <header className="header">

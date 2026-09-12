@@ -69,15 +69,15 @@
 
 .crud-layout {
   display: grid;
-  grid-template-columns: minmax(320px, 380px) minmax(0, 1fr);
-  gap: var(--spacing-24);
+  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+  gap: var(--spacing-20);
   align-items: start;
 }
 
 .crud-panel {
-  padding: var(--spacing-24);
+  padding: 20px;
   border: 1px solid var(--color-border-light);
-  border-radius: 24px;
+  border-radius: 20px;
   background: rgba(255, 255, 255, 0.94);
   box-shadow: var(--shadow-lg);
   backdrop-filter: blur(10px);
@@ -117,12 +117,12 @@
 
 .crud-form {
   display: grid;
-  gap: var(--spacing-16);
+  gap: var(--spacing-12);
 }
 
 .crud-form label {
   display: grid;
-  gap: var(--spacing-8);
+  gap: var(--spacing-6);
 }
 
 .crud-form span {
@@ -133,9 +133,9 @@
 
 .crud-form input {
   width: 100%;
-  padding: 14px 16px;
+  padding: 11px 12px;
   border: 1px solid var(--color-border);
-  border-radius: 14px;
+  border-radius: 12px;
   background: var(--color-bg-primary);
   color: var(--color-text-primary);
   transition: border-color var(--transition-base), box-shadow var(--transition-base);
@@ -154,9 +154,71 @@
   flex-wrap: wrap;
 }
 
+.battler-search-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-10);
+  margin-top: var(--spacing-4);
+  align-items: start;
+}
+
+.battler-search-field {
+  display: grid;
+  gap: var(--spacing-6);
+  min-width: 0;
+}
+
+.battler-search-field span {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.battler-search-field input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  box-sizing: border-box;
+}
+
+.battler-tag-result {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-top: 12px;
+  min-width: 0;
+}
+
+.battler-selected-stack {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.battler-tag-empty {
+  border: 1px dashed var(--color-border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: rgba(148, 163, 184, 0.04);
+  color: var(--color-text-secondary);
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+}
+
+.battler-tag-empty p {
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+
 .primary-button,
 .secondary-button,
 .ghost-button,
+.ghost-button-review,
 .danger-button {
   display: inline-flex;
   align-items: center;
@@ -181,6 +243,12 @@
 .ghost-button {
   background: transparent;
   color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+}
+
+.ghost-button-review {
+  background-color: rgb(5, 211, 5);
+  color: white;
   border: 1px solid var(--color-border);
 }
 

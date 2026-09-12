@@ -28,6 +28,7 @@ export default function EditBar() {
     const [editingBar, setEditingBar] = useState(null);   // bar đang sửa
     const [pendingBars, setPendingBars] = useState([]);   // bars chưa lưu (local)
     const [lastSavedAt, setLastSavedAt] = useState(null);
+    const [battlerIDSelected, setBattlerIDSelected] = useState(null);
 
     // ── Query: video ──────────────────────────────────────────────────────────
     const { data: video, isLoading: videoLoading } = useQuery({
@@ -84,16 +85,19 @@ export default function EditBar() {
     }, []);
 
     // Thêm bar mới → vào pendingBars
-    const handleAddBar = useCallback(({ time, content }) => {
+    const handleAddBar = useCallback(({ time, content, battlerId, barttelID }) => {
+        const resolvedBarttelID = barttelID ?? battlerId ?? battlerIDSelected;
         const newBar = {
             id: `pending_${Date.now()}`,
             time,
             content,
             isPending: true,
             videoId: videoId,
+            battlerId: resolvedBarttelID ?? null,
+            barttelID: resolvedBarttelID ?? null,
         };
         setPendingBars(prev => [...prev, newBar]);
-    }, []);
+    }, [videoId, battlerIDSelected]);
 
     const handleEdit = useCallback((bar) => {
         setEditingBar(bar);
@@ -101,15 +105,22 @@ export default function EditBar() {
     }, []);
 
     // Cập nhật bar (từ edit flow) → update trong đúng list
-    const handleUpdateBar = useCallback(async ({ id, time, content }) => {
+    const handleUpdateBar = useCallback(async ({ id, time, content, battlerId, barttelID }) => {
         const isSaved = savedBars.some(b => b.id === id);
+        const resolvedBarttelID = barttelID ?? battlerId ?? battlerIDSelected;
+
         if (isSaved) {
             try {
-                const res = await barService.update(id, { startTime: time, content, videoId: videoId });
+                const res = await barService.update(id, {
+                    startTime: time,
+                    content,
+                    videoId: videoId,
+                    barttelID: resolvedBarttelID ?? null,
+                });
                 console.log("API update result:", res);
                 // Cập nhật trực tiếp cache, không cần gọi lại API
                 queryClient.setQueryData(['bars', videoId], (oldData = []) =>
-                    oldData.map(b => b.id === id ? { ...b, time, content } : b)
+                    oldData.map(b => b.id === id ? { ...b, time, content, barttelID: resolvedBarttelID ?? b.barttelID ?? null } : b)
                 );
 
             } catch (error) {
@@ -119,11 +130,11 @@ export default function EditBar() {
 
         } else {
             setPendingBars(prev =>
-                prev.map(b => b.id === id ? { ...b, time, content } : b)
+                prev.map(b => b.id === id ? { ...b, time, content, barttelID: resolvedBarttelID ?? b.barttelID ?? null, battlerId: resolvedBarttelID ?? b.battlerId ?? null } : b)
             );
         }
         setEditingBar(null);
-    }, [savedBars, videoId, queryClient]);
+    }, [savedBars, videoId, queryClient, battlerIDSelected]);
 
     // Xoá  
     const handleDelete = useCallback(async (id) => {
@@ -212,6 +223,7 @@ export default function EditBar() {
         // console.log("Check all quẻy Key",
         //     queryClient.getQueryCache().getAll().map(q => q.queryKey)
         // ),
+        console.log("battlerIDSelected: ", battlerIDSelected),
         <div className="edit-bar-page">
             {/* Top bar */}
             <div className="edit-bar-topbar">
@@ -273,6 +285,8 @@ export default function EditBar() {
                         onAddBar={handleAddBar}
                         onUpdateBar={handleUpdateBar}
                         onCancelEdit={() => setEditingBar(null)}
+                        videoId={videoId}
+                        onBattlerChange={setBattlerIDSelected}
                     />
                 </div>
 

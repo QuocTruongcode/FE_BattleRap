@@ -2,7 +2,9 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import styles from './LyricPanel.module.css';
 import { REACTIONS_ICONS } from "../../constants/const.js";
 
-export default function LyricPanel({ lyrics, getCurrentTime, selectedId, onSelectLine, usePlainCss = false, onActiveLineChange, selectedReactionID, activeLineId, selectedReactionsByLine = {} }) {
+export default function LyricPanel({ lyrics, getCurrentTime, selectedId,
+    onSelectLine, usePlainCss = false, onActiveLineChange,
+    selectedReactionID, activeLineId, selectedReactionsByLine = {}, reactionBarByVideo = [] }) {
     const activeRef = useRef(null);
     const currentTimeRef = useRef(0);
     const [activeId, setActiveId] = useState(null);
@@ -63,14 +65,17 @@ export default function LyricPanel({ lyrics, getCurrentTime, selectedId, onSelec
             hasNote: styles.hasNote,
         };
 
-    const selectedReaction = REACTIONS_ICONS.find((reaction) => reaction.id === selectedReactionID);
-
     return (
         <div className={classes.lyricSection}>
             <div className={classes.lyricHeader}>Lyric</div>
             <div className={classes.lyricList}>
                 {lyrics.map((line) => {
-                    const lineReactionId = selectedReactionsByLine[line.id] ?? (line.id === activeLineId ? selectedReactionID : null);
+                    const savedReaction = reactionBarByVideo.find(
+                        (reaction) => String(reaction.barID) === String(line.id)
+                    );
+                    const lineReactionId = selectedReactionsByLine[line.id]
+                        ?? savedReaction?.ReactionType
+                        ?? (line.id === activeLineId ? selectedReactionID : null);
                     const lineReaction = REACTIONS_ICONS.find((reaction) => reaction.id === lineReactionId);
                     const isActiveLine = line.id === activeId;
                     const isSelectedLine = line.id === selectedId;

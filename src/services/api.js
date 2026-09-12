@@ -2,6 +2,7 @@ import axios from 'axios';
 import { redirectToLogin } from '../styles/utils/navigation'; // 👈 file mới, sẽ tạo bên dưới
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '';
+const CHATBOT_URL = import.meta.env.VITE_CHATBOT_URL ?? '';
 
 const apiClient = axios.create({
     baseURL: API_BASE_URL,
@@ -11,15 +12,24 @@ const apiClient = axios.create({
     timeout: 10000,
 });
 
+// tạo instance axios riêng cho ChatBot, nếu cần cấu hình khác
+const apiChatBot = axios.create({
+    baseURL: CHATBOT_URL,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    timeout: 120000,
+});
+
 // 👇 Thêm đoạn này
 apiClient.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('token');
-        console.log('Token from localStorage:', token); // Debug: Log the token
+        // console.log('Token from localStorage:', token); // Debug: Log the token
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
-        console.log('Request config:', config);
+        // console.log('', config);
         return config;
     },
     (error) => Promise.reject(error)
@@ -119,9 +129,19 @@ export const videoService = {
 
 export const barService = {
     create(payload) {
+        const normalizedPayload = Array.isArray(payload)
+            ? payload.map((item) => ({
+                ...item,
+                barttelID: item?.barttelID ?? item?.battlerId ?? null,
+            }))
+            : {
+                ...payload,
+                barttelID: payload?.barttelID ?? payload?.battlerId ?? null,
+            };
+
         return apiRequest('/api/bars', {
             method: 'POST',
-            body: payload,
+            body: normalizedPayload,
         });
     },
 
@@ -132,7 +152,10 @@ export const barService = {
     update(id, payload) {
         return apiRequest(`/api/bars/${id}`, {
             method: 'PUT',
-            body: payload,
+            body: {
+                ...payload,
+                barttelID: payload?.barttelID ?? payload?.battlerId ?? null,
+            },
         });
     },
 
@@ -215,13 +238,27 @@ export const searchService = {
     },
 };
 
-export const barReactoin = {
+export const barReaction = {
     create(payload) {
         return apiRequest('/api/bar-reactions', {
             method: 'POST',
             body: payload,
         });
     },
+
+    bulkCreate(payload) {
+        return apiRequest('/api/bar-reactions/bulk', {
+            method: 'POST',
+            body: payload,
+        });
+    },
+
+    getReactionBarByUserAndVideo(userId, videoId) {
+        return apiRequest(`/api/bar-reactions/user/${userId}/video/${videoId}`, {
+            method: 'GET',
+        });
+    },
+
 
     update(id, payload) {
         return apiRequest(`/api/bar-reactions/${id}`, {
@@ -258,13 +295,92 @@ export const loginService = {
     },
 };
 
+export const chatBotService = {
+    postQuery(query) {
+        return apiChatBot.post('/post-input-question', {
+            question: query
+        });
+    },
+};
+
+
+export const battlerService = {
+    getAll() {
+        return apiRequest('/api/battlers');
+    },
+
+    getById(id) {
+        return apiRequest(`/api/battlers/${id}`);
+    },
+
+    create(payload) {
+        return apiRequest('/api/battlers', {
+            method: 'POST',
+            body: payload,
+        });
+    },
+
+    update(id, payload) {
+        return apiRequest(`/api/battlers/${id}`, {
+            method: 'PUT',
+            body: payload,
+        });
+    },
+
+    remove(id) {
+        return apiRequest(`/api/battlers/${id}`, {
+            method: 'DELETE',
+        });
+    },
+};
+
+export const searchBattler = {
+    search(keyword) {
+        return apiRequest('/api/search/battlers', {
+            method: 'GET',
+            params: { keyword },
+        });
+    },
+};
+
+export const Video_battler = {
+
+    getBattlerByVideoId(videoID) {
+        return apiRequest(`/api/video-battlers/video/${videoID}`);
+    },
+
+
+    create(payload) {
+        return apiRequest('/api/video-battlers', {
+            method: 'POST',
+            body: payload,
+        });
+    },
+
+    update(id, payload) {
+        return apiRequest(`/api/video-battlers/${id}`, {
+            method: 'PUT',
+            body: payload,
+        });
+    },
+
+    remove(videoID, battlerID) {
+        return apiRequest(`/api/video-battlers/video/${videoID}/battler/${battlerID}`, {
+            method: 'DELETE',
+        });
+    },
+};
 export default {
     apiRequest,
     videoService,
     barService,
     reviewService,
     searchService,
-    barReactoin,
+    barReaction,
     authService,
-    loginService
+    loginService,
+    chatBotService,
+    battlerService,
+    searchBattler,
+    Video_battler
 };

@@ -8,7 +8,7 @@ import './Home.css';
 
 export default function Home() {
     const [searchQuery, setSearchQuery] = useState('');
-    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const navigate = useNavigate();
 
 

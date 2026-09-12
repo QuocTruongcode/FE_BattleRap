@@ -1,17 +1,22 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import './Sidebar.css';
+import { useAuth } from '../../contexts/AuthContext';
 import {
     FaHome,
     FaFire,
     FaVideo,
     FaBook,
-    FaYoutube, FaProjectDiagram
+    FaYoutube, FaProjectDiagram,
+    FaRobot,
 } from "react-icons/fa";
+import { FaMicrophoneLines } from "react-icons/fa6";
 const ROUTED_ITEMS = [
     { icon: <FaHome />, label: 'Trang chủ', to: '/', end: true },
     { icon: <FaVideo />, label: 'Video', to: '/crud' },
     { icon: <FaProjectDiagram />, label: 'Tri thức Rap', to: '/knowledgeGraph' },
+    { icon: <FaRobot />, label: 'Trợ lý ảo', to: '/chatbot' },
+    { icon: <FaMicrophoneLines />, label: 'Battler', to: '/CRUDbattler' },
 
 ];
 
@@ -22,11 +27,17 @@ const STATIC_ITEMS = [
 ];
 
 export default function Sidebar({ isCollapsed, onToggle }) {
+    const { user } = useAuth();
+    const visibleRoutedItems = ROUTED_ITEMS.filter(
+        (item) => user?.UserType !== 'U2' || !['/crud', '/knowledgeGraph'].includes(item.to)
+    );
+    // console.log('Sidebar isCollapsed, user:', isCollapsed);
+    // console.log('Sidebar render, user:', user?.UserType);
     return (
         <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
 
             <nav className="sidebar-nav">
-                {ROUTED_ITEMS.map((item) => (
+                {visibleRoutedItems.map((item) => (
                     <NavLink
                         key={item.to}
                         to={item.to}

@@ -4,7 +4,7 @@ import Header from './Header';
 import Sidebar from './Sidebar';
 
 export default function MainLayout({ children, onSearch }) {
-    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
     const toggleSidebar = () => setIsSidebarCollapsed((prev) => !prev);
 

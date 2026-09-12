@@ -1,0 +1,15 @@
+.crud-battler-page {
+    width: 100%;
+    min-height: 100%;
+}
+
+.crud-battler-page__content {
+    width: 100%;
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+.crud-battler-page__form-wrap {
+    margin-top: 28px;
+    width: 100%;
+}

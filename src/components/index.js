@@ -6,3 +6,5 @@ export * from './search';
 export * from './knowledge-graph';
 export * from './auth';
 export * from './layout';
+export * from './RAGChatBot';
+export * from './battler';

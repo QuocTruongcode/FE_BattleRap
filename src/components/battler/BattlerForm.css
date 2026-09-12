@@ -1,0 +1,194 @@
+.battler-form-wrapper {
+  display: grid;
+  grid-template-columns: minmax(300px, 520px) minmax(300px, 1fr);
+  gap: 24px;
+  width: 100%;
+  align-items: start;
+}
+
+.battler-form {
+  position: sticky;
+  top: 24px;
+  background: #fff;
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 14px 30px rgba(19, 35, 51, 0.08);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.battler-form__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.battler-form__header h3 {
+  margin: 4px 0 0;
+  font-size: 1.5rem;
+  color: #0f172a;
+}
+
+.battler-form__label {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.battler-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.battler-form__field input,
+.battler-form__field textarea {
+  width: 100%;
+  border: 1px solid #dbe3ee;
+  background: #f8fafc;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font: inherit;
+  color: #0f172a;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.battler-form__field input:focus,
+.battler-form__field textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.battler-form__field textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+
+.battler-form__actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.battler-form__button,
+.mini-button,
+.battler-form__cancel {
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.battler-form__button:hover,
+.mini-button:hover,
+.battler-form__cancel:hover {
+  transform: translateY(-1px);
+}
+
+.battler-form__button--primary {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+  padding: 12px 18px;
+}
+
+.battler-form__button--secondary,
+.battler-form__cancel {
+  background: #eef2ff;
+  color: #1e3a8a;
+  padding: 12px 18px;
+}
+
+.battler-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+  padding-right: 8px;
+  scrollbar-width: thin;
+}
+
+.battler-list__item {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+.battler-list__thumb {
+  width: 76px;
+  height: 76px;
+  object-fit: cover;
+  border-radius: 14px;
+  flex-shrink: 0;
+}
+
+.battler-list__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.battler-list__info h4 {
+  margin: 0 0 4px;
+  color: #0f172a;
+  font-size: 1.1rem;
+}
+
+.battler-list__info p {
+  margin: 0 0 4px;
+  color: #475569;
+  font-weight: 600;
+}
+
+.battler-list__info small {
+  color: #64748b;
+  line-height: 1.5;
+  display: block;
+}
+
+.battler-list__actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.mini-button {
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  border-radius: 999px;
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.08);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+}
+
+.mini-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 20px rgba(15, 23, 42, 0.12);
+}
+
+.mini-button--edit {
+  background: rgba(224, 242, 254, 0.95);
+  color: #075985;
+}
+
+.mini-button--delete {
+  background: rgba(254, 226, 226, 0.95);
+  color: #b91c1c;
+}
+
+@media (max-width: 900px) {
+  .battler-form-wrapper {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,13 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
 import './BarInputPanel.css';
+import { Video_battler } from '../../services/api';
 /**
  * BarInputPanel
  * Props:
  *  - currentTime: number (giây, từ VideoPlayer)
  *  - editingBar: { id, time, content } | null  (khi click Sửa từ BarTimeline)
- *  - onAddBar: ({ time, content }) => void
- *  - onUpdateBar: ({ id, time, content }) => void
+ *  - onAddBar: ({ time, content, battlerId }) => void
+ *  - onUpdateBar: ({ id, time, content, battlerId }) => void
  *  - onCancelEdit: () => void
+ *  - videoId: string | number | null
  */
 export default function BarInputPanel({
     currentTime = 0,
@@ -15,9 +17,13 @@ export default function BarInputPanel({
     onAddBar,
     onUpdateBar,
     onCancelEdit,
+    videoId = null,
+    onBattlerChange,
 }) {
     const [lockedTime, setLockedTime] = useState(null);
     const [content, setContent] = useState('');
+    const [battlerOptions, setBattlerOptions] = useState([]);
+    const [selectedBattlerId, setSelectedBattlerId] = useState('');
     const MAX_CHARS = 500;
 
     // Khi có editingBar từ BarTimeline → điền sẵn dữ liệu
@@ -39,12 +45,78 @@ export default function BarInputPanel({
         setLockedTime(currentTime);
     };
 
+    useEffect(() => {
+        if (!videoId) {
+            setBattlerOptions([]);
+            setSelectedBattlerId('');
+            return;
+        }
+
+        let isMounted = true;
+
+        Video_battler.getBattlerByVideoId(videoId)
+            .then((result) => {
+                const list = Array.isArray(result?.data)
+                    ? result.data
+                    : Array.isArray(result)
+                        ? result
+                        : [];
+
+                if (!isMounted) return;
+
+                const normalized = list.flatMap((item) => {
+                    const battler = item?.battler || item?.Battler || item || {};
+                    const battlerId = battler?.id ?? battler?.battlerId ?? item?.battlerId ?? item?.BattlerId ?? item?.BattlerID ?? item?.battlerID ?? null;
+
+                    if (!battlerId) return [];
+
+                    return [{
+                        ...battler,
+                        ...item,
+                        battlerId,
+                    }];
+                });
+
+                setBattlerOptions(normalized);
+                setSelectedBattlerId((prev) => {
+                    const nextValue = prev && normalized.some((item) => String(item.battlerId) === String(prev))
+                        ? prev
+                        : normalized[0]?.battlerId ?? '';
+
+                    onBattlerChange?.(nextValue || null);
+                    return nextValue;
+                });
+            })
+            .catch((error) => {
+                console.error('Get battlers by video error:', error);
+                if (isMounted) {
+                    setBattlerOptions([]);
+                    setSelectedBattlerId('');
+                }
+            });
+
+        return () => {
+            isMounted = false;
+        };
+    }, [videoId]);
+
     const handleSubmit = () => {
         if (!content.trim() || lockedTime == null) return;
+        const resolvedBattlerId = selectedBattlerId || null;
+        const payload = {
+            time: lockedTime,
+            content: content.trim(),
+            battlerId: resolvedBattlerId,
+            barttelID: resolvedBattlerId,
+        };
+
         if (editingBar) {
-            onUpdateBar?.({ id: editingBar.id, time: lockedTime, content: content.trim() });
+            onUpdateBar?.({
+                ...payload,
+                id: editingBar.id,
+            });
         } else {
-            onAddBar?.({ time: lockedTime, content: content.trim() });
+            onAddBar?.(payload);
         }
         setContent('');
         setLockedTime(null);
@@ -68,6 +140,7 @@ export default function BarInputPanel({
     const canSubmit = content.trim().length > 0 && lockedTime != null;
 
     return (
+        console.log("selectedBattlerId: ", selectedBattlerId),
         <div className="bar-input-panel">
             {/* Header thông tin thời gian */}
             <div className="bip-time-row">
@@ -108,6 +181,38 @@ export default function BarInputPanel({
                     {isEditing && <span className="bip-editing-badge">Đang sửa bar</span>}
                 </div>
             )}
+
+            <div className="bip-battler-select-wrap">
+                <label className="bip-content-label" htmlFor="bar-battler-select">
+                    Battler
+                </label>
+                <select
+                    id="bar-battler-select"
+                    className="bip-battler-select"
+                    value={selectedBattlerId}
+                    onChange={(event) => {
+                        const nextValue = event.target.value;
+                        setSelectedBattlerId(nextValue);
+                        onBattlerChange?.(nextValue || null);
+                    }}
+                    disabled={battlerOptions.length === 0}
+                >
+                    {battlerOptions.length > 0 ? (
+                        battlerOptions.map((battler) => {
+                            const battlerId = battler.battlerId ?? battler.id;
+                            const battlerName = battler.RapName || battler.rapName || `Battler ${battlerId}`;
+
+                            return (
+                                <option key={String(battlerId)} value={String(battlerId)}>
+                                    {battlerName}
+                                </option>
+                            );
+                        })
+                    ) : (
+                        <option value="">Không có battler nào</option>
+                    )}
+                </select>
+            </div>
 
             {/* Textarea nội dung */}
             <div className="bip-content-section">

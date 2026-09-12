@@ -4,7 +4,7 @@ import { useAuth } from "../../contexts/AuthContext"; // context bạn đang có
 
 function ProtectedRoute({ children, allowedRoles }) {
     const { user, loading } = useAuth();
-
+    // console.log('ProtectedRoute render, user:', user);
     if (loading) {
         return <div>Đang tải...</div>; // tránh flash nội dung trước khi biết user là ai
     }
@@ -14,7 +14,7 @@ function ProtectedRoute({ children, allowedRoles }) {
         return <Navigate to="/login" replace />;
     }
 
-    if (allowedRoles && !allowedRoles.includes(user.userType)) {
+    if (allowedRoles && !allowedRoles.includes(user.UserType)) {
         // Đã đăng nhập nhưng sai quyền -> đá về trang 403 hoặc trang chủ
         return <Navigate to="/403" replace />;
     }
