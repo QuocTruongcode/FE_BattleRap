@@ -61,8 +61,23 @@ export function useVideoReview() {
                     alert('Có lỗi trong quá trình lấy đánh giá từ AI. Vui lòng thử lại sau.');
                 } else {
                     const newContent = data.textList.message || 'Không có đánh giá từ AI';
-                    setReviewContent(newContent);
-                    editorRef.current?.setMarkdown(newContent);
+                    console.log('AI Review Result:', newContent);
+                    const markDownContent =
+                        '**Bối cảnh trận đấu**\n' + newContent.match_review.context +
+                        '\n\n' +
+                        '**Đánh giá chung**\n' + newContent.match_review.general_assessment +
+                        '\n\n' +
+                        '**Phản ứng cộng đồng**\n' + newContent.match_review.community_reaction +
+                        '\n\n' +
+                        '**Đánh giá battler**\n' +
+                        newContent.battler_reviews
+                            .map(battler =>
+                                `**${battler.battler_name}**\n${battler.review_text}`
+                            )
+                            .join('\n\n');
+
+                    setReviewContent(markDownContent);
+                    editorRef.current?.setMarkdown(markDownContent);
                 }
 
                 setIsAnalyzing(false);

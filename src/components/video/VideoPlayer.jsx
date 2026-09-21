@@ -65,7 +65,7 @@ const VideoPlayer = forwardRef(function VideoPlayer({ videoUrl, onTimeUpdate, ch
                 },
                 events: {
                     onReady: (e) => {
-                        console.log('YouTube Player ready ✅', e.target);
+                        // console.log('YouTube Player ready ✅', e.target);
                     },
                     onStateChange: (e) => {
                         switch (e.data) {

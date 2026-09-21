@@ -169,6 +169,11 @@ export const barService = {
             method: 'DELETE',
         });
     },
+    explainBar(id) {
+        return apiRequest(`/api/bars/explainBar/${id}`, {
+            method: 'GET',
+        });
+    }
 };
 
 // reviewService.js
@@ -370,6 +375,38 @@ export const Video_battler = {
         });
     },
 };
+
+export const explanation = {
+
+    getExplanationByBarId(BarID) {
+        return apiRequest(`/api/explanations/bar/${BarID}`);
+    },
+
+
+    create(payload) {
+        return apiRequest('/api/explanations', {
+            method: 'POST',
+            body: payload,
+        });
+    },
+
+    callLLMAnalysisBar(payload) {
+        return apiRequest('/api/call-llm/analysis-bar', {
+            method: 'POST',
+            body: payload,
+            timeout: 60000, // 60 giây, đủ cho luồng Gemini + Tavily search song song
+
+        });
+    },
+
+    update(id, payload) {
+        return apiRequest(`/api/explanations/${id}`, {
+            method: 'PUT',
+            body: payload,
+        });
+    },
+
+};
 export default {
     apiRequest,
     videoService,
@@ -382,5 +419,7 @@ export default {
     chatBotService,
     battlerService,
     searchBattler,
-    Video_battler
+    Video_battler,
+    explanation,
+
 };

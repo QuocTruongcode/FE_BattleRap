@@ -36,7 +36,6 @@ export function AuthProvider({ children }) {
         setRefreshFlag(prev => prev + 1);
     }, []);
 
-    console.log('AuthProvider render, user:', user);
 
     return (
         <AuthContext.Provider value={{ user, loading, setUser, refreshAuth }}>

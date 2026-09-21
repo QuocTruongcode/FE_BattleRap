@@ -97,7 +97,7 @@
 /* ==========================
    RIGHT PANEL
 ========================== */
-
+/* 
 .explanation-panel {
     width: 380px;
 
@@ -112,7 +112,7 @@
     flex-shrink: 0;
 
     overflow: hidden;
-}
+} */
 
 .explanation-panel.hidden {
     width: 0;

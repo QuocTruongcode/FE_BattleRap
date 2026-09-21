@@ -77,6 +77,7 @@ export default function VideoCrud() {
         if (editingId) {
             updateMutation.mutate({ id: editingId, formData: nextVideo });
             handleResetForm();
+
         } else {
             createMutation.mutate(nextVideo);
             handleResetForm();
@@ -260,7 +261,6 @@ export default function VideoCrud() {
     }
 
     return (
-        console.log("Editing ID:", editingId),
         <div className="home-container">
             <Header
                 onSearch={(query) => setSearchQuery(query)}

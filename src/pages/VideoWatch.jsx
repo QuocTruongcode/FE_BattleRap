@@ -130,8 +130,8 @@ export default function VideoWatch() {
     };
 
     return (
-        console.log("Check reactionBarByVideo: ", reactionBarByVideo),
-        console.log("check user: ", user),
+        // console.log("Check reactionBarByVideo: ", reactionBarByVideo),
+        // console.log("check user: ", user),
         // console.log("check selectedReactionID: ", selectedReactionID),
         // console.log("Check line active id: ", activeLineIdRef.current),
         console.log("Check selectedReactionsByLine: ", selectedReactionsByLine),
