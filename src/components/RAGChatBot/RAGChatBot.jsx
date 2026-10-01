@@ -1,5 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import {
+    MDXEditor,
+    codeBlockPlugin,
+    headingsPlugin,
+    linkPlugin,
+    listsPlugin,
+    quotePlugin,
+    tablePlugin,
+    thematicBreakPlugin,
+} from '@mdxeditor/editor';
+import {
     FiArrowUp,
     FiChevronDown,
     FiCopy,
@@ -22,6 +32,8 @@ import {
 } from 'react-icons/fi';
 import './RAGChatBot.css';
 import { chatBotService } from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
+import { historyChatBot, AIChatContext } from '../../services/api'
 const starterMessages = [
     {
         id: 'welcome',
@@ -30,11 +42,7 @@ const starterMessages = [
     },
 ];
 
-const conversations = [
-    { id: 1, title: 'Phân tích trận B Ray vs Datmaniac', time: 'Hôm nay' },
-    { id: 2, title: 'Tìm các bar có punchline mạnh', time: 'Hôm qua' },
-    { id: 3, title: 'Tổng hợp phong cách Andree', time: 'Thứ 6' },
-];
+let conversations = [];
 
 const quickPrompts = [
     { icon: FiSearch, label: 'Tìm kiếm bar nổi bật' },
@@ -42,25 +50,38 @@ const quickPrompts = [
     { icon: FiSmile, label: 'Giải thích punchline' },
 ];
 
-function formatMessage(text) {
-    return text.split('\n').map((line, index) => (
-        <span key={`${line}-${index}`}>
-            {line}
-            {index < text.split('\n').length - 1 && <br />}
-        </span>
-    ));
-}
-
 export default function RAGChatBot({ onSendMessage }) {
     const [messages, setMessages] = useState(starterMessages);
     const [input, setInput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const textareaRef = useRef(null);
     const messagesEndRef = useRef(null);
-    const replyTimerRef = useRef(null);
+    // const replyTimerRef = useRef(null);
+    const [conversationID, setconversationID] = useState(() => crypto.randomUUID());
 
-    useEffect(() => () => clearTimeout(replyTimerRef.current), []);
+    const [conversation, setConversationState] = useState({});
+    const conversationRef = useRef(conversation);
+    const { user } = useAuth();
+
+    const setconversation = (nextConversation) => {
+        conversationRef.current = nextConversation;
+        setConversationState(nextConversation);
+    };
+
+    useEffect(() => {
+        const loadConversation = async () => {
+            try {
+                const req = await historyChatBot.getConversationIDByUserID();
+                conversations = req.data
+                console.log("Check conversations: ", req.data)
+            } catch (error) {
+                console.error('Không thể tải lịch sử cuộc trò chuyện:', error);
+            }
+        };
+
+        loadConversation();
+    }, []);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -77,8 +98,8 @@ export default function RAGChatBot({ onSendMessage }) {
     };
 
     const handleNewChat = () => {
-        clearTimeout(replyTimerRef.current);
         setMessages([]);
+        setconversationID(crypto.randomUUID());
         setInput('');
         setIsTyping(false);
         textareaRef.current?.focus();
@@ -123,29 +144,43 @@ export default function RAGChatBot({ onSendMessage }) {
     const handleSend = async () => {
         const content = input.trim();
         if (!content || isTyping) return;
-
+        setIsTyping(true);
         const userMessage = {
-            id: `user-${Date.now()}`,
+            // id: `user-${Date.now()}`,
             role: 'user',
             content,
-        };
+            conversationID
 
+        };
         setMessages((current) => [...current, userMessage]);
         setInput('');
         if (textareaRef.current) textareaRef.current.style.height = 'auto';
-        setIsTyping(true);
 
         try {
-            const response = await chatBotService.postQuery(content);
-            const reply = response?.data?.message ?? 'Tôi chưa có câu trả lời cho câu hỏi này.';
+            const payload = {
+                conversationID,
+                question: userMessage.content,
+            };
+            const response = await AIChatContext.askWithContext(payload);
+            console.log("Check response: ", response)
+            setconversation(userMessage);
+            await historyChatBot.create(conversationRef.current);
+
+            // const response = await chatBotService.postQuery(content);
+            const reply = response?.data ?? 'Tôi chưa có câu trả lời cho câu hỏi này.';
+            const assistantMessage = {
+                // id: `assistant-${Date.now()}`,
+                role: 'assistant',
+                content: reply,
+                conversationID,
+            };
+
+            setconversation(assistantMessage);
+            await historyChatBot.create(conversationRef.current);
 
             setMessages((current) => [
                 ...current,
-                {
-                    id: `assistant-${Date.now()}`,
-                    role: 'assistant',
-                    content: reply,
-                },
+                assistantMessage,
             ]);
         } catch (error) {
             const errorMessage = error?.response?.data?.message || error?.message || 'Đã xảy ra lỗi khi gửi tin nhắn.';
@@ -153,7 +188,7 @@ export default function RAGChatBot({ onSendMessage }) {
             setMessages((current) => [
                 ...current,
                 {
-                    id: `assistant-error-${Date.now()}`,
+                    // id: `assistant-error-${Date.now()}`,
                     role: 'assistant',
                     content: errorMessage,
                 },
@@ -175,7 +210,24 @@ export default function RAGChatBot({ onSendMessage }) {
         textareaRef.current?.focus();
     };
 
+    const getConversation = async (getConversationID) => {
+        const old_onversation = await historyChatBot.getConversation(getConversationID)
+        setconversationID(old_onversation.data[0].conversationID)
+        setMessages(old_onversation.data)
+        console.log("Check old_onversation: ", old_onversation)
+    }
+
+
+
     return (
+        // console.log("conversation: ", conversation),
+        // console.log("input question: ", input),
+        // console.log("check conversationID: ", conversationID),
+        // console.log("check messages: ", messages),
+
+        // // console.log("check user: ", user),
+        // console.log("check conversation: ", conversation),
+
         <section className="rag-chatbot" aria-label="RAG ChatBot">
             <aside className={`rag-chatbot__sidebar${isSidebarOpen ? '' : ' is-collapsed'}`}>
                 <div className="rag-chatbot__brand">
@@ -194,9 +246,9 @@ export default function RAGChatBot({ onSendMessage }) {
                 <div className="rag-chatbot__history">
                     <span className="rag-chatbot__section-label">Gần đây</span>
                     {conversations.map((conversation) => (
-                        <button className="rag-chatbot__history-item" key={conversation.id} title={conversation.title}>
+                        <button className="rag-chatbot__history-item" key={conversation.id} title={conversation.title} onClick={() => getConversation(conversation)}>
                             <FiMessageSquare />
-                            <span>{conversation.title}</span>
+                            <span>{conversation}</span>
                             <small>{conversation.time}</small>
                         </button>
                     ))}
@@ -238,12 +290,29 @@ export default function RAGChatBot({ onSendMessage }) {
                         </div>
                     )}
 
-                    {messages.map((message) => (
-                        <article className={`rag-chatbot__message rag-chatbot__message--${message.role}`} key={message.id}>
+                    {messages.map((message, index) => (
+                        <article key={index}
+                            className={`rag-chatbot__message rag-chatbot__message--${message.role}`}>
                             <div className="rag-chatbot__message-avatar">{message.role === 'assistant' ? <FiMessageSquare /> : <FiUser />}</div>
                             <div className="rag-chatbot__message-body">
                                 <div className="rag-chatbot__message-meta">{message.role === 'assistant' ? 'RapMind' : 'Bạn'}</div>
-                                <div className="rag-chatbot__message-content">{formatMessage(message.content)}</div>
+                                <div className="rag-chatbot__message-content">
+                                    <MDXEditor
+                                        markdown={message.content}
+                                        readOnly
+                                        className="rag-chatbot__markdown-editor"
+                                        contentEditableClassName="rag-chatbot__markdown-content"
+                                        plugins={[
+                                            headingsPlugin(),
+                                            listsPlugin(),
+                                            quotePlugin(),
+                                            thematicBreakPlugin(),
+                                            tablePlugin(),
+                                            linkPlugin(),
+                                            codeBlockPlugin(),
+                                        ]}
+                                    />
+                                </div>
                                 {message.role === 'assistant' && (
                                     <div className="rag-chatbot__message-actions">
                                         <button title="Sao chép" aria-label="Sao chép"><FiCopy /></button>

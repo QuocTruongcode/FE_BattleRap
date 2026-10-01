@@ -302,7 +302,7 @@ export const loginService = {
 
 export const chatBotService = {
     postQuery(query) {
-        return apiChatBot.post('/post-input-question', {
+        return apiChatBot.post('/api/chatbot', {
             question: query
         });
     },
@@ -394,7 +394,7 @@ export const explanation = {
         return apiRequest('/api/call-llm/analysis-bar', {
             method: 'POST',
             body: payload,
-            timeout: 60000, // 60 giây, đủ cho luồng Gemini + Tavily search song song
+            timeout: 90000, // 90 giây, đủ cho luồng Gemini + Tavily search song song
 
         });
     },
@@ -407,6 +407,41 @@ export const explanation = {
     },
 
 };
+
+export const historyChatBot = {
+
+    create(payload) {
+        return apiRequest('/api/history-chat-bots', {
+            method: 'POST',
+            body: payload,
+        });
+    },
+
+    getConversation(conversationID) {
+        return apiRequest(`/api/history-chat-bots/conversation/${conversationID}`)
+    },
+
+    getConversationIDByUserID() {
+        return apiRequest(`/api/history-chat-bots/conversations/recent`)
+    },
+
+};
+export const AIChatContext = {
+    getConversation(conversationID) {
+        return apiRequest(
+            `/api/ai-chat-context/recent?conversationID=${encodeURIComponent(conversationID)}`
+        );
+    },
+
+    askWithContext(payload) {
+        return apiRequest('/api/ai-chat-context/ask', {
+            method: 'POST',
+            body: payload,
+            timeout: 90000,
+        });
+    },
+};
+
 export default {
     apiRequest,
     videoService,
@@ -421,5 +456,6 @@ export default {
     searchBattler,
     Video_battler,
     explanation,
-
+    historyChatBot,
+    AIChatContext
 };

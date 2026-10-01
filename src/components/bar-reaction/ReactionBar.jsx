@@ -35,6 +35,11 @@ export default function ReactionBar({ onSelect, onSpaceKey }) {
                     return prev; // không đổi index, chỉ mượn functional-update để lấy đúng giá trị mới nhất
                 });
             } else if (e.key === ' ' || e.code === 'Space') {
+                const hoveredChatbot = document.querySelector('.rag-chatbot:hover');
+                if (hoveredChatbot) {
+                    if (!hoveredChatbot.contains(e.target)) e.preventDefault();
+                    return;
+                }
                 e.preventDefault();
                 onSpaceKey?.();
             }

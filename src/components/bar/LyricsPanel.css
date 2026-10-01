@@ -12,16 +12,18 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    background: white;
+    background: #10090b;
+    border-top: 1px solid #3c1720;
     overflow: hidden;
 }
 
 .lyricHeader {
     padding: 5px 10px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #3c1720;
     font-size: 13px;
     font-weight: 600;
-    color: #666;
+    color: #b98b93;
+    background: #160d10;
 }
 
 .lyricList {
@@ -30,6 +32,7 @@
     overflow-x: hidden;
     padding: 24px 0;
     scroll-behavior: smooth;
+    background-image: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.02) 0, rgba(255, 255, 255, 0.02) 1px, transparent 1px, transparent 4px);
 }
 
 .lyricLine {
@@ -58,7 +61,7 @@
 }
 
 .lyricLine:hover {
-    background: #f5f5f5;
+    background: #241116;
     opacity: 0.7;
 }
 
@@ -67,9 +70,9 @@
     opacity: 1;
     transform: scale(1.06);
     filter: blur(0);
-    background: #fff5f5;
-    border-left: 4px solid #cc0000;
-    box-shadow: 0 2px 12px rgba(204, 0, 0, 0.15);
+    background: #2b1118;
+    border-left: 4px solid #ff3048;
+    box-shadow: 0 2px 12px rgba(204, 0, 0, 0.22);
 }
 
 .lyricLine.active .lyricTime {
@@ -78,7 +81,7 @@
 }
 
 .lyricLine.active .lyricContent {
-    color: #111;
+    color: #f7f6f6;
     font-weight: 600;
 }
 
@@ -95,13 +98,13 @@
 .lyricTime {
     min-width: 42px;
     font-size: 14px;
-    color: #999;
+    color: #98747b;
     transition: color 0.5s ease, font-weight 0.5s ease;
 }
 
 .lyricContent {
     font-size: 17px;
-    color: #222;
+    color: #d9c2c6;
     line-height: 1.7;
     transition: color 0.5s ease, font-weight 0.5s ease;
 }

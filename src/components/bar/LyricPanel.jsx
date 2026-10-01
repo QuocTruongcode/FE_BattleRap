@@ -6,7 +6,6 @@ export default function LyricPanel({ lyrics, getCurrentTime, selectedId,
     onSelectLine, usePlainCss = false, onActiveLineChange,
     selectedReactionID, activeLineId, selectedReactionsByLine = {}, reactionBarByVideo = [] }) {
     const activeRef = useRef(null);
-    const currentTimeRef = useRef(0);
     const [activeId, setActiveId] = useState(null);
 
     const computeActiveLine = useCallback((time) => {
@@ -19,7 +18,6 @@ export default function LyricPanel({ lyrics, getCurrentTime, selectedId,
     useEffect(() => {
         const interval = setInterval(() => {
             const time = getCurrentTime();
-            currentTimeRef.current = time;
 
             const newActiveId = computeActiveLine(time);
             setActiveId(prev => (prev === newActiveId ? prev : newActiveId));
@@ -83,7 +81,10 @@ export default function LyricPanel({ lyrics, getCurrentTime, selectedId,
 
                     return (
                         <div
-                            style={{ border: `3px solid ${lineReaction?.color || 'transparent'}` }}
+                            style={{
+                                border: 'none',
+                                borderLeft: `6px solid ${lineReaction?.color || 'transparent'}`,
+                            }}
                             key={line.id}
                             ref={line.id === activeId ? activeRef : null}
                             className={[
@@ -94,6 +95,15 @@ export default function LyricPanel({ lyrics, getCurrentTime, selectedId,
                             ].join(' ')}
                             onClick={() => onSelectLine(line)}
                         >
+                            {isActiveLine && (
+                                <span
+                                    key={line.id}
+                                    className={styles.progressBar}
+                                    style={{
+                                        backgroundColor: lineReaction?.color || 'transparent',
+                                    }}
+                                />
+                            )}
                             <span className={classes.lyricTime}>{formatTime(line.time)}</span>
                             <span className={classes.lyricContent}>{line.content}</span>
 

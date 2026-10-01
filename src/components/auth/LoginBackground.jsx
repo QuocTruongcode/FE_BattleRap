@@ -1,6 +1,7 @@
 import './LoginBackground.css'
 import backgroundPageLogin from '../../assets/backgrounPageLogin.jpg'
 import ContentLogin from './ContentLogin'
+import FireSparks from './FireSparks'
 function LoginBackground({ children }) {
     return (
         <main
@@ -8,6 +9,7 @@ function LoginBackground({ children }) {
             style={{ '--login-background-image': `url(${backgroundPageLogin})` }}
         >
             <div className="login-background__shade" aria-hidden="true" />
+            <FireSparks />
             <div className="login-background__content">
                 <ContentLogin />
             </div>

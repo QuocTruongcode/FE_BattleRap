@@ -12,6 +12,17 @@ import {
     codeBlockPlugin,
 } from '@mdxeditor/editor';
 import { useAuth } from '../../contexts/AuthContext';
+import { ImageGallery } from '../review/index'
+import { RAGChatBot } from '../RAGChatBot/index';
+import { FaArrowLeft } from "react-icons/fa";
+
+const normalizeMarkdown = (markdown) => {
+    if (typeof markdown !== 'string') return markdown;
+
+    return markdown
+        .replace(/\\r\\n|\\n|\\r/g, '\n')
+        .replace(/\*{4}([^*\n]+)\*{4}/g, '**$1**');
+};
 
 export default function ExplanationPanel({ line, onClose }) {
     const [panelWidth, setPanelWidth] = useState(380);
@@ -23,10 +34,23 @@ export default function ExplanationPanel({ line, onClose }) {
         error: null,
     });
     const [LLMReply, setLLMReply] = useState(null);
+    const mdxEditorRef = useRef(null);
     const [isExpanded, setIsExpanded] = useState(true);
     const [idExp, setIdExp] = useState(null);
     const { user } = useAuth();
     const canEdit = user?.UserType === "U0";
+    const [images, setImages] = useState([]);
+    const [chatbotLineId, setChatbotLineId] = useState(null);
+
+    useEffect(() => {
+        if (
+            LLMReply != null &&
+            mdxEditorRef.current?.getMarkdown() !== LLMReply
+        ) {
+            mdxEditorRef.current?.setMarkdown(LLMReply);
+        }
+    }, [LLMReply]);
+
     useEffect(() => {
         let isActive = true;
 
@@ -48,9 +72,10 @@ export default function ExplanationPanel({ line, onClose }) {
                 if (exp && exp.length > 0) {
                     if (isActive) {
                         setBarContext({ id: exp[0].barId, error: null });
-                        setLLMReply(exp[0].meaning);
+                        setLLMReply(normalizeMarkdown(exp[0].meaning));
                         setIsExpanded(true);
                         setIdExp(exp[0].id);
+                        setImages(JSON.parse(exp[0].images))
                     }
                     return;
                 }
@@ -83,6 +108,8 @@ export default function ExplanationPanel({ line, onClose }) {
                 return;
             }
 
+            console.log("Check result explainBar: ", result)
+
             const data = result?.data ?? result;
             const content = data?.content ?? '';
             const rapName = data?.RapName ?? '';
@@ -99,8 +126,10 @@ export default function ExplanationPanel({ line, onClose }) {
 -Link video: ${linkVideo}
 -Đánh giá của khán giả: ${review}
 -Thông tin về battler ${rapName}: ${describe}
+-Giải thích vắn tắt ${LLMReply}
 `.trim();
 
+            console.log("Check userMessage: ", userMessage)
             setBarContext({
                 id: line.id,
                 error: null,
@@ -108,26 +137,27 @@ export default function ExplanationPanel({ line, onClose }) {
 
             // This request starts only after getExplanationByBarId and explainBar finish.
             const llmResponse = await explanation.callLLMAnalysisBar({ message: userMessage });
-            // console.log("Check LLM response searchResults: ", llmResponse.message.searchResults);
-            const internetContext = llmResponse.message.searchResults;
+            console.log("Check LLM response message: ", llmResponse.message.explanation);
+            setImages(llmResponse.message.cleanedImages)
+            // const internetContext = llmResponse.message.searchResults;
 
-            const combinedAnswerMarkdown = internetContext
-                .map((item, index) => {
-                    const answer = item?.data?.answer;
-                    if (!answer) return null; // bỏ qua item không có answer
+            // const combinedAnswerMarkdown = internetContext
+            //     .map((item, index) => {
+            //         const answer = item?.data?.answer;
+            //         if (!answer) return null; // bỏ qua item không có answer
 
-                    // Nếu bạn có thêm nguồn/tiêu đề thì thêm vào đây, ví dụ item?.data?.url hoặc item?.data?.title
-                    // const source = item?.sources?.url ? `\n> Nguồn: ${item.sources.url}` : "";
+            //         // Nếu bạn có thêm nguồn/tiêu đề thì thêm vào đây, ví dụ item?.data?.url hoặc item?.data?.title
+            //         // const source = item?.sources?.url ? `\n> Nguồn: ${item.sources.url}` : "";
 
-                    return `### Kết quả ${index + 1}\n${answer}`;
-                })
-                .filter(Boolean) // loại bỏ các phần tử null
-                .join("\n\n---\n\n");
+            //         return `### Kết quả ${index + 1}\n${answer}`;
+            //     })
+            //     .filter(Boolean) // loại bỏ các phần tử null
+            //     .join("\n\n---\n\n");
 
-            console.log("Check combinedAnswerMarkdown: ", combinedAnswerMarkdown);
+            // console.log("Check combinedAnswerMarkdown: ", combinedAnswerMarkdown);
             if (isActive) {
-                setLLMReply(llmResponse?.message.explanation);
-                setIsExpanded(false);
+                setLLMReply(normalizeMarkdown(llmResponse?.message.explanation));
+                setIsExpanded(true);
             }
         } catch (error) {
             alert('Có lỗi xảy ra khi lấy giải thích từ LLM: ' + error.message);
@@ -179,6 +209,8 @@ export default function ExplanationPanel({ line, onClose }) {
             const payload = {
                 barId: line.id,
                 meaning: LLMReply,
+                images: images,
+
             };
             if (idExp) {
                 await explanation.update(idExp, payload);
@@ -191,14 +223,16 @@ export default function ExplanationPanel({ line, onClose }) {
 
             }
             setIsExpanded(true);
-        } catch (e) {
+        } catch {
             alert("Có lỗi xảy ra khi thêm giải thích")
         }
 
     }
+    const isChatbotVisible = chatbotLineId === line?.id;
     return (
-        // console.log("Check user: ", user),
+        // console.log("Check image: ", images),
         // console.log("check id Exp: ", idExp),
+        // console.log("Check LLMReply: ", LLMReply),
         <div
             className={`explanation-panel ${!line ? 'hidden' : ''} ${isResizing ? 'is-resizing' : ''}`}
             style={{ '--explanation-panel-width': `${panelWidth}px` }}
@@ -213,72 +247,96 @@ export default function ExplanationPanel({ line, onClose }) {
                         aria-orientation="vertical"
                         tabIndex={0}
                     />
-                    <div className="panel-header">
-                        <h3>Giải thích punchline</h3>
-                        <span className="panel-timestamp">{formatTime(line.time)}</span>
-                        <button className="panel-close" onClick={onClose}>×</button>
-                    </div>
-                    <div className="panel-body">
-                        <div className="quote-box">{line.content}</div>
+                    {isChatbotVisible ? (
+                        <>
+                            <div className="panel-header">
+                                <FaArrowLeft
+                                    onClick={() => setChatbotLineId(null)}
+                                >
+                                </FaArrowLeft>
+                                <h3>Chatbot</h3>
+                                <button className="panel-close" onClick={onClose}>×</button>
+                            </div>
+                            <div className="panel-body">
+                                <RAGChatBot />
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <div className="panel-header">
+                                <h3>Giải thích punchline</h3>
+                                <span className="panel-timestamp">{formatTime(line.time)}</span>
+                                <button className="panel-close" onClick={onClose}>×</button>
+                            </div>
+                            <div className="panel-body">
+                                <div className="quote-box">{line.content}</div>
 
-                        {isLoading ? (
-                            <div className="panel-section">
-                                <p style={{ color: '#aaa' }}>Chưa có giải thích...</p>
-                            </div>
-                        ) : error ? (
-                            <div className="panel-section">
-                                <p style={{ color: '#f88' }}>{error}</p>
-                            </div>
-                        ) : LLMReply ? (
-                            <div className="panel-section">
-                                <MDXEditor
-                                    key={isExpanded}
-                                    markdown={LLMReply}
-                                    readOnly={!canEdit}
-                                    onChange={canEdit ? (newMarkdown) => setLLMReply(newMarkdown) : undefined}
-                                    plugins={[
-                                        headingsPlugin(),
-                                        listsPlugin(),
-                                        quotePlugin(),
-                                        thematicBreakPlugin(),
-                                        tablePlugin(),
-                                        linkPlugin(),
-                                        codeBlockPlugin(),
-                                    ]}
-                                />
-                            </div>
-                        ) : (
-                            <div className="panel-section">
-                                <p style={{ color: '#aaa' }}>Chưa có giải thích cho câu này.</p>
-                            </div>
-                        )}
+                                {isLoading ? (
+                                    <div className="panel-section">
+                                        <p style={{ color: '#aaa' }}>Chưa có giải thích...</p>
+                                    </div>
+                                ) : error ? (
+                                    <div className="panel-section">
+                                        <p style={{ color: '#f88' }}>{error}</p>
+                                    </div>
+                                ) : LLMReply ? (
+                                    <div className="panel-section"
+                                        onKeyDown={(e) => e.stopPropagation()}>
+                                        <MDXEditor
+                                            ref={mdxEditorRef}
+                                            markdown={LLMReply}
+                                            readOnly={!canEdit}
+                                            onChange={canEdit ? (newMarkdown) => setLLMReply(newMarkdown) : undefined}
+                                            plugins={[
+                                                headingsPlugin(),
+                                                listsPlugin(),
+                                                quotePlugin(),
+                                                thematicBreakPlugin(),
+                                                tablePlugin(),
+                                                linkPlugin(),
+                                                codeBlockPlugin(),
+                                            ]}
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="panel-section">
+                                        <p style={{ color: '#aaa' }}>Chưa có giải thích cho câu này.</p>
+                                    </div>
+                                )}
 
+                                <ImageGallery images={images} alt="Ảnh giải thích"></ImageGallery>
 
-                    </div>
+                            </div>
+                        </>
+                    )}
                 </>
             )}
-            {canEdit ? (
-                <div className="explanation-feedback">
-                    <p>Bạn đánh giá như nào về câu trả lời này?</p>
-                    <div className="explanation-feedback-actions">
-                        <button type="button" className="agree-button" onClick={() => handleSubmitExp()}>
-                            Đồng ý
-                        </button>
-                        <button type="button" className="feedback-button" onClick={() => fetchAndExplainBar(line, true)}>
-                            Cần hỏi thêm
-                        </button>
+            {
+                !isChatbotVisible && canEdit ? (
+                    <div className="explanation-feedback">
+                        <p>Bạn đánh giá như nào về câu trả lời này?</p>
+                        <div className="explanation-feedback-actions">
+                            <button type="button" className="agree-button" onClick={() => handleSubmitExp()}>
+                                Đồng ý
+                            </button>
+                            <button type="button" className="feedback-button" onClick={() => fetchAndExplainBar(line, true)}>
+                                Cần hỏi thêm
+                            </button>
+                        </div>
                     </div>
-                </div>
-            ) : (
-                <div className="explanation-feedback">
-                    <p>Sử dụng AI để giải thích bar!</p>
-                    <div className="explanation-feedback-actions">
-                        <button type="button" className="feedback-button" onClick={() => fetchAndExplainBar(line, true)}>
-                            Chatbot
-                        </button>
+                ) : !isChatbotVisible && (
+                    <div className="explanation-feedback">
+                        <p>Sử dụng AI để giải thích bar!</p>
+                        <div className="explanation-feedback-actions">
+                            <button type="button" className="feedback-button" onClick={() => {
+                                setChatbotLineId(line.id);
+                            }}>
+                                Chatbot
+                            </button>
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
         </div>
     );
 }

@@ -241,3 +241,91 @@
         border-top-color: transparent;
     }
 }
+
+.explanation-panel {
+    background-color: #10090b;
+    background-image: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.02) 0, rgba(255, 255, 255, 0.02) 1px, transparent 1px, transparent 4px);
+    border-left-color: #3c1720;
+    color: #f1dce0;
+}
+
+.explanation-panel .panel-header {
+    border-bottom-color: #3c1720;
+    background: rgba(22, 13, 16, 0.94);
+}
+
+.explanation-panel .panel-header h3,
+.explanation-panel .panel-timestamp {
+    color: #f1dce0;
+}
+
+.explanation-panel .panel-close {
+    color: #c3949d;
+}
+
+.explanation-panel .panel-close:hover,
+.explanation-panel .panel-close:focus-visible {
+    background: #2b1118;
+    color: #fff1f3;
+}
+
+.explanation-panel .panel-body {
+    scrollbar-color: #71303e transparent;
+}
+
+.explanation-panel .quote-box {
+    border-left-color: #ff3048;
+    background: #241116;
+    color: #f4dfe2;
+}
+
+.explanation-panel .panel-section,
+.explanation-panel .panel-section > p,
+.explanation-panel .mdxeditor,
+.explanation-panel .mdxeditor p,
+.explanation-panel .mdxeditor [contenteditable='true'],
+.explanation-panel .mdxeditor h1,
+.explanation-panel .mdxeditor h2,
+.explanation-panel .mdxeditor h3,
+.explanation-panel .mdxeditor h4,
+.explanation-panel .mdxeditor h5,
+.explanation-panel .mdxeditor h6,
+.explanation-panel .mdxeditor li,
+.explanation-panel .mdxeditor td,
+.explanation-panel .mdxeditor th,
+.explanation-panel .mdxeditor a {
+    color: #fff;
+}
+
+.explanation-panel .mdxeditor [contenteditable='true'] {
+    color: #fff;
+}
+
+.explanation-panel .mdxeditor blockquote {
+    border-left-color: #71303e;
+    color: #fff;
+}
+
+.explanation-panel .explanation-feedback {
+    border-color: #51232e;
+    background: rgba(36, 17, 22, 0.88);
+}
+
+.explanation-panel .explanation-feedback p {
+    color: #cfaab1;
+}
+
+.explanation-panel .feedback-button,
+.explanation-panel .agree-button {
+    border-color: #71303e;
+    color: #f1dce0;
+    background: #241116;
+}
+
+.explanation-panel .feedback-button:hover,
+.explanation-panel .feedback-button:focus-visible,
+.explanation-panel .agree-button:hover {
+    border-color: #ff3048;
+    color: #fff1f3;
+    background: #3a151f;
+}
