@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { VideoPlayer, BunnyPlayer } from '../components/video';
 import { LyricPanel } from '../components/bar';
 import { ExplanationPanel } from '../components/review';
+import RhymePanel from '../components/review/RhymePanel';
 import { videoService, barService, barReaction } from '../services/api';
 import '../components/bar/LyricsPanel.css';
 import './VideoWatch.css';
@@ -18,6 +19,7 @@ import { useAuth } from "../contexts/AuthContext"; // context bạn đang có us
 export default function VideoWatch() {
     const currentTimeRef = useRef(0);
     const [selectedLine, setSelectedLine] = useState(null);
+    const [activeAnalysis, setActiveAnalysis] = useState('explanation');
     const [selectedReactionID, setSelectedReactionID] = useState(null);
     const [selectedReactionsByLine, setSelectedReactionsByLine] = useState({});
 
@@ -178,10 +180,47 @@ export default function VideoWatch() {
 
             </div>
 
-            <ExplanationPanel
-                line={selectedLine}
-                onClose={() => setSelectedLine(null)}
-            />
+            <aside className="watch-analysis-panel">
+                <nav className="watch-analysis-tabs" role="tablist" aria-label="Phân tích bar">
+                    <button
+                        type="button"
+                        role="tab"
+                        aria-selected={activeAnalysis === 'explanation'}
+                        className={activeAnalysis === 'explanation' ? 'is-active' : ''}
+                        onClick={() => setActiveAnalysis('explanation')}
+                    >
+                        Giải thích
+                    </button>
+                    <button
+                        type="button"
+                        role="tab"
+                        aria-selected={activeAnalysis === 'rhyme'}
+                        className={activeAnalysis === 'rhyme' ? 'is-active' : ''}
+                        onClick={() => setActiveAnalysis('rhyme')}
+                    >
+                        Gieo vần
+                    </button>
+                </nav>
+                <div className="watch-analysis-content">
+                    {activeAnalysis === 'explanation' ? (
+                        selectedLine ? (
+                            <ExplanationPanel
+                                line={selectedLine}
+                                onClose={() => setSelectedLine(null)}
+                            />
+                        ) : (
+                            <div className="watch-analysis-empty">
+                                Chọn một câu rap để xem giải thích.
+                            </div>
+                        )
+                    ) : (
+                        <RhymePanel
+                            videoId={videoId}
+                            onClose={() => setActiveAnalysis('explanation')}
+                        />
+                    )}
+                </div>
+            </aside>
 
 
         </div>

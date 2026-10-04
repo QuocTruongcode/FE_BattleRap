@@ -1,0 +1,13 @@
+.view-post-drama-empty {
+    display: grid;
+    width: min(100%, 860px);
+    min-height: 220px;
+    padding: 24px;
+    place-items: center;
+    color: #65676b;
+    background: #fff;
+    border: 1px dashed #c9ccd1;
+    border-radius: 8px;
+    font-size: 14px;
+    text-align: center;
+}

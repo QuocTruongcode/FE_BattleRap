@@ -17,6 +17,8 @@ import { AuthProvider, useAuth } from './contexts/AuthContext'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import { barReaction } from '../src/services/api' // 👈 đổi đúng tên service bạn đang dùng
 import { RAGChatBot } from './components/RAGChatBot'
+import PageDrama from './pages/PageDrama'
+
 // Component con, nằm TRONG BrowserRouter + AuthProvider nên mới dùng được useLocation() và useAuth()
 function AppContent() {
   const location = useLocation()
@@ -118,6 +120,17 @@ function AppContent() {
           </ProtectedRoute>
         }
       />
+
+      <Route
+        path="/CRUDdrama"
+        element={
+          <ProtectedRoute allowedRoles={['U0']}>
+            <PageDrama />
+          </ProtectedRoute>
+        }
+      />
+
+
     </Routes>
   )
 }

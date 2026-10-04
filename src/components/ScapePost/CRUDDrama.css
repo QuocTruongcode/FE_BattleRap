@@ -1,0 +1,116 @@
+.crud-drama-panel {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: min(100%, 400px);
+    padding: 24px;
+    color: #202124;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.crud-drama-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.crud-drama-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+.crud-drama-label {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.crud-drama-links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.crud-drama-link-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.crud-drama-panel input {
+    box-sizing: border-box;
+    min-width: 0;
+    height: 40px;
+    padding: 0 10px;
+    color: inherit;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font: inherit;
+}
+
+.crud-drama-link-row input {
+    flex: 1;
+}
+
+.crud-drama-empty-add {
+    align-self: flex-start;
+}
+
+.crud-drama-panel input:focus {
+    border-color: #6366f1;
+    outline: 2px solid rgba(99, 102, 241, 0.18);
+}
+
+.crud-drama-icon-button {
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    color: #fff;
+    background: #4f46e5;
+    border: 0;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 20px;
+    line-height: 1;
+}
+
+.crud-drama-icon-button:hover:not(:disabled) {
+    background: #4338ca;
+}
+
+.crud-drama-remove-button {
+    background: #dc2626;
+}
+
+.crud-drama-remove-button:hover:not(:disabled) {
+    background: #b91c1c;
+}
+
+.crud-drama-submit-button {
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 16px;
+    color: #fff;
+    background: #4f46e5;
+    border: 0;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.crud-drama-submit-button:hover {
+    background: #4338ca;
+}
+
+.crud-drama-submit-button:focus-visible {
+    outline: 3px solid rgba(99, 102, 241, 0.35);
+    outline-offset: 2px;
+}

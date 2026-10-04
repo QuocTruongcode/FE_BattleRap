@@ -442,6 +442,27 @@ export const AIChatContext = {
     },
 };
 
+export const CheckTheRhyme = {
+    getRyme(videoId) {
+        return apiRequest(
+            `/api/check-the-rhyme/video/${videoId}`
+        );
+    },
+
+
+};
+
+export const FacebookPosts = {
+    scrapeFacebookPosts(payload) {
+        return apiRequest(`/api/facebook-posts`, {
+            method: 'POST',
+            body: payload,
+            timeout: 90000,
+
+        });
+    },
+
+};
 export default {
     apiRequest,
     videoService,
@@ -457,5 +478,7 @@ export default {
     Video_battler,
     explanation,
     historyChatBot,
-    AIChatContext
+    AIChatContext,
+    CheckTheRhyme,
+    FacebookPosts
 };
