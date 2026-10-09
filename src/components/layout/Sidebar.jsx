@@ -17,11 +17,11 @@ const ROUTED_ITEMS = [
     { icon: <FaProjectDiagram />, label: 'Tri thức Rap', to: '/knowledgeGraph' },
     { icon: <FaRobot />, label: 'Trợ lý ảo', to: '/chatbot' },
     { icon: <FaMicrophoneLines />, label: 'Battler', to: '/CRUDbattler' },
+    { icon: <FaFire />, label: 'Thịnh hành', to: '/CRUDdrama' },
 
 ];
 
 const STATIC_ITEMS = [
-    { icon: <FaFire />, label: 'Thịnh hành' },
     { icon: <FaYoutube />, label: 'Đăng ký' },
     { icon: <FaBook />, label: 'Thư viện' },
 ];

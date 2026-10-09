@@ -37,7 +37,7 @@ export function useVideoReview() {
         return true;
     };
 
-    const handleReviewAi = ({ formData }) => {
+    const handleReviewAi = ({ formData, matchID }) => {
         setReviewContent(null);
         const videoId = getYoutubeVideoId(formData.linkVideo);
 
@@ -52,7 +52,7 @@ export function useVideoReview() {
         setIsAnalyzing(true);
         setProgressMessage('');
 
-        sseRef.current = reviewService.getReviewsAI(videoId, {
+        sseRef.current = reviewService.getReviewsAI(videoId, matchID, {
             onStep: (data) => {
                 setProgressMessage(data.message);
             },

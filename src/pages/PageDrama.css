@@ -31,7 +31,7 @@
 
 .page-drama__workspace {
     display: grid;
-    grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 45fr) minmax(0, 55fr);
     align-items: start;
     gap: 24px;
 }
@@ -42,6 +42,7 @@
 
 .page-drama__settings .crud-drama-panel {
     width: 100%;
+    max-width: none;
 }
 
 .page-drama__preview {
@@ -78,6 +79,44 @@
 
 .page-drama__post-scroll .view-post-drama {
     margin: 0 auto;
+}
+
+.page-drama__post-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.page-drama__select-post-button {
+    display: grid;
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    place-items: center;
+    color: #fff;
+    background: #0f766e;
+    border: 2px solid #ccfbf1;
+    border-radius: 50%;
+    box-shadow: 0 3px 10px rgba(15, 118, 110, 0.25);
+    cursor: pointer;
+    font-size: 26px;
+    font-weight: 600;
+    line-height: 1;
+    transition: background-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.page-drama__select-post-button:hover {
+    background: #115e59;
+    box-shadow: 0 5px 14px rgba(15, 118, 110, 0.35);
+    transform: translateY(-2px);
+}
+
+.page-drama__select-post-button:focus-visible {
+    outline: 3px solid rgba(20, 184, 166, 0.45);
+    outline-offset: 2px;
 }
 
 @media (max-width: 900px) {

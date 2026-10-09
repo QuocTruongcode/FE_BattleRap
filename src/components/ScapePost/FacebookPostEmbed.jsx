@@ -52,7 +52,7 @@ function loadFacebookSdk() {
     return facebookSdkPromise;
 }
 
-export default function FacebookPostEmbed({ href }) {
+export default function FacebookPostEmbed({ href, width = 500 }) {
     const embedRef = useRef(null);
     const [error, setError] = useState(null);
 
@@ -87,8 +87,12 @@ export default function FacebookPostEmbed({ href }) {
     return (
         <div className="facebook-post-embed">
             {href ? (
-                <div ref={embedRef} className="facebook-post-embed-frame">
-                    <div className="fb-post" data-href={href} data-width="500" />
+                <div
+                    ref={embedRef}
+                    className="facebook-post-embed-frame"
+                    style={{ width: `min(100%, ${width}px)` }}
+                >
+                    <div className="fb-post" data-href={href} data-width={width} />
                 </div>
             ) : (
                 <p role="status">Chưa có link bài viết để nhúng.</p>

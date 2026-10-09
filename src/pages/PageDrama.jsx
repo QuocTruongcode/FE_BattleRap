@@ -4,10 +4,11 @@ import { CRUDDrama, ViewPostDrama } from '../components/ScapePost';
 import './PageDrama.css';
 
 export default function PageDrama() {
+    const [selectedPosts, setSelectedPosts] = useState([]);
     const [posts, setPosts] = useState([]);
 
     return (
-        console.log('PageDrama render', posts),
+        // console.log('PageDrama render', posts),
         <div className="page-drama">
             <MainLayout>
                 <div className="page-drama__content">
@@ -20,7 +21,15 @@ export default function PageDrama() {
 
                     <div className="page-drama__workspace">
                         <div className="page-drama__settings">
-                            <CRUDDrama onSubmit={setPosts} />
+                            <CRUDDrama
+                                onSubmit={setPosts}
+                                selectedPosts={selectedPosts}
+                                onRemoveSelectedPost={(postToRemove) => {
+                                    setSelectedPosts((currentPosts) => (
+                                        currentPosts.filter((post) => post !== postToRemove)
+                                    ));
+                                }}
+                            />
                         </div>
 
                         <section className="page-drama__preview" aria-labelledby="page-drama-preview-title">
@@ -29,10 +38,28 @@ export default function PageDrama() {
                             </h2>
                             <div className="page-drama__post-scroll">
                                 {posts.length > 0 ? posts.map((post, index) => (
-                                    <ViewPostDrama
+                                    <div
+                                        className="page-drama__post-item"
                                         key={post.postId || post.url || index}
-                                        post={post}
-                                    />
+                                    >
+                                        <ViewPostDrama post={post} />
+                                        <button
+                                            className="page-drama__select-post-button"
+                                            type="button"
+                                            onClick={() => setSelectedPosts((currentPosts) => (
+                                                currentPosts.some((selected) => (
+                                                    (selected.postId && selected.postId === post.postId)
+                                                    || (selected.url && selected.url === post.url)
+                                                ))
+                                                    ? currentPosts
+                                                    : [...currentPosts, post]
+                                            ))}
+                                            aria-label="Chọn bài đăng này"
+                                            title="Chọn bài đăng này"
+                                        >
+                                            +
+                                        </button>
+                                    </div>
                                 )) : (
                                     <ViewPostDrama />
                                 )}

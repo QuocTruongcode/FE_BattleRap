@@ -1,13 +1,23 @@
 import './ModalReview.css';
 
-export default function ModalReview({ isOpen, onClose, children, onReviewAi, onSave, onCancel, isAnalyzing, progressMessage }) {
+export default function ModalReview({
+  isOpen,
+  onClose,
+  children,
+  onReviewAi,
+  onSave,
+  onCancel,
+  isAnalyzing,
+  progressMessage,
+  title = 'Review trận đấu ( thống kê dựa trên các comment của khản giả )',
+}) {
   if (!isOpen) return null;
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h3 className="modal-title">Review trận đấu ( thống kê dựa trên các comment của khản giả )</h3>
+          <h3 className="modal-title">{title}</h3>
           <button className="modal-close" onClick={onClose} aria-label="Đóng modal">×</button>
         </div>
 
@@ -27,9 +37,11 @@ export default function ModalReview({ isOpen, onClose, children, onReviewAi, onS
         )}
 
         <div className="modal-actions">
-          <button type="button" className="modal-btn modal-btn-ai" onClick={onReviewAi} disabled={isAnalyzing}>
-            {isAnalyzing ? "Đang xử lý..." : "Review bằng AI"}
-          </button>
+          {onReviewAi && (
+            <button type="button" className="modal-btn modal-btn-ai" onClick={onReviewAi} disabled={isAnalyzing}>
+              {isAnalyzing ? "Đang xử lý..." : "Review bằng AI"}
+            </button>
+          )}
 
           <div className="modal-actions-right">
             <button type="button" className="modal-btn modal-btn-cancel" onClick={onCancel}>

@@ -260,6 +260,7 @@ export default function VideoCrud() {
         );
     }
 
+
     return (
         <div className="home-container">
             <Header
@@ -269,7 +270,7 @@ export default function VideoCrud() {
             />
             {/* //modal review */}
             <ModalReview isOpen={isOpen} onClose={() => { setIsOpen(false); setReviewContent(null); }}
-                onReviewAi={() => handleReviewAi({ formData })} onSave={() => triggerSubmitFromModal(formRef)}
+                onReviewAi={() => handleReviewAi({ formData, matchID: editingId })} onSave={() => triggerSubmitFromModal(formRef)}
                 isAnalyzing={isAnalyzing} progressMessage={progressMessage} onCancel={handleCancel}>
                 <EditReview ref={editorRef}
                     markdown={reviewContent} onChange={setReviewContent} />

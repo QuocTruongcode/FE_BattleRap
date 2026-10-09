@@ -1,7 +1,7 @@
 import FacebookPostEmbed from './FacebookPostEmbed';
 import './ViewPostDrama.css';
 
-export default function ViewPostDrama({ post }) {
+export default function ViewPostDrama({ post, embedWidth }) {
     if (!post) {
         return (
             <div className="view-post-drama-empty" role="status">
@@ -10,5 +10,5 @@ export default function ViewPostDrama({ post }) {
         );
     }
 
-    return <FacebookPostEmbed href={post.url} />;
+    return <FacebookPostEmbed href={post.url} width={embedWidth} />;
 }

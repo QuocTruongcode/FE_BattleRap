@@ -182,7 +182,7 @@ export const reviewService = {
     // Giữ cách gọi cũ cho các API bình thường khác
 
     // Hàm mới dành riêng cho SSE — không return data, mà nhận callback
-    getReviewsAI(videoId, { onStep, onResult, onError, onCancelled }) {
+    getReviewsAI(videoId, matchID, { onStep, onResult, onError, onCancelled }) {
         const baseURL = import.meta.env.VITE_API_BASE_URL || "";
 
         // 1. Tự sinh jobId ở phía client
@@ -190,7 +190,7 @@ export const reviewService = {
 
         // 2. Gửi kèm jobId lên server khi mở kết nối SSE
         const source = new EventSource(
-            `${baseURL}/api/review?videoId=${videoId}&jobId=${jobId}`
+            `${baseURL}/api/review?videoId=${videoId}&jobId=${jobId}&matchID=${matchID}`
         );
 
         source.addEventListener('step', (e) => {
@@ -239,6 +239,13 @@ export const searchService = {
             method: 'GET',
             params: { keyword },
             signal,
+        });
+    },
+
+    searchDramas(keyword) {
+        return apiRequest('/api/search/dramas', {
+            method: 'GET',
+            params: { keyword },
         });
     },
 };
@@ -448,8 +455,6 @@ export const CheckTheRhyme = {
             `/api/check-the-rhyme/video/${videoId}`
         );
     },
-
-
 };
 
 export const FacebookPosts = {
@@ -461,7 +466,50 @@ export const FacebookPosts = {
 
         });
     },
+};
 
+export const Drama = {
+    create(payload) {
+        return apiRequest('/api/dramas', {
+            method: 'POST',
+            body: payload,
+        });
+    },
+
+    bulkCreate(payload) {
+        return apiRequest('/api/drama-events/bulk', {
+            method: 'POST',
+            body: payload,
+        });
+    },
+
+    scrapeFacebookComments(payload) {
+        return apiRequest('/api/facebook-comments', {
+            method: 'POST',
+            body: payload,
+            timeout: 90000,
+
+        });
+    },
+
+    getAllDramaEventByDramaID(dramaID) {
+        return apiRequest(
+            `/api/drama-events/drama/${dramaID}`
+        );
+    },
+
+    deleteDramaEvent(id) {
+        return apiRequest(`/api/drama-events/${id}`, {
+            method: 'DELETE',
+
+        });
+    },
+
+    reviewDrama(dramaID) {
+        return apiRequest(`/api/review-drama/${dramaID}`, {
+            timeout: 90000,
+        });
+    },
 };
 export default {
     apiRequest,
@@ -480,5 +528,6 @@ export default {
     historyChatBot,
     AIChatContext,
     CheckTheRhyme,
-    FacebookPosts
+    FacebookPosts,
+    Drama
 };
