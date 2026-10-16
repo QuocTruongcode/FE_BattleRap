@@ -3,7 +3,7 @@ import { forwardRef, useRef, useState, useEffect, useImperativeHandle } from 're
 import { FiMaximize2, FiMinimize2 } from 'react-icons/fi';
 import './VideoStage.css';
 
-const VideoStage = forwardRef(function VideoStage({ children, playerNode, isPlaying }, ref) {
+const VideoStage = forwardRef(function VideoStage({ children, playerNode, isPlaying, fullscreenChildren }, ref) {
     const wrapperRef = useRef(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -13,7 +13,7 @@ const VideoStage = forwardRef(function VideoStage({ children, playerNode, isPlay
     }));
 
     useEffect(() => {
-        const handleChange = () => setIsFullscreen(!!document.fullscreenElement);
+        const handleChange = () => setIsFullscreen(document.fullscreenElement === wrapperRef.current);
         document.addEventListener('fullscreenchange', handleChange);
         return () => document.removeEventListener('fullscreenchange', handleChange);
     }, []);
@@ -21,8 +21,11 @@ const VideoStage = forwardRef(function VideoStage({ children, playerNode, isPlay
     const toggleFullscreen = () => {
         if (!document.fullscreenElement) {
             wrapperRef.current.requestFullscreen();
+            // console.log("Check fullScreen: ", document.fullscreenElement)
         } else {
             document.exitFullscreen();
+            // console.log("Check fullScreen2: ", document.fullscreenElement)
+
         }
     };
 
@@ -45,6 +48,12 @@ const VideoStage = forwardRef(function VideoStage({ children, playerNode, isPlay
             >
                 {children}
             </div>
+
+            {isFullscreen && !isPlaying && fullscreenChildren && (
+                <div className="video-stage__fullscreen-content">
+                    {fullscreenChildren}
+                </div>
+            )}
 
             <button
                 className="video-stage__fs-btn"

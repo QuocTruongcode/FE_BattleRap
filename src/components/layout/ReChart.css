@@ -1,0 +1,111 @@
+.chart-card {
+  width: 50%;
+  max-width: none;
+  box-sizing: border-box;
+  padding: 0;
+  margin-top: 35px;
+
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+
+  /* Trong suốt hoàn toàn */
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+/* .chart-card {
+  -webkit-mask-image: linear-gradient(to bottom, #000 75%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 75%, transparent 100%);
+} */
+
+.chart-card .chart-axis-tick rect {
+  fill: rgba(5, 7, 10, 0.72);
+}
+
+.chart-card .chart-axis-tick text {
+  font-size: 12px;
+  fill: rgba(255, 254, 254, 0.85);
+}
+
+/* Tooltip cũng làm kính cho đồng bộ */
+.chart-tooltip {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 12px;
+  background: rgba(6, 7, 7, 0.6);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+}
+
+.chart-tooltip__label { font-size: 12px; color: rgba(255, 255, 255, 0.65); }
+.chart-tooltip__value { font-size: 15px; color: #26a69a; }
+
+.chart-live-label rect {
+    fill: #2a2e39;
+    stroke: rgba(255, 255, 255, 0.08);
+}
+.chart-live-label__time {
+    fill: rgba(255, 255, 255, 0.7);
+    font-size: 13px;
+}
+.chart-live-label__value {
+    fill: #26a69a;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.chart-axis-tick.is-active rect {
+    fill: #26a69a;
+}
+.chart-axis-tick.is-active text {
+    fill: #fff;
+    font-weight: 600;
+}
+
+.chart-card { position: relative; }
+
+.chart-live-label rect {
+    fill: #2a2e39;
+    stroke: rgba(255, 255, 255, 0.08);
+}
+.chart-live-label__time {
+    fill: rgba(255, 255, 255, 0.7);
+    font-size: 13px;
+}
+.chart-live-label__value {
+    fill: #26a69a;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.chart-card .chart-axis-tick.is-active rect { fill: #26a69a; }
+.chart-card .chart-axis-tick.is-active text { fill: #fff; font-weight: 600; }
+
+.chart-pager {
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #2a2e39;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 12px;
+}
+.chart-pager button {
+    border: 0;
+    border-radius: 999px;
+    padding: 2px 8px;
+    background: #26a69a;
+    color: #fff;
+    font-size: 12px;
+    cursor: pointer;
+}

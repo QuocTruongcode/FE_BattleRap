@@ -70,9 +70,32 @@
 }
 
 .lyricContent {
+    flex: 1;
+    min-width: 0;
     font-size: 14px;
     color: #222;
     line-height: 1.4;
+}
+
+.lyricStats {
+    display: flex;
+    flex-shrink: 0;
+    gap: 8px;
+    margin-left: auto;
+    color: #888;
+    font-size: 30px;
+    font-family: 'Big Shoulders Stencil Display', sans-serif;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.lyricStats span:first-child {
+    color: #a66a17;
+}
+
+.lyricStats span:last-child {
+    color: #28776f;
 }
 
 .active {
@@ -91,6 +114,6 @@
 
 .hasNote::after {
     content: '📝';
-    margin-left: auto;
+    margin-left: 0;
     font-size: 12px;
 }

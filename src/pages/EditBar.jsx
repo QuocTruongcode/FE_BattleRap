@@ -224,6 +224,7 @@ export default function EditBar() {
         //     queryClient.getQueryCache().getAll().map(q => q.queryKey)
         // ),
         console.log("battlerIDSelected: ", battlerIDSelected),
+        console.log("Check savedBars in editbar: ", savedBars),
         <div className="edit-bar-page">
             {/* Top bar */}
             <div className="edit-bar-topbar">

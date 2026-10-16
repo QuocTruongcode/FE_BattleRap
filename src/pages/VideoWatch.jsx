@@ -14,7 +14,8 @@ import './VideoWatch.css';
 import { ReactionBar } from '../components/bar-reaction';
 import { VideoStage } from '../components/video';
 import { useAuth } from "../contexts/AuthContext"; // context bạn đang có user, loading
-
+import MyChart from '../components/layout/ReChart'
+import TableSummary from '../components/layout/TableSummary'
 
 export default function VideoWatch() {
     const currentTimeRef = useRef(0);
@@ -108,13 +109,16 @@ export default function VideoWatch() {
     useEffect(() => {
         if (!user?.userId) return;
         if (Object.keys(selectedReactionsByLine).length === 0) return;
-
         localStorage.setItem(
             `pending_reactions_${user.userId}`,
             JSON.stringify(selectedReactionsByLine)
         );
     }, [selectedReactionsByLine, user?.userId]);
     // Kêt thúc useEffect
+
+    // useEffect(() => {
+    //     console.log("Check: ", document.fullscreenElement)
+    // }, [])
 
     const handleSpaceKey = () => {
         playerRef.current?.togglePlay();
@@ -132,11 +136,12 @@ export default function VideoWatch() {
     };
 
     return (
+        // console.log("Check currentTimeRef: ", currentTimeRef),
         // console.log("Check reactionBarByVideo: ", reactionBarByVideo),
         // console.log("check user: ", user),
         // console.log("check selectedReactionID: ", selectedReactionID),
-        // console.log("Check line active id: ", activeLineIdRef.current),
-        console.log("Check selectedReactionsByLine: ", selectedReactionsByLine),
+        console.log("Check video: ", video),
+        console.log("Check savedBars: ", savedBars),
         <div className="watch-page">
             {/* 
                 <button onClick={() => navigate(-1)}>
@@ -159,8 +164,19 @@ export default function VideoWatch() {
                         ref={playerRef}
                         videoUrl={video?.linkVideo}
                         onTimeUpdate={handleTimeUpdate}
+                        fullscreenChildren={
+                            <div className="video-summary-layout">
+                                <MyChart savedBars={savedBars} currentTimeRef={currentTimeRef} />
+                                <TableSummary
+                                    savedBars={savedBars}
+                                    currentTimeRef={currentTimeRef}
+                                    onBarSelect={(time) => playerRef.current?.seekTo(time)}
+                                />
+                            </div>
+                        }
                     >
                         <ReactionBar onSpaceKey={handleSpaceKey} onSelect={handleSelectReaction} />
+
                     </VideoPlayer>
                 )}
 

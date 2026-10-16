@@ -5,9 +5,11 @@ export default function ModalReview({
   onClose,
   children,
   onReviewAi,
+  onSummarizeAi,
   onSave,
   onCancel,
   isAnalyzing,
+  isSummarizing,
   progressMessage,
   title = 'Review trận đấu ( thống kê dựa trên các comment của khản giả )',
 }) {
@@ -24,11 +26,11 @@ export default function ModalReview({
         <div className="modal-body">{children}</div>
 
         {/* Khu vực hiện tiến trình khi đang phân tích AI */}
-        {isAnalyzing && (
+        {(isAnalyzing || isSummarizing) && (
           <div className="ai-progress">
             <span className="ai-spinner" />
             <span className="ai-progress-text">
-              {progressMessage || "Đang khởi tạo"}
+              {isSummarizing ? progressMessage || "Đang tóm tắt bằng AI" : progressMessage || "Đang khởi tạo"}
               <span className="ai-dots">
                 <span>.</span><span>.</span><span>.</span>
               </span>
@@ -40,6 +42,16 @@ export default function ModalReview({
           {onReviewAi && (
             <button type="button" className="modal-btn modal-btn-ai" onClick={onReviewAi} disabled={isAnalyzing}>
               {isAnalyzing ? "Đang xử lý..." : "Review bằng AI"}
+            </button>
+          )}
+          {onSummarizeAi && (
+            <button
+              type="button"
+              className="modal-btn modal-btn-ai"
+              onClick={onSummarizeAi}
+              disabled={isSummarizing || isAnalyzing}
+            >
+              {isSummarizing ? "Đang tóm tắt..." : "Tóm tắt bằng AI"}
             </button>
           )}
 

@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import styles from './LyricPanel.module.css';
-import { REACTIONS_ICONS } from "../../constants/const.js";
+import {
+    getAverageScoreColor,
+    getOptimisticReactionStats,
+    REACTIONS_ICONS,
+} from "../../constants/const.js";
 
 export default function LyricPanel({ lyrics, getCurrentTime, selectedId,
     onSelectLine, usePlainCss = false, onActiveLineChange,
@@ -47,6 +51,7 @@ export default function LyricPanel({ lyrics, getCurrentTime, selectedId,
             lyricLine: 'lyricLine',
             lyricTime: 'lyricTime',
             lyricContent: 'lyricContent',
+            lyricStats: 'lyricStats',
             active: 'active',
             selected: 'selected',
             hasNote: 'has-note',
@@ -58,6 +63,7 @@ export default function LyricPanel({ lyrics, getCurrentTime, selectedId,
             lyricLine: styles.lyricLine,
             lyricTime: styles.lyricTime,
             lyricContent: styles.lyricContent,
+            lyricStats: styles.lyricStats,
             active: styles.active,
             selected: styles.selected,
             hasNote: styles.hasNote,
@@ -71,9 +77,16 @@ export default function LyricPanel({ lyrics, getCurrentTime, selectedId,
                     const savedReaction = reactionBarByVideo.find(
                         (reaction) => String(reaction.barID) === String(line.id)
                     );
+                    const optimisticReactionId = selectedReactionsByLine[line.id]
+                        ?? (line.id === activeLineId ? selectedReactionID : null);
                     const lineReactionId = selectedReactionsByLine[line.id]
                         ?? savedReaction?.ReactionType
                         ?? (line.id === activeLineId ? selectedReactionID : null);
+                    const reactionStats = getOptimisticReactionStats(
+                        line,
+                        optimisticReactionId,
+                        savedReaction?.ReactionType,
+                    );
                     const lineReaction = REACTIONS_ICONS.find((reaction) => reaction.id === lineReactionId);
                     const isActiveLine = line.id === activeId;
                     const isSelectedLine = line.id === selectedId;
@@ -126,6 +139,15 @@ export default function LyricPanel({ lyrics, getCurrentTime, selectedId,
                                     <ReactionIcon />
                                 </span>
                             )}
+                            <span className={classes.lyricStats}>
+                                <span style={{ color: getAverageScoreColor(reactionStats.averageScore) }}>
+                                    {reactionStats.averageScore == null
+                                        ? '-'
+                                        : Number(reactionStats.averageScore).toFixed(1)} đ
+                                </span>
+                                /
+                                <span>{reactionStats.totalReaction ?? '-'} Ratings</span>
+                            </span>
                         </div>
                     );
                 })}

@@ -5,7 +5,7 @@ import { Video_battler } from '../../services/api';
  * BarInputPanel
  * Props:
  *  - currentTime: number (giây, từ VideoPlayer)
- *  - editingBar: { id, time, content } | null  (khi click Sửa từ BarTimeline)
+ *  - editingBar: { id, time, content, barttelID } | null  (khi click Sửa từ BarTimeline)
  *  - onAddBar: ({ time, content, battlerId }) => void
  *  - onUpdateBar: ({ id, time, content, battlerId }) => void
  *  - onCancelEdit: () => void
@@ -31,8 +31,14 @@ export default function BarInputPanel({
         if (editingBar) {
             setLockedTime(editingBar.time);
             setContent(editingBar.content);
+            const battlerId = editingBar.barttelID ?? editingBar.battlerId;
+            if (battlerId != null && battlerId !== '') {
+                const nextBattlerId = String(battlerId);
+                setSelectedBattlerId(nextBattlerId);
+                onBattlerChange?.(nextBattlerId);
+            }
         }
-    }, [editingBar]);
+    }, [editingBar, onBattlerChange]);
 
     const formatTime = (secs) => {
         if (secs == null) return '--:--';
@@ -79,9 +85,14 @@ export default function BarInputPanel({
 
                 setBattlerOptions(normalized);
                 setSelectedBattlerId((prev) => {
-                    const nextValue = prev && normalized.some((item) => String(item.battlerId) === String(prev))
-                        ? prev
-                        : normalized[0]?.battlerId ?? '';
+                    const editingBattlerId = editingBar?.barttelID ?? editingBar?.battlerId;
+                    const hasPreviousBattler = prev
+                        && normalized.some((item) => String(item.battlerId) === String(prev));
+                    const nextValue = editingBattlerId != null && editingBattlerId !== ''
+                        ? String(editingBattlerId)
+                        : hasPreviousBattler
+                            ? String(prev)
+                            : String(normalized[0]?.battlerId ?? '');
 
                     onBattlerChange?.(nextValue || null);
                     return nextValue;
@@ -98,7 +109,7 @@ export default function BarInputPanel({
         return () => {
             isMounted = false;
         };
-    }, [videoId]);
+    }, [videoId, editingBar?.id, editingBar?.barttelID, editingBar?.battlerId, onBattlerChange]);
 
     const handleSubmit = () => {
         if (!content.trim() || lockedTime == null) return;
@@ -140,7 +151,7 @@ export default function BarInputPanel({
     const canSubmit = content.trim().length > 0 && lockedTime != null;
 
     return (
-        console.log("selectedBattlerId: ", selectedBattlerId),
+        console.log("editingBar: ", editingBar),
         <div className="bar-input-panel">
             {/* Header thông tin thời gian */}
             <div className="bip-time-row">
@@ -197,6 +208,13 @@ export default function BarInputPanel({
                     }}
                     disabled={battlerOptions.length === 0}
                 >
+                    {selectedBattlerId
+                        && !battlerOptions.some((battler) => String(battler.battlerId ?? battler.id) === selectedBattlerId)
+                        && (
+                            <option value={selectedBattlerId}>
+                                Battler {selectedBattlerId}
+                            </option>
+                        )}
                     {battlerOptions.length > 0 ? (
                         battlerOptions.map((battler) => {
                             const battlerId = battler.battlerId ?? battler.id;

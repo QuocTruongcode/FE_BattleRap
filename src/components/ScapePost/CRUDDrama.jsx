@@ -1,12 +1,13 @@
 import { Fragment, useEffect, useState } from 'react';
 import './CRUDDrama.css';
-import { FacebookPosts, Drama, searchService } from '../../services/api';
+import { FacebookPosts, Drama, searchService, ChunkService } from '../../services/api';
 import { EditReview, ModalReview } from '../review';
 import ViewPostDrama from './ViewPostDrama';
 const DEFAULT_VALUE = {
     links: ['https://www.facebook.com/grabfanthang9'],
     onlyPostsNewerThan: '',
     onlyPostsOlderThan: '',
+    urlPost: '',
 };
 
 function EventVideoTitleSearch({ selectedTitle, videoID, onSelect }) {
@@ -111,6 +112,7 @@ function getInitialValue(initialValue) {
             : [...DEFAULT_VALUE.links],
         onlyPostsNewerThan: initialValue?.onlyPostsNewerThan ?? DEFAULT_VALUE.onlyPostsNewerThan,
         onlyPostsOlderThan: initialValue?.onlyPostsOlderThan ?? DEFAULT_VALUE.onlyPostsOlderThan,
+        urlPost: initialValue?.urlPost ?? DEFAULT_VALUE.urlPost,
     };
 }
 
@@ -130,10 +132,9 @@ export default function CRUDDrama({
     const [deletingDramaEventID, setDeletingDramaEventID] = useState(null);
     const [dramaEvent, setDramaEvent] = useState([]);
     const [selectedVideoByItem, setSelectedVideoByItem] = useState({});
-    const [reviewDrama, setReviewDrama] = useState('');
-    const [reviewDramaID, setReviewDramaID] = useState(null);
     const [reviewDraft, setReviewDraft] = useState('');
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+    const [isReviewingDrama, setIsReviewingDrama] = useState(false);
 
     const updateValue = (nextValue) => {
         setFormValue(nextValue);
@@ -168,13 +169,24 @@ export default function CRUDDrama({
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+
         try {
             setIsSubmittingDramaEvent(true);
-            const posts = await FacebookPosts.scrapeFacebookPosts(formValue);
-            if (!Array.isArray(posts?.data)) {
-                throw new Error('Dữ liệu bài đăng trả về không hợp lệ.');
+            if (formValue.urlPost.trim()) {
+                setIsSubmittingDramaEvent(true);
+                console.log("Check url: ", formValue.urlPost.trim())
+                const APost = await FacebookPosts.scrapeAPost({ url: formValue.urlPost.trim() })
+                console.log("Check APost: ", APost)
+                onSubmit?.(APost.data);
             }
-            onSubmit?.(posts.data);
+            else {
+                const posts = await FacebookPosts.scrapeFacebookPosts(formValue);
+                if (!Array.isArray(posts?.data)) {
+                    throw new Error('Dữ liệu bài đăng trả về không hợp lệ.');
+                }
+                onSubmit?.(posts.data);
+            }
+
         } catch (e) {
             console.error('Failed to scrape Facebook posts:', e);
             alert('Lấy bài đăng thất bại.');
@@ -302,41 +314,96 @@ export default function CRUDDrama({
 
     const ReviewDrama = async (dramaID) => {
         try {
+            // setIsSubmittingDramaEvent(false);
+
             if (dramaID === null) {
                 alert('Vui lòng chọn drama trước khi xem đánh giá.');
                 return;
             }
-            if (reviewDramaID === dramaID) {
-                setReviewDraft(reviewDrama);
+            const reviewed = await Drama.getDramaByID(dramaID)
+            console.log("Check reviewed drama: ", reviewed.data.summary)
+            if (reviewed?.data?.summary === null) {
+                setReviewDraft("Chưa có đánh giá drama này, vui lòng nhấn Review bằng AI để tạo đánh giá drama.")
                 setIsReviewModalOpen(true);
+
                 return;
             }
-            const review = await Drama.reviewDrama(dramaID);
-            if (typeof review?.data?.message !== 'string') {
-                throw new Error('Nội dung review drama trả về không hợp lệ.');
-            }
-            setReviewDrama(review.data.message);
-            setReviewDramaID(dramaID);
-            setReviewDraft(review.data.message);
+            setReviewDraft(reviewed.data.summary);
+
             setIsReviewModalOpen(true);
-            setIsSubmittingDramaEvent(true);
         } catch (error) {
             console.error('Review drama error:', error);
             alert('Có lỗi xảy ra khi xem đánh giá drama.');
         } finally {
-            setIsSubmittingDramaEvent(false);
+            // setIsSubmittingDramaEvent(true);
         }
     };
 
+    const handleReviewDramaWithAi = async () => {
+        if (dramaID === null) {
+            alert('Vui lòng chọn drama trước khi đánh giá bằng AI.');
+            return;
+        }
+
+        setIsReviewingDrama(true);
+        try {
+            const review = await Drama.reviewDrama(dramaID);
+            if (typeof review?.data?.message !== 'string') {
+                throw new Error('Nội dung review drama trả về không hợp lệ.');
+            }
+            setReviewDraft(review.data.message);
+        } catch (error) {
+            console.error('AI review drama error:', error);
+            alert('Có lỗi xảy ra khi đánh giá drama bằng AI.');
+        } finally {
+            setIsReviewingDrama(false);
+        }
+    };
+
+    const updateDramaReview = async (dramaID, reviewContent) => {
+        try {
+            if (dramaID === null) {
+                alert('Vui lòng chọn drama trước khi cập nhật đánh giá.');
+                return;
+            }
+            const res = await Drama.update(dramaID, { summary: reviewContent });
+            console.log('Drama review updated:', res);
+            // setReviewDrama(reviewContent);
+            // setReviewDraft(reviewContent);
+        } catch (error) {
+            console.error('Update drama review error:', error);
+            alert('Có lỗi xảy ra khi cập nhật đánh giá drama.');
+        }
+    };
+
+    const handleSaveToVectorDB = async (dramaID) => {
+        try {
+            const req = await ChunkService.upsertChunkDrama(dramaID);
+            if (req.success === true) {
+                alert("Lưu vào vectorDB thành công!")
+            }
+        } catch (e) {
+            alert("Lưu vào vetorDB thất bại!")
+        }
+    }
+
     return (
+        // console.log("Check reviewDraft: ", reviewDraft),
+        // console.log("Check reviewDrama: ", reviewDrama),
+        console.log("Check dramaEvent: ", dramaEvent),
         <div className="crud-drama-forms">
             <ModalReview
                 isOpen={isReviewModalOpen}
                 title="Đánh giá Drama"
-                onClose={() => setIsReviewModalOpen(false)}
+                onClose={() => { setIsReviewModalOpen(false) }}
+                onReviewAi={handleReviewDramaWithAi}
+                isAnalyzing={isReviewingDrama}
+                progressMessage="Đang đánh giá drama bằng AI"
                 onSave={() => {
-                    setReviewDrama(reviewDraft);
-                    setIsReviewModalOpen(false);
+                    // setIsReviewModalOpen(false);
+                    console.log("Saved: ");
+                    // onClick={() => updateDramaReview(dramaID, reviewDraft);
+                    updateDramaReview(dramaID, reviewDraft);
                 }}
                 onCancel={() => setIsReviewModalOpen(false)}
             >
@@ -395,6 +462,17 @@ export default function CRUDDrama({
                         )}
                     </div>
                 </div>
+
+                <label className="crud-drama-field" htmlFor="crud-drama-post-url">
+                    <span className="crud-drama-label">URL post</span>
+                    <input
+                        id="crud-drama-post-url"
+                        type="url"
+                        value={formValue.urlPost}
+                        onChange={(event) => updateValue({ ...formValue, urlPost: event.target.value })}
+                        placeholder="Nhập URL post(Nhập để lấy riêng 1 bài post)"
+                    />
+                </label>
 
                 <label className="crud-drama-field" htmlFor="crud-drama-newer-than">
                     <span className="crud-drama-label">Bài đăng mới hơn từ</span>
@@ -466,6 +544,14 @@ export default function CRUDDrama({
                             Review
                         </button>
                     </div>
+                    <button
+                        className="crud-drama-submit-button crud-drama-action-save"
+                        type="button"
+                        onClick={() => handleSaveToVectorDB(dramaID)}
+                        disabled={isSubmittingDramaEvent || dramaID === null}
+                    >
+                        Lưu xuống vectorDB
+                    </button>
                 </form>
                 {dramaSearchResults !== null && (
                     <div className="crud-drama-search-results" aria-live="polite">
@@ -558,6 +644,9 @@ export default function CRUDDrama({
                             ))}
                         </>
                     )}
+
+
+                    // Viết  ở đây phần lấy bài post trực tiếp từ link
                     <button
                         className="crud-drama-submit-button"
                         type="button"
@@ -582,7 +671,7 @@ export default function CRUDDrama({
                         }}
                         disabled={isSubmittingDramaEvent}
                     >
-                        Đồng ý
+                        Đồng ý lưu các sự kiện
                     </button>
                 </section>
             )}

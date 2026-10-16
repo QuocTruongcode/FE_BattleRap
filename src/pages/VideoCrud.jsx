@@ -6,7 +6,7 @@ import { useVideoCrudForm } from '../hooks/useVideoCrudForm';
 import { useVideoCrudQueries } from '../hooks/useVideoCrudQueries';
 import { useVideoReview } from '../hooks/useVideoReview';
 import './VideoCrud.css';
-import { searchBattler, Video_battler } from '../services/api';
+import { searchBattler, Video_battler, ChunkService } from '../services/api';
 import BattlerTag from '../components/battler/BattlerTag';
 
 export default function VideoCrud() {
@@ -260,6 +260,20 @@ export default function VideoCrud() {
         );
     }
 
+    const handleSaveVectorDB = async (videoID) => {
+        try {
+            console.log("Check videoID: ", videoID)
+            const req = await ChunkService.upsertChunkVideoAndBar(videoID)
+            if (req.success === true) {
+                alert("Lưu data xuóng vectorDB thành công!")
+
+            }
+            // console.log("Check req chunk video and bar: ", req)
+        } catch (e) {
+            alert("Lưu data xuóng vectorDB thất bại!")
+        }
+    }
+
 
     return (
         <div className="home-container">
@@ -392,10 +406,15 @@ export default function VideoCrud() {
                                     <button type="submit" value="Review" className="ghost-button-review">
                                         Review
                                     </button>
+
+
                                 </div>
 
                                 {editingId ? (
                                     <>
+                                        <button type="button" value="SaveToVectorDB" className="ghost-button-save-chunks" onClick={() => handleSaveVectorDB(editingId)}>
+                                            Lưu data xuống vectorDB
+                                        </button>
                                         <div className="battler-search-row">
                                             <div className="battler-search-field">
                                                 <label>

@@ -60,3 +60,13 @@
 .video-stage__overlay > * {
     pointer-events: auto;
 }
+
+.video-stage__fullscreen-content {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.video-stage__fullscreen-content > * {
+    pointer-events: auto;
+}

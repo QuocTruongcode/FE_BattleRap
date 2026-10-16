@@ -1,6 +1,6 @@
 import { useEffect, useRef, forwardRef, useImperativeHandle, memo, useState } from 'react';
 import VideoStage from './VideoStage';
-const VideoPlayer = forwardRef(function VideoPlayer({ videoUrl, onTimeUpdate, children }, ref) {
+const VideoPlayer = forwardRef(function VideoPlayer({ videoUrl, onTimeUpdate, children, fullscreenChildren }, ref) {
     const [isPlaying, setIsPlaying] = useState(false); // local, không cần đẩy ra ngoài
     const playerRef = useRef(null);
     const intervalRef = useRef(null);
@@ -120,7 +120,7 @@ const VideoPlayer = forwardRef(function VideoPlayer({ videoUrl, onTimeUpdate, ch
             playerNode={<div id="yt-player" style={{ width: '100%', height: '100%' }}
             />}
             isPlaying={isPlaying}
-
+            fullscreenChildren={fullscreenChildren}
         >
             {children}
         </VideoStage>

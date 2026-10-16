@@ -273,7 +273,9 @@
 .crud-drama-action-review {
     background: #9333ea;
 }
-
+.crud-drama-action-save{
+    background-color: rgb(49, 5, 169);
+}
 .crud-drama-action-review:hover {
     background: #7e22ce;
 }

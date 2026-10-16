@@ -34,6 +34,8 @@ import './RAGChatBot.css';
 import { chatBotService } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { historyChatBot, AIChatContext } from '../../services/api'
+import { useNavigate } from 'react-router-dom';
+import { handleAction } from '../../styles/utils/chatActions';
 const starterMessages = [
     {
         id: 'welcome',
@@ -69,6 +71,7 @@ export default function RAGChatBot({ onSendMessage }) {
         setConversationState(nextConversation);
     };
 
+    const navigate = useNavigate()
     useEffect(() => {
         const loadConversation = async () => {
             try {
@@ -163,11 +166,14 @@ export default function RAGChatBot({ onSendMessage }) {
             };
             const response = await AIChatContext.askWithContext(payload);
             console.log("Check response: ", response)
+            if (response?.data?.action !== null) {
+                handleAction(response.data.action, { navigate });
+            }
             setconversation(userMessage);
             await historyChatBot.create(conversationRef.current);
 
             // const response = await chatBotService.postQuery(content);
-            const reply = response?.data ?? 'Tôi chưa có câu trả lời cho câu hỏi này.';
+            const reply = response?.data?.message ?? 'Tôi chưa có câu trả lời cho câu hỏi này.';
             const assistantMessage = {
                 // id: `assistant-${Date.now()}`,
                 role: 'assistant',

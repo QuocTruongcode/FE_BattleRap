@@ -466,6 +466,15 @@ export const FacebookPosts = {
 
         });
     },
+
+    scrapeAPost(payload) {
+        return apiRequest(`/api/facebook-posts/url`, {
+            method: 'POST',
+            body: payload,
+            timeout: 90000,
+
+        });
+    },
 };
 
 export const Drama = {
@@ -510,7 +519,39 @@ export const Drama = {
             timeout: 90000,
         });
     },
+
+    update(id, payload) {
+        return apiRequest(`/api/dramas/${id}`, {
+            method: 'PUT',
+            body: payload,
+        });
+    },
+
+    getDramaByID(dramaID) {
+        return apiRequest(
+            `/api/dramas/${dramaID}`
+        );
+    },
 };
+
+export const ChunkService = {
+    upsertChunkVideoAndBar(videoID) {
+        return apiRequest(
+            `/api/chunks/video/${videoID}/bars`, {
+            timeout: 100000,
+        }
+        );
+    },
+
+    upsertChunkDrama(dramaID) {
+        return apiRequest(
+            `/api/chunks/drama/${dramaID}`, {
+            timeout: 100000,
+        }
+        );
+    }
+
+}
 export default {
     apiRequest,
     videoService,
@@ -529,5 +570,6 @@ export default {
     AIChatContext,
     CheckTheRhyme,
     FacebookPosts,
-    Drama
+    Drama,
+    ChunkService,
 };

@@ -49,6 +49,7 @@
     align-items: center;
     gap: 18px;
     padding: 24px 12px;
+    padding-top: 0px;
     pointer-events: none; /* khoảng gap giữa các nút cũng xuyên click được */
 }
 
@@ -59,7 +60,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 0px;
     padding: 18px 10px;
     border-radius: 18px;
     background: rgba(255, 255, 255, 0.06);
