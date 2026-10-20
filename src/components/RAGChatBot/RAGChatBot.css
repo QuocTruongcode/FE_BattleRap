@@ -9,7 +9,6 @@
     width: 100%;
     min-height: 680px;
     overflow: hidden;
-    background: #fff;
     color: var(--rag-ink);
     font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
 }
@@ -100,14 +99,13 @@
     --rag-soft: #1a0d11;
     --rag-accent: #e62f4b;
     --rag-accent-light: #3a151f;
-    background-color: #10090b;
-    background-image: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.02) 0, rgba(255, 255, 255, 0.02) 1px, transparent 1px, transparent 4px);
+    background: none;
     color: var(--rag-ink);
 }
 
 .rag-chatbot__sidebar,
 .rag-chatbot__main {
-    background: rgba(16, 9, 11, 0.96);
+    background: none;
 }
 
 .rag-chatbot__sidebar {

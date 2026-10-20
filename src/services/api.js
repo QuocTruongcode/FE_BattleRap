@@ -532,6 +532,12 @@ export const Drama = {
             `/api/dramas/${dramaID}`
         );
     },
+
+    getAllVideoOfDrama() {
+        return apiRequest(
+            `/api/dramas/with-videos`
+        )
+    }
 };
 
 export const ChunkService = {
@@ -552,6 +558,57 @@ export const ChunkService = {
     }
 
 }
+
+export const CommentVideo = {
+    getCommentsByVideo(videoID) {
+        return apiRequest(
+            `/api/comments/video/${videoID}`, {
+        }
+        );
+    },
+
+    create(payload) {
+        return apiRequest('/api/comments/', {
+            method: 'POST',
+            body: payload,
+        });
+    },
+
+    createReactionComment(payload) {
+        return apiRequest(`/api/reaction-comments`, {
+            method: 'POST',
+            body: payload,
+        });
+    },
+}
+
+export const ReaactionComment = {
+    getMyCommentReactions() {
+        return apiRequest(
+            `/api/reaction-comments/mine`, {
+        }
+        );
+    },
+
+
+    createReplyComment(payload) {
+        return apiRequest('/api/replies', {
+            method: 'POST',
+            body: payload,
+        });
+    },
+
+
+    getReplyCommentsByComment(commentID) {
+        return apiRequest(
+            `/api/replies/comment/${commentID}`, {
+        }
+        );
+    },
+}
+
+
+
 export default {
     apiRequest,
     videoService,
@@ -572,4 +629,6 @@ export default {
     FacebookPosts,
     Drama,
     ChunkService,
+    CommentVideo,
+    ReaactionComment
 };

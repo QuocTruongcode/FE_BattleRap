@@ -16,6 +16,7 @@ import { VideoStage } from '../components/video';
 import { useAuth } from "../contexts/AuthContext"; // context bạn đang có user, loading
 import MyChart from '../components/layout/ReChart'
 import TableSummary from '../components/layout/TableSummary'
+import Comments from '../components/comment/Comments';
 
 export default function VideoWatch() {
     const currentTimeRef = useRef(0);
@@ -140,9 +141,14 @@ export default function VideoWatch() {
         // console.log("Check reactionBarByVideo: ", reactionBarByVideo),
         // console.log("check user: ", user),
         // console.log("check selectedReactionID: ", selectedReactionID),
+        // style={{backgroundImage: `url("${video.thumbnailUrl}")`
         console.log("Check video: ", video),
-        console.log("Check savedBars: ", savedBars),
-        <div className="watch-page">
+        console.log("Check activeLineIdRef: ", activeLineIdRef.current),
+        <div className="watch-page" style={
+            video?.thumbnailUrl
+                ? { "--thumb": `url("${video.thumbnailUrl}")` }
+                : undefined
+        }>
             {/* 
                 <button onClick={() => navigate(-1)}>
                     ← Back
@@ -193,7 +199,6 @@ export default function VideoWatch() {
                     reactionBarByVideo={reactionBarByVideo}
                 />
 
-
             </div>
 
             <aside className="watch-analysis-panel">
@@ -216,6 +221,15 @@ export default function VideoWatch() {
                     >
                         Gieo vần
                     </button>
+                    <button
+                        type="button"
+                        role="tab"
+                        aria-selected={activeAnalysis === 'comments'}
+                        className={activeAnalysis === 'comments' ? 'is-active' : ''}
+                        onClick={() => setActiveAnalysis('comments')}
+                    >
+                        Bình luận
+                    </button>
                 </nav>
                 <div className="watch-analysis-content">
                     {activeAnalysis === 'explanation' ? (
@@ -229,10 +243,19 @@ export default function VideoWatch() {
                                 Chọn một câu rap để xem giải thích.
                             </div>
                         )
-                    ) : (
+                    ) : activeAnalysis === 'rhyme' ? (
                         <RhymePanel
                             videoId={videoId}
                             onClose={() => setActiveAnalysis('explanation')}
+                        />
+                    ) : (
+                        <Comments
+                            userName={user?.UserName}
+                            userId={user?.userId}
+                            className="video-comments--panel"
+                            resizable
+                            video={video}
+                            bars={savedBars}
                         />
                     )}
                 </div>

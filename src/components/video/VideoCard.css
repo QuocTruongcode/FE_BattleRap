@@ -87,6 +87,27 @@
   color: #065fd4;
 }
 
+.video-score-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.video-score-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #bdbdbd;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.video-score-count svg {
+  width: 14px;
+  height: 14px;
+}
+
 .channel-name {
   margin: 4px 0 2px 0;
   font-size: 12px;

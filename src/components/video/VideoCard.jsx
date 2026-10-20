@@ -1,4 +1,5 @@
 import './VideoCard.css';
+import { REACTION_KEY_MAP, REACTIONS_ICONS } from '../../constants/const.js';
 
 export default function VideoCard({ video, onClick }) {
     const formatViews = (views = 0) => {
@@ -23,6 +24,17 @@ export default function VideoCard({ video, onClick }) {
         return `${Math.floor(diffDays / 365)} năm trước`;
     };
 
+    const scoreCounts = (video.barScoreCounts ?? [])
+        .filter(({ count }) => Number(count) > 0)
+        .map(({ range, count }) => ({
+            range,
+            count,
+            reaction: REACTIONS_ICONS.find(
+                ({ id }) => id === REACTION_KEY_MAP[range]
+            ),
+        }))
+        .filter(({ reaction }) => reaction);
+
     return (
         <div className="video-card" onClick={onClick}>
             {/* Thumbnail */}
@@ -45,6 +57,24 @@ export default function VideoCard({ video, onClick }) {
                     <h3 className="video-title" title={video.title}>
                         {video.title}
                     </h3>
+                    {scoreCounts.length > 0 && (
+                        <div className="video-score-counts">
+                            {scoreCounts.map(({ range, count, reaction }) => {
+                                const Icon = reaction.icon;
+
+                                return (
+                                    <span
+                                        className="video-score-count"
+                                        key={range}
+                                        title={reaction.label}
+                                    >
+                                        <Icon aria-hidden="true" style={{ color: reaction.color }} />
+                                        <span>{count}</span>
+                                    </span>
+                                );
+                            })}
+                        </div>
+                    )}
                     {/* <p className="channel-name">{video.channel || 'WebbattelRap'}</p>
                     <div className="video-stats">
                         <span>{formatViews(video.views)} lượt xem</span>

@@ -5,7 +5,7 @@ import {
     getOptimisticReactionStats,
     REACTIONS_ICONS,
 } from "../../constants/const.js";
-
+import { useLyricStore } from "../../stores/useLyricStore.js"
 export default function LyricPanel({ lyrics, getCurrentTime, selectedId,
     onSelectLine, usePlainCss = false, onActiveLineChange,
     selectedReactionID, activeLineId, selectedReactionsByLine = {}, reactionBarByVideo = [] }) {
@@ -14,11 +14,16 @@ export default function LyricPanel({ lyrics, getCurrentTime, selectedId,
 
     const computeActiveLine = useCallback((time) => {
         for (let i = lyrics.length - 1; i >= 0; i--) {
-            if (time >= lyrics[i].time) return lyrics[i].id;
+            if (time >= lyrics[i].time) return lyrics[i];
         }
         return null;
     }, [lyrics]);
 
+    const setActiveLineId = useLyricStore((s) => s.setActiveLineId);
+
+    useEffect(() => {
+        setActiveLineId(activeId);
+    }, [activeId, setActiveLineId]);
     useEffect(() => {
         const interval = setInterval(() => {
             const time = getCurrentTime();
@@ -70,6 +75,7 @@ export default function LyricPanel({ lyrics, getCurrentTime, selectedId,
         };
 
     return (
+        // console.log("Check activeId: ", activeId),
         <div className={classes.lyricSection}>
             <div className={classes.lyricHeader}>Lyric</div>
             <div className={classes.lyricList}>
@@ -88,7 +94,7 @@ export default function LyricPanel({ lyrics, getCurrentTime, selectedId,
                         savedReaction?.ReactionType,
                     );
                     const lineReaction = REACTIONS_ICONS.find((reaction) => reaction.id === lineReactionId);
-                    const isActiveLine = line.id === activeId;
+                    const isActiveLine = line.id === activeId?.id;
                     const isSelectedLine = line.id === selectedId;
                     const ReactionIcon = lineReaction?.icon;
 
@@ -99,7 +105,7 @@ export default function LyricPanel({ lyrics, getCurrentTime, selectedId,
                                 borderLeft: `6px solid ${lineReaction?.color || 'transparent'}`,
                             }}
                             key={line.id}
-                            ref={line.id === activeId ? activeRef : null}
+                            ref={line.id === activeId?.id ? activeRef : null}
                             className={[
                                 classes.lyricLine,
                                 isActiveLine ? classes.active : '',
