@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import './EditBar.css';
 import { VideoPlayer, BunnyPlayer } from '../components/video';
+import HlsPlayer from '../components/video/HlsPlayer';
 import { videoService, barService } from '../services/api';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, useCallback, useRef } from 'react';
@@ -267,7 +268,13 @@ export default function EditBar() {
             <div className="edit-bar-layout">
                 {/* Cột trái: video + input */}
                 <div className="edit-bar-left">
-                    {video?.linkBunny ? (
+                    {video?.storageId ? (
+                        <HlsPlayer
+                            ref={videoPlayerRef}
+                            storageId={video.storageId}
+                            onTimeUpdate={handleTimeUpdate}
+                        />
+                    ) : video?.linkBunny ? (
                         <BunnyPlayer
                             ref={videoPlayerRef}
                             videoUrl={video.linkBunny}

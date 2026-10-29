@@ -45,7 +45,7 @@ export default function Home() {
                 <Sidebar isCollapsed={isSidebarCollapsed} onToggle={() => setIsSidebarCollapsed((prev) => !prev)} />
 
                 <main className="home-main-content">
-                    <BannerEvent />
+                    {/* <BannerEvent /> */}
                     {isLoading ? (
                         <p className="home-video-status" aria-live="polite">Đang tải video...</p>
                     ) : isError ? (

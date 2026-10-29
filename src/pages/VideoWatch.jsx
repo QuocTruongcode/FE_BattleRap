@@ -17,7 +17,7 @@ import { useAuth } from "../contexts/AuthContext"; // context bạn đang có us
 import MyChart from '../components/layout/ReChart'
 import TableSummary from '../components/layout/TableSummary'
 import Comments from '../components/comment/Comments';
-
+import HlsPlayer from '../components/video/HlsPlayer';
 export default function VideoWatch() {
     const currentTimeRef = useRef(0);
     const [selectedLine, setSelectedLine] = useState(null);
@@ -135,6 +135,16 @@ export default function VideoWatch() {
         }));
         setSelectedReactionID(reactionId);
     };
+    const summaryLayout = (
+        <div className="video-summary-layout">
+            <MyChart savedBars={savedBars} currentTimeRef={currentTimeRef} />
+            <TableSummary
+                savedBars={savedBars}
+                currentTimeRef={currentTimeRef}
+                onBarSelect={(time) => playerRef.current?.seekTo(time)}
+            />
+        </div>
+    );
 
     return (
         // console.log("Check currentTimeRef: ", currentTimeRef),
@@ -156,33 +166,27 @@ export default function VideoWatch() {
 
             <div className="watch-main">
 
-                {video?.linkBunny ? (
-                    <BunnyPlayer
+                {video?.storageId ? (
+                    <HlsPlayer
                         ref={playerRef}
-                        videoUrl={video.linkBunny}
+                        storageId={video.storageId}
                         onTimeUpdate={handleTimeUpdate}
+                        fullscreenChildren={summaryLayout}
                     >
                         <ReactionBar onSpaceKey={handleSpaceKey} onSelect={handleSelectReaction} />
-
+                    </HlsPlayer>
+                ) : video?.linkBunny ? (
+                    <BunnyPlayer ref={playerRef} videoUrl={video.linkBunny} onTimeUpdate={handleTimeUpdate}>
+                        <ReactionBar onSpaceKey={handleSpaceKey} onSelect={handleSelectReaction} />
                     </BunnyPlayer>
                 ) : (
                     <VideoPlayer
                         ref={playerRef}
                         videoUrl={video?.linkVideo}
                         onTimeUpdate={handleTimeUpdate}
-                        fullscreenChildren={
-                            <div className="video-summary-layout">
-                                <MyChart savedBars={savedBars} currentTimeRef={currentTimeRef} />
-                                <TableSummary
-                                    savedBars={savedBars}
-                                    currentTimeRef={currentTimeRef}
-                                    onBarSelect={(time) => playerRef.current?.seekTo(time)}
-                                />
-                            </div>
-                        }
+                        fullscreenChildren={summaryLayout}
                     >
                         <ReactionBar onSpaceKey={handleSpaceKey} onSelect={handleSelectReaction} />
-
                     </VideoPlayer>
                 )}
 

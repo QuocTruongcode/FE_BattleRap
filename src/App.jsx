@@ -20,7 +20,6 @@ import { RAGChatBot } from './components/RAGChatBot'
 import PageDrama from './pages/PageDrama'
 import MyChart from './components/layout/ReChart'
 import TableSummary from './components/layout/TableSummary'
-
 // Component con, nằm TRONG BrowserRouter + AuthProvider nên mới dùng được useLocation() và useAuth()
 function AppContent() {
   const location = useLocation()
@@ -145,6 +144,7 @@ function AppContent() {
           <TableSummary />
         }
       />
+
 
     </Routes>
   )

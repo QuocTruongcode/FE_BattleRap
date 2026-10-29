@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 export const emptyForm = {
     title: '',
+    FileName: '',
     linkVideo: '',
     linkBunny: '',
     thumbnailUrl: '',
@@ -26,6 +27,7 @@ export function useVideoCrudForm() {
         setEditingId(video.id);
         setFormData({
             title: video.title,
+            FileName: video.FileName || '',
             linkVideo: video.linkVideo,
             linkBunny: video.linkBunny || '',
             thumbnailUrl: video.thumbnailUrl,

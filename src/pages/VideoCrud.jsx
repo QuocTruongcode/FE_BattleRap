@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { Header, Sidebar } from '../components/layout';
 import { ModalReview, EditReview } from '../components/review';
 import { useVideoCrudForm } from '../hooks/useVideoCrudForm';
 import { useVideoCrudQueries } from '../hooks/useVideoCrudQueries';
 import { useVideoReview } from '../hooks/useVideoReview';
 import './VideoCrud.css';
-import { searchBattler, Video_battler, ChunkService } from '../services/api';
+import { searchBattler, Video_battler, ChunkService, R2Storage } from '../services/api';
 import BattlerTag from '../components/battler/BattlerTag';
 
 export default function VideoCrud() {
@@ -37,6 +38,25 @@ export default function VideoCrud() {
         updateMutation,
         deleteMutation,
     } = useVideoCrudQueries(searchQuery);
+
+    const {
+        data: localVideoFiles = [],
+        isLoading: isLocalVideoFilesLoading,
+        isError: isLocalVideoFilesError,
+        error: localVideoFilesError,
+    } = useQuery({
+        queryKey: ['local-video-files'],
+        queryFn: async () => {
+            const response = await R2Storage.getAllVideoInLocalStorage();
+            const files = Array.isArray(response) ? response : response?.data;
+
+            if (!Array.isArray(files) || files.some((file) => typeof file !== 'string')) {
+                throw new Error('Dữ liệu danh sách file video không hợp lệ.');
+            }
+
+            return files;
+        },
+    });
 
     const {
         isOpen,
@@ -79,7 +99,10 @@ export default function VideoCrud() {
             handleResetForm();
 
         } else {
-            createMutation.mutate(nextVideo);
+            createMutation.mutate({
+                ...nextVideo,
+                FileName: formData.FileName || null,
+            });
             handleResetForm();
         }
     };
@@ -357,6 +380,31 @@ export default function VideoCrud() {
                                         placeholder="Nhập tiêu đề video"
                                         required
                                     />
+                                </label>
+
+                                <label>
+                                    <span>File video</span>
+                                    <select
+                                        name="FileName"
+                                        value={formData.FileName}
+                                        onChange={handleChange}
+                                        disabled={isLocalVideoFilesLoading || isLocalVideoFilesError}
+                                    >
+                                        <option value="">Không chọn file</option>
+                                        {localVideoFiles.map((fileName) => (
+                                            <option key={fileName} value={fileName}>
+                                                {fileName}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {isLocalVideoFilesLoading ? (
+                                        <small>Đang tải danh sách file...</small>
+                                    ) : null}
+                                    {isLocalVideoFilesError ? (
+                                        <small role="alert">
+                                            Không tải được danh sách file: {localVideoFilesError.message}
+                                        </small>
+                                    ) : null}
                                 </label>
 
                                 <label>

@@ -131,7 +131,8 @@
   font-weight: var(--font-weight-medium);
 }
 
-.crud-form input {
+.crud-form input,
+.crud-form select {
   width: 100%;
   padding: 11px 12px;
   border: 1px solid var(--color-border);
@@ -141,7 +142,8 @@
   transition: border-color var(--transition-base), box-shadow var(--transition-base);
 }
 
-.crud-form input:focus {
+.crud-form input:focus,
+.crud-form select:focus {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(6, 95, 212, 0.12);
   outline: none;

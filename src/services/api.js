@@ -609,6 +609,16 @@ export const ReaactionComment = {
 
 
 
+export const R2Storage = {
+    getAllVideoInLocalStorage() {
+        return apiRequest(
+            `/api/folder-videos`, {
+        }
+        );
+    },
+}
+
+
 export default {
     apiRequest,
     videoService,
@@ -630,5 +640,6 @@ export default {
     Drama,
     ChunkService,
     CommentVideo,
-    ReaactionComment
+    ReaactionComment,
+    R2Storage
 };
