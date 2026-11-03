@@ -329,3 +329,13 @@
     color: #fff1f3;
     background: #3a151f;
 }
+
+.panel-warning{
+    margin: 16px;
+    padding: 14px 16px;
+    border-radius: 0 8px 8px 0;
+    color: #ff3c00;
+    font-weight: 600;
+    line-height: 1.6;
+    font-style: italic;
+}

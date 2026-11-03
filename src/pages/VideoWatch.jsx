@@ -40,6 +40,13 @@ export default function VideoWatch() {
         setSelectedLine(line);
     };
 
+    const handleJoinBarComments = (barTime) => {
+        setActiveAnalysis('comments');
+        playerRef.current?.seekTo(barTime);
+        playerRef.current?.autoPlay();
+
+    };
+
     const { user } = useAuth(); // lấy user
 
 
@@ -127,11 +134,12 @@ export default function VideoWatch() {
 
     const handleSelectReaction = (reactionId) => {
         const lineId = activeLineIdRef.current;
-        if (!lineId) return;
+        console.log("Check lineID: ", lineId.id)
+        if (!lineId.id) return;
 
         setSelectedReactionsByLine(prev => ({
             ...prev,
-            [lineId]: reactionId,
+            [lineId.id]: reactionId,
         }));
         setSelectedReactionID(reactionId);
     };
@@ -150,7 +158,7 @@ export default function VideoWatch() {
         // console.log("Check currentTimeRef: ", currentTimeRef),
         // console.log("Check reactionBarByVideo: ", reactionBarByVideo),
         // console.log("check user: ", user),
-        // console.log("check selectedReactionID: ", selectedReactionID),
+        console.log("check selectedReactionsByLine: ", selectedReactionsByLine),
         // style={{backgroundImage: `url("${video.thumbnailUrl}")`
         console.log("Check video: ", video),
         console.log("Check activeLineIdRef: ", activeLineIdRef.current),
@@ -195,6 +203,7 @@ export default function VideoWatch() {
                     getCurrentTime={getCurrentTime}
                     // selectedId={selectedLine?.id}
                     onSelectLine={handleSelectLine}
+                    onJoinBarComments={handleJoinBarComments}
                     usePlainCss
                     onActiveLineChange={(id) => { activeLineIdRef.current = id; }}
                     selectedReactionID={selectedReactionID}
@@ -241,6 +250,7 @@ export default function VideoWatch() {
                             <ExplanationPanel
                                 line={selectedLine}
                                 onClose={() => setSelectedLine(null)}
+                                onJoinComments={handleJoinBarComments}
                             />
                         ) : (
                             <div className="watch-analysis-empty">

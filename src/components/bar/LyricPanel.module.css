@@ -117,3 +117,11 @@
     margin-left: 0;
     font-size: 12px;
 }
+.doubleClickHint {
+    display: inline-block;
+    margin-left: 12px;
+    color: #dc2626;
+    font-size: 13px;
+    font-style: italic;
+    font-weight: 400;
+}

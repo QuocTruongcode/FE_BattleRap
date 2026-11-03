@@ -29,6 +29,11 @@ const HlsPlayer = forwardRef(function HlsPlayer(
             if (video.paused) video.play().catch(() => { });
             else video.pause();
         },
+
+        autoPlay: () => {
+            const video = videoRef.current;
+            video?.play().catch(() => { });
+        }
     }));
 
     // 1) Nạp HLS

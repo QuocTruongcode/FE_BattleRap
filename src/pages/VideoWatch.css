@@ -518,6 +518,321 @@
     }
 }
 
+@media (max-width: 960px) {
+    .watch-page {
+        display: flex;
+        height: auto;
+        min-height: 100dvh;
+        flex-direction: column;
+        overflow-x: hidden;
+        overflow-y: visible;
+        background-attachment: scroll;
+    }
+
+    .watch-main {
+        width: 100%;
+        min-height: 0;
+        flex: 0 0 auto;
+        overflow: visible;
+    }
+
+    .watch-page .video-area {
+        width: calc(100% - 24px);
+        margin: 12px auto 0;
+        border-radius: 10px;
+    }
+
+    .watch-page .video-stage__fs-btn {
+        right: 12px;
+        bottom: 60px;
+        width: 40px;
+        height: 40px;
+    }
+
+    .watch-page .lyricSection {
+        width: calc(100% - 24px);
+        height: min(26dvh, 240px);
+        min-height: 110px;
+        flex: 0 0 auto;
+        margin: 12px auto 0;
+        overflow: hidden;
+
+        background: none;
+    }
+
+    .watch-page .lyricHeader {
+        flex: 0 0 auto;
+        padding: 10px 12px;
+        background: none;
+    }
+
+    .watch-page .lyricList {
+        min-height: 0;
+        padding: 8px 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        background-color: none;
+    }
+
+    .watch-page .lyricLine {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        align-items: start;
+        gap: 4px 8px;
+        padding: 10px 12px;
+        transform: none;
+        filter: none;
+        will-change: auto;
+
+    }
+
+    .watch-page .lyricTime {
+        min-width: 36px;
+        padding-top: 2px;
+        font-size: 12px;
+    }
+
+    .watch-page .lyricContent {
+        font-size: 15px;
+        line-height: 1.55;
+        overflow-wrap: anywhere;
+
+    }
+
+    .watch-page .lyricStats {
+        grid-column: 2 / -1;
+        gap: 4px;
+        margin: 0;
+        align-self: start;
+        font-size: 14px;
+    }
+
+    .watch-page .watch-analysis-panel {
+        width: 100%;
+        max-width: none;
+        min-width: 0;
+        height: auto;
+        flex: 0 0 auto;
+        overflow: visible;
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .watch-page .watch-analysis-tabs {
+        position: sticky;
+        z-index: 3;
+        top: 0;
+        width: 100%;
+        flex: 0 0 46px;
+        border-bottom: 1px solid #3c1720;
+        background: rgba(16, 9, 11, 0.96);
+    }
+
+    .watch-page .watch-analysis-tabs button {
+        min-width: 0;
+        flex: 1 1 0;
+        padding: 0 8px;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    .watch-page .watch-analysis-content {
+        width: 100%;
+        min-height: 0;
+        flex: 0 0 auto;
+        margin: 0;
+        overflow: hidden;
+    }
+
+    .watch-page .watch-analysis-empty {
+        width: 100%;
+        min-height: 180px;
+        flex: 1 1 auto;
+        padding: 20px;
+        border: 0;
+    }
+
+    .watch-page .watch-analysis-content > .explanation-panel,
+    .watch-page .watch-analysis-result {
+        width: 100%;
+        max-width: 100%;
+        max-height: min(65dvh, 520px);
+        min-height: 260px;
+        flex: 1 1 100%;
+        border-right: 0;
+        border-left: 0;
+    }
+
+    .watch-page .watch-analysis-result {
+        border-top: 1px solid #3c1720;
+    }
+
+    .watch-page .video-comments--panel {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        max-height: min(65dvh, 520px);
+        flex: 1 1 100%;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    .watch-page .watch-analysis-resize-handle,
+    .watch-page .video-comments__resize-handle {
+        display: none;
+    }
+
+    .video-summary-layout {
+        grid-template-columns: minmax(0, 1fr);
+        max-height: 100%;
+        gap: 12px;
+        margin-top: 0;
+        overflow-y: auto;
+        padding: 12px;
+    }
+
+    .video-summary-layout > .table-summary-wrap {
+        width: 100%;
+    }
+
+    .video-summary-layout > .chart-card {
+        width: 100%;
+    }
+}
+
+@media (max-width: 600px), (max-width: 960px) and (max-height: 500px) {
+    .watch-page .video-area--fs .video-stage__fullscreen-content .video-summary-layout {
+        display: none;
+    }
+
+    .watch-page .lyricHeader {
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+
+    .watch-page .video-area .reactionBar {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        bottom: auto;
+        left: 0;
+        width: 100%;
+        height: auto;
+        justify-content: flex-start;
+        background: none;
+        pointer-events: none;
+    }
+
+    .watch-page .video-area:not(.video-area--fs) {
+        overflow: visible;
+        margin-bottom: 92px;
+    }
+
+    .watch-page .video-area--fs .reactionBar {
+        position: absolute;
+        top: max(8px, env(safe-area-inset-top));
+        right: 8px;
+        bottom: auto;
+        left: 8px;
+        width: auto;
+        height: auto;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0.72), transparent);
+    }
+
+    .watch-page .video-area .reactionBar__list {
+        width: 100%;
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 6px;
+        overflow-x: auto;
+        padding: 6px 4px 10px;
+        scrollbar-width: none;
+        touch-action: pan-x;
+    }
+
+    .watch-page .video-area .reactionBar__list::-webkit-scrollbar {
+        display: none;
+    }
+
+    .watch-page .video-area .reactionBar__item {
+        width: 54px;
+        min-width: 54px;
+        min-height: 48px;
+        flex: 0 0 54px;
+        gap: 3px;
+        padding: 5px 3px;
+        border-radius: 10px;
+    }
+
+    .watch-page .video-area .reactionBar__icon {
+        font-size: 1.45rem;
+    }
+
+    .watch-page .video-area .reactionBar__label {
+        font-size: 0.58rem;
+        line-height: 1.1;
+    }
+
+    .watch-page .video-area .reactionBar__divider {
+        display: none;
+    }
+
+    .watch-page .lyricSection {
+        height: min(20dvh, 160px);
+        min-height: 80px;
+    }
+}
+
+@media (max-width: 480px) {
+    .watch-page .video-area {
+        width: 100%;
+        margin-top: 0;
+        border-radius: 0;
+    }
+
+    .watch-page .lyricSection {
+        width: calc(100% - 16px);
+        height: min(20dvh, 160px);
+        min-height: 80px;
+        margin-top: 8px;
+    }
+
+    .watch-page .lyricLine {
+        padding: 9px 10px;
+    }
+
+    .watch-page .lyricContent {
+        font-size: 14px;
+    }
+
+    .watch-page .watch-analysis-tabs button {
+        padding: 0 5px;
+        font-size: 12px;
+    }
+
+    .watch-page .watch-analysis-content > .explanation-panel,
+    .watch-page .watch-analysis-result,
+    .watch-page .video-comments--panel {
+        max-height: 70dvh;
+    }
+
+}
+
+@media (max-width: 360px) {
+    .watch-page .lyricTime {
+        min-width: 32px;
+        font-size: 11px;
+    }
+
+    .watch-page .lyricContent {
+        font-size: 13px;
+    }
+
+    .watch-page .lyricStats {
+        font-size: 12px;
+    }
+}
+
 @media (max-width: 520px) {
     .video-summary-layout {
         grid-template-columns: minmax(0, 1fr);

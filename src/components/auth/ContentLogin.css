@@ -90,3 +90,61 @@
     font-size: 14px;
     margin-top: 8px;
 }
+
+@media (max-width: 600px) {
+    .content-login {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .content-login__title {
+        margin-bottom: 0.5rem;
+        font-size: clamp(2rem, 9vw, 3.5rem);
+        letter-spacing: clamp(0.25rem, 3vw, 0.8rem);
+        line-height: 0.98;
+    }
+
+    .google-login-wrapper {
+        width: 100%;
+        max-width: 320px;
+        margin: 1rem auto 0;
+        transform: none;
+    }
+
+    .google-login-wrapper:hover {
+        transform: none;
+    }
+
+    .google-login-wrapper > div,
+    .google-login-wrapper iframe {
+        max-width: 100%;
+    }
+
+    .google-login-button {
+        width: min(100% - 16px, 400px);
+        min-height: 54px;
+        gap: 12px;
+        margin-top: 1.25rem;
+        padding: 0 14px;
+        font-size: 15px;
+    }
+
+    .content-login__error,
+    .content-login__status {
+        padding: 0 8px;
+        overflow-wrap: anywhere;
+    }
+}
+
+@media (max-width: 360px) {
+    .content-login__title {
+        font-size: 2rem;
+        letter-spacing: 0.25rem;
+    }
+
+    .google-login-button {
+        gap: 8px;
+        padding: 0 10px;
+        font-size: 14px;
+    }
+}

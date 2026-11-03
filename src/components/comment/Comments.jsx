@@ -20,6 +20,55 @@ const formatVideoTime = (seconds) => {
     return `${minutes}:${String(remainderSeconds).padStart(2, '0')}`;
 };
 
+const getRepliesForDisplay = (replies, commentID, visibleCount) => {
+    const directReplies = [];
+    const repliesByParentId = new Map();
+
+    replies.forEach((reply, index) => {
+        const replyId = reply.id ?? reply.replyID ?? reply.ReplyID;
+        const parentCommentID = reply.commentID ?? reply.CommentID;
+        const parentReplyID = reply.replyCommentID ?? reply.ReplyCommentID;
+
+        if (parentReplyID != null) {
+            const parentKey = String(parentReplyID);
+            const children = repliesByParentId.get(parentKey) ?? [];
+            children.push({ reply, index });
+            repliesByParentId.set(parentKey, children);
+        } else if (parentCommentID == null || String(parentCommentID) === String(commentID)) {
+            directReplies.push({ reply, index, replyId });
+        }
+    });
+
+    const visibleReplies = [];
+    const visitedReplyIds = new Set();
+    const appendChildReplies = (parentReplyId) => {
+        (repliesByParentId.get(String(parentReplyId)) ?? []).forEach((child) => {
+            const childId = child.reply.id ?? child.reply.replyID ?? child.reply.ReplyID;
+            const childKey = String(childId);
+            if (visitedReplyIds.has(childKey)) return;
+
+            visitedReplyIds.add(childKey);
+            visibleReplies.push(child);
+            appendChildReplies(childId);
+        });
+    };
+
+    directReplies.slice(0, visibleCount).forEach(({ reply, index, replyId }) => {
+        visibleReplies.push({ reply, index });
+        visitedReplyIds.add(String(replyId));
+        appendChildReplies(replyId);
+    });
+
+    return visibleReplies;
+};
+
+const getDirectReplyCount = (replies, commentID) => replies.filter((reply) => {
+    const parentCommentID = reply.commentID ?? reply.CommentID;
+    const parentReplyID = reply.replyCommentID ?? reply.ReplyCommentID;
+    return parentReplyID == null
+        && (parentCommentID == null || String(parentCommentID) === String(commentID));
+}).length;
+
 const getCommentList = (response) => {
     const comments = Array.isArray(response) ? response : response?.data;
     console.log("Check full comment: ", comments)
@@ -34,6 +83,8 @@ const getCommentList = (response) => {
 
         return {
             id: comment.commentID ?? comment.CommentID ?? comment.id ?? index,
+            userID: comment.userID ?? comment.UserID ?? comment.user_id
+                ?? comment.User?.userID ?? comment.User?.UserID,
             userName: comment.userName ?? comment.User.UserName ?? comment.username ?? 'Người dùng',
             content: comment.content ?? comment.Content ?? comment.comment ?? comment.Comment ?? '',
             like: Math.max(0, Number(comment.like ?? comment.totalLike ?? 0) || 0),
@@ -61,9 +112,11 @@ export default function Comments({
     const [replyThreads, setReplyThreads] = useState({});
     const [replySubmitting, setReplySubmitting] = useState({});
     const [activeReplyCommentId, setActiveReplyCommentId] = useState(null);
+    const [activeReplyToReplyId, setActiveReplyToReplyId] = useState(null);
     const [replyDrafts, setReplyDrafts] = useState({});
     const [replyEmojiPickerCommentId, setReplyEmojiPickerCommentId] = useState(null);
     const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
+
     const emojiPickerId = useId();
     const [panelWidth, setPanelWidth] = useState(380);
     const [isResizing, setIsResizing] = useState(false);
@@ -221,7 +274,7 @@ export default function Comments({
                 nextIds.add(String(nextComment.id));
                 return { videoID, commentIds: nextIds };
             });
-        }, 350);
+        }, 50);
 
         return () => window.clearInterval(intervalId);
     }, [videoID]);
@@ -487,7 +540,10 @@ export default function Comments({
                         items: [reply, ...thread.items],
                         visibleCount: Math.max(
                             1,
-                            Math.min(thread.items.length + 1, Math.max(thread.visibleCount, REPLY_BATCH_SIZE))
+                            Math.min(
+                                getDirectReplyCount(thread.items, comment.id) + 1,
+                                Math.max(thread.visibleCount, REPLY_BATCH_SIZE)
+                            )
                         ),
                     },
                 };
@@ -517,6 +573,85 @@ export default function Comments({
         }
     };
 
+    const handleCreateReplyToReply = async (reply, comment) => {
+        const replyKey = `reply:${String(reply.id ?? reply.replyID ?? reply.ReplyID)}`;
+        const commentKey = String(comment.id);
+        if (replySubmitting[replyKey]) return;
+
+        const content = (replyDrafts[replyKey] ?? '').trim();
+        if (!content) return;
+
+        const replyUserID = reply.userID
+            ?? reply.UserID
+            ?? reply.User?.userID
+            ?? reply.User?.UserID;
+        const replyUserName = reply.ReplyUser?.UserName
+            ?? reply.replyUserName
+            ?? reply.replyUsername
+            ?? reply.User?.UserName
+            ?? reply.userName
+            ?? 'người dùng';
+
+        setReplySubmitting((current) => ({ ...current, [replyKey]: true }));
+        setSubmitError('');
+        try {
+            const response = await ReaactionComment.createReplyComment({
+                commentID: comment.id,
+                replyCommentID: reply.id ?? reply.replyID ?? reply.ReplyID,
+                replyUserID,
+                content,
+            });
+            const createdReply = response?.data ?? response;
+            const createdAt = createdReply?.createdAt ?? createdReply?.CreatedAt ?? new Date().toISOString();
+            const createdReplyFields = { ...createdReply };
+            delete createdReplyFields.commentID;
+            delete createdReplyFields.CommentID;
+            const nestedReply = {
+                ...createdReplyFields,
+                id: createdReply?.id ?? createdReply?.replyID ?? createdReply?.ReplyID
+                    ?? `temporary-${replyKey}-${replyThreads[commentKey]?.items.length ?? 0}`,
+                replyCommentID: createdReply?.replyCommentID ?? createdReply?.ReplyCommentID
+                    ?? reply.id ?? reply.replyID ?? reply.ReplyID,
+                userID: createdReply?.userID ?? createdReply?.UserID ?? userId,
+                replyUserID: createdReply?.replyUserID ?? createdReply?.ReplyUserID ?? replyUserID,
+                content: createdReply?.content ?? createdReply?.Content ?? content,
+                createdAt,
+                User: createdReply?.User ?? { UserName: userName },
+                ReplyUser: {
+                    UserName: createdReply?.ReplyUser?.UserName ?? replyUserName,
+                },
+            };
+
+            setReplyThreads((current) => {
+                const thread = current[commentKey];
+                if (!thread) return current;
+
+                return {
+                    ...current,
+                    [commentKey]: {
+                        ...thread,
+                        items: [nestedReply, ...thread.items],
+                    },
+                };
+            });
+            setReplyDrafts((current) => {
+                const next = { ...current };
+                delete next[replyKey];
+                return next;
+            });
+            setActiveReplyToReplyId(null);
+            setReplyEmojiPickerCommentId(null);
+        } catch (requestError) {
+            setSubmitError(requestError.message || 'Không thể gửi phản hồi.');
+        } finally {
+            setReplySubmitting((current) => {
+                const next = { ...current };
+                delete next[replyKey];
+                return next;
+            });
+        }
+    };
+
     const handleGetReplyCommentsByComment = async (commentID) => {
         const commentKey = String(commentID);
         const currentThread = replyThreads[commentKey];
@@ -528,7 +663,10 @@ export default function Comments({
                     ...current[commentKey],
                     visibleCount: currentThread.visibleCount > 0
                         ? 0
-                        : Math.min(REPLY_BATCH_SIZE, currentThread.items.length),
+                        : Math.min(
+                            REPLY_BATCH_SIZE,
+                            getDirectReplyCount(currentThread.items, commentID)
+                        ),
                 },
             }));
             return;
@@ -544,16 +682,20 @@ export default function Comments({
 
         try {
             const response = await ReaactionComment.getReplyCommentsByComment(commentID);
+            console.log("Check response: ", response)
             const replies = Array.isArray(response) ? response : response?.data;
             if (!Array.isArray(replies)) {
                 throw new Error('Dữ liệu phản hồi bình luận trả về không hợp lệ.');
             }
 
+            console.log("Check replies: ", replies)
+
+
             setReplyThreads((current) => ({
                 ...current,
                 [commentKey]: {
                     items: replies,
-                    visibleCount: Math.min(REPLY_BATCH_SIZE, replies.length),
+                    visibleCount: Math.min(REPLY_BATCH_SIZE, getDirectReplyCount(replies, commentID)),
                     isLoading: false,
                 },
             }));
@@ -579,9 +721,12 @@ export default function Comments({
                 ...current,
                 [commentKey]: {
                     ...thread,
-                    visibleCount: thread.visibleCount >= thread.items.length
+                    visibleCount: thread.visibleCount >= getDirectReplyCount(thread.items, commentID)
                         ? 0
-                        : Math.min(thread.visibleCount + REPLY_BATCH_SIZE, thread.items.length),
+                        : Math.min(
+                            thread.visibleCount + REPLY_BATCH_SIZE,
+                            getDirectReplyCount(thread.items, commentID)
+                        ),
                 },
             };
         });
@@ -590,6 +735,7 @@ export default function Comments({
 
 
     return (
+        // console.log("Check activeReplyCommentId: ", activeReplyCommentId),
         console.log("Check replyThreads: ", replyThreads),
         <section
             className={`video-comments ${className} ${isResizing ? 'is-resizing' : ''}`.trim()}
@@ -716,6 +862,9 @@ export default function Comments({
                                         : barTimeById.get(String(comment.barID))
                                 );
                             const replyThread = replyThreads[String(comment.id)];
+                            const replyCount = replyThread && !replyThread.isLoading
+                                ? replyThread.items.length
+                                : comment.totalReply;
 
                             return (
                                 <Fragment key={comment.id}>
@@ -768,6 +917,7 @@ export default function Comments({
                                                 className="video-comments__reply"
                                                 aria-expanded={String(activeReplyCommentId) === String(comment.id)}
                                                 onClick={() => {
+                                                    setActiveReplyToReplyId(null);
                                                     setActiveReplyCommentId((currentId) => (
                                                         String(currentId) === String(comment.id) ? null : comment.id
                                                     ));
@@ -777,7 +927,7 @@ export default function Comments({
                                                 Phản hồi
                                             </button>
                                         </div>
-                                        {comment.totalReply > 0 && (
+                                        {replyCount > 0 && (
                                             <button
                                                 type="button"
                                                 className="video-comments__reply-count"
@@ -787,56 +937,225 @@ export default function Comments({
                                             >
                                                 {replyThread?.isLoading
                                                     ? 'Đang tải phản hồi...'
-                                                    : `${comment.totalReply} phản hồi`}
+                                                    : `${replyCount} phản hồi`}
                                             </button>
                                         )}
                                         {replyThread?.visibleCount > 0 && (
                                             <div className="video-comments__reply-thread">
-                                                {replyThread.items
-                                                    .slice(0, replyThread.visibleCount)
-                                                    .map((reply, replyIndex) => {
-                                                        const createdAtValue = reply.createdAt ?? reply.CreatedAt;
-                                                        const createdAt = createdAtValue
-                                                            ? new Date(createdAtValue)
-                                                            : null;
-                                                        const isValidDate = createdAt
-                                                            && !Number.isNaN(createdAt.getTime());
-                                                        const replyUserName = reply.User?.UserName
-                                                            ?? reply.userName
-                                                            ?? 'Người dùng';
-                                                        const mentionedUserName = reply.ReplyUser?.UserName
-                                                            ?? reply.replyUserName
-                                                            ?? reply.replyUsername
-                                                            ?? 'người dùng';
+                                                {getRepliesForDisplay(
+                                                    replyThread.items,
+                                                    comment.id,
+                                                    replyThread.visibleCount
+                                                ).map(({ reply, index: replyIndex }) => {
+                                                    const createdAtValue = reply.createdAt ?? reply.CreatedAt;
+                                                    const createdAt = createdAtValue
+                                                        ? new Date(createdAtValue)
+                                                        : null;
+                                                    const isValidDate = createdAt
+                                                        && !Number.isNaN(createdAt.getTime());
+                                                    const replyUserName = reply.User?.UserName
+                                                        ?? reply.userName
+                                                        ?? 'Người dùng';
+                                                    const mentionedUserName = reply.ReplyUser?.UserName
+                                                        ?? reply.replyUserName
+                                                        ?? reply.replyUsername
+                                                        ?? 'người dùng';
 
-                                                        return (
-                                                            <article
-                                                                className="video-comments__reply-item"
-                                                                key={reply.id ?? reply.replyID ?? replyIndex}
-                                                            >
-                                                                <div className="video-comments__reply-meta">
-                                                                    <span>{replyUserName}</span>
-                                                                    {isValidDate && (
-                                                                        <time dateTime={createdAt.toISOString()}>
-                                                                            {createdAt.toLocaleString('vi-VN')}
-                                                                        </time>
-                                                                    )}
-                                                                </div>
-                                                                <p>
-                                                                    <span className="video-comments__reply-mention">
-                                                                        @{mentionedUserName}
-                                                                    </span>
-                                                                    {` ${reply.content ?? reply.Content ?? ''}`}
-                                                                </p>
-                                                            </article>
-                                                        );
-                                                    })}
+                                                    return (
+                                                        <article
+                                                            className="video-comments__reply-item"
+                                                            key={reply.id ?? reply.replyID ?? replyIndex}
+                                                        >
+                                                            <div className="video-comments__reply-meta">
+                                                                <span>{replyUserName}</span>
+                                                                {isValidDate && (
+                                                                    <time dateTime={createdAt.toISOString()}>
+                                                                        {createdAt.toLocaleString('vi-VN')}
+                                                                    </time>
+                                                                )}
+                                                            </div>
+                                                            <p>
+                                                                <span className="video-comments__reply-mention">
+                                                                    @{mentionedUserName}
+                                                                </span>
+                                                                {` ${reply.content ?? reply.Content ?? ''}`}
+                                                            </p>
+
+                                                            <div className="video-comments__item-actions">
+                                                                <button
+                                                                    type="button"
+                                                                    className={commentReactions[String(reply.id)] === 'like' ? 'is-active' : ''}
+                                                                    aria-label="Thích bình luận"
+                                                                    title="Thích"
+                                                                    aria-pressed={commentReactions[String(reply.id)] === 'like'}
+                                                                    onClick={() => handleCommentReaction(reply, 'like')}
+                                                                >
+                                                                    <LuThumbsUp aria-hidden="true" />
+                                                                    <span>{reply.like}</span>
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    className={commentReactions[String(reply.id)] === 'dissLike' ? 'is-active' : ''}
+                                                                    aria-label="Không thích bình luận"
+                                                                    title="Không thích"
+                                                                    aria-pressed={commentReactions[String(reply.id)] === 'dissLike'}
+                                                                    onClick={() => handleCommentReaction(reply, 'dissLike')}
+                                                                >
+                                                                    <LuThumbsDown aria-hidden="true" />
+                                                                    <span>{reply.dissLike}</span>
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    className="video-comments__reply"
+                                                                    aria-expanded={
+                                                                        String(activeReplyToReplyId)
+                                                                        === String(reply.id ?? reply.replyID ?? reply.ReplyID)
+                                                                    }
+                                                                    onClick={() => {
+                                                                        const replyId = reply.id ?? reply.replyID ?? reply.ReplyID;
+                                                                        const isActive = String(activeReplyToReplyId) === String(replyId);
+                                                                        setActiveReplyCommentId(null);
+                                                                        setActiveReplyToReplyId(isActive ? null : replyId);
+                                                                        setReplyEmojiPickerCommentId(null);
+                                                                    }}
+                                                                >
+                                                                    Phản hồi
+                                                                </button>
+                                                            </div>
+                                                            {String(activeReplyToReplyId)
+                                                                === String(reply.id ?? reply.replyID ?? reply.ReplyID) && (
+                                                                    <div className="video-comments__composer video-comments__reply-composer">
+                                                                        <label>
+                                                                            <span className="video-comments__visually-hidden">
+                                                                                Viết phản hồi cho {replyUserName}
+                                                                            </span>
+                                                                            <textarea
+                                                                                ref={(element) => {
+                                                                                    const key = `reply:${String(
+                                                                                        reply.id ?? reply.replyID ?? reply.ReplyID
+                                                                                    )}`;
+                                                                                    if (element) {
+                                                                                        replyTextareaRefs.current.set(key, element);
+                                                                                    } else {
+                                                                                        replyTextareaRefs.current.delete(key);
+                                                                                    }
+                                                                                }}
+                                                                                value={replyDrafts[
+                                                                                    `reply:${String(reply.id ?? reply.replyID ?? reply.ReplyID)}`
+                                                                                ] ?? ''}
+                                                                                onChange={(event) => {
+                                                                                    const key = `reply:${String(
+                                                                                        reply.id ?? reply.replyID ?? reply.ReplyID
+                                                                                    )}`;
+                                                                                    setReplyDrafts((current) => ({
+                                                                                        ...current,
+                                                                                        [key]: event.target.value,
+                                                                                    }));
+                                                                                }}
+                                                                                placeholder={userName && userId
+                                                                                    ? 'Viết phản hồi...'
+                                                                                    : 'Đăng nhập để phản hồi'}
+                                                                                maxLength={1000}
+                                                                                rows={2}
+                                                                                disabled={!userName || !userId || !videoID}
+                                                                            />
+                                                                        </label>
+                                                                        {userName && userId && videoID && (
+                                                                            <div
+                                                                                className="video-comments__reply-emoji"
+                                                                                ref={replyEmojiPickerRef}
+                                                                            >
+                                                                                <button
+                                                                                    type="button"
+                                                                                    className="video-comments__emoji-trigger"
+                                                                                    aria-label="Thêm emoji vào phản hồi"
+                                                                                    aria-expanded={
+                                                                                        String(replyEmojiPickerCommentId)
+                                                                                        === `reply:${String(reply.id ?? reply.replyID ?? reply.ReplyID)}`
+                                                                                    }
+                                                                                    onClick={() => {
+                                                                                        const key = `reply:${String(
+                                                                                            reply.id ?? reply.replyID ?? reply.ReplyID
+                                                                                        )}`;
+                                                                                        setIsEmojiPickerOpen(false);
+                                                                                        setReplyEmojiPickerCommentId((currentId) => (
+                                                                                            String(currentId) === key ? null : key
+                                                                                        ));
+                                                                                    }}
+                                                                                >
+                                                                                    <LuSmilePlus size={20} />
+                                                                                </button>
+                                                                                {String(replyEmojiPickerCommentId)
+                                                                                    === `reply:${String(reply.id ?? reply.replyID ?? reply.ReplyID)}`
+                                                                                    && (
+                                                                                        <div className="video-comments__emoji-picker">
+                                                                                            <EmojiPicker
+                                                                                                onEmojiClick={(emojiData) => handleReplyEmojiClick(
+                                                                                                    `reply:${String(
+                                                                                                        reply.id ?? reply.replyID ?? reply.ReplyID
+                                                                                                    )}`,
+                                                                                                    emojiData
+                                                                                                )}
+                                                                                                width="100%"
+                                                                                                height={350}
+                                                                                                theme="dark"
+                                                                                                lazyLoadEmojis
+                                                                                            />
+                                                                                        </div>
+                                                                                    )}
+                                                                            </div>
+                                                                        )}
+                                                                        <div className="video-comments__reply-actions">
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() => {
+                                                                                    const key = `reply:${String(
+                                                                                        reply.id ?? reply.replyID ?? reply.ReplyID
+                                                                                    )}`;
+                                                                                    setReplyDrafts((current) => {
+                                                                                        const next = { ...current };
+                                                                                        delete next[key];
+                                                                                        return next;
+                                                                                    });
+                                                                                    setReplyEmojiPickerCommentId(null);
+                                                                                    setActiveReplyToReplyId(null);
+                                                                                }}
+                                                                            >
+                                                                                Hủy
+                                                                            </button>
+                                                                            <button
+                                                                                type="button"
+                                                                                className="video-comments__reply-submit"
+                                                                                disabled={
+                                                                                    !userName
+                                                                                    || !userId
+                                                                                    || !videoID
+                                                                                    || !replyDrafts[
+                                                                                        `reply:${String(reply.id ?? reply.replyID ?? reply.ReplyID)}`
+                                                                                    ]?.trim()
+                                                                                    || replySubmitting[
+                                                                                    `reply:${String(reply.id ?? reply.replyID ?? reply.ReplyID)}`
+                                                                                    ]
+                                                                                }
+                                                                                onClick={() => handleCreateReplyToReply(reply, comment)}
+                                                                            >
+                                                                                {replySubmitting[
+                                                                                    `reply:${String(reply.id ?? reply.replyID ?? reply.ReplyID)}`
+                                                                                ] ? 'Đang gửi...' : 'Bình luận'}
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                        </article>
+                                                    );
+                                                })}
                                                 <button
                                                     type="button"
                                                     className="video-comments__reply-thread-toggle"
                                                     onClick={() => handleLoadMoreReplies(comment.id)}
                                                 >
-                                                    {replyThread.visibleCount < replyThread.items.length
+                                                    {replyThread.visibleCount
+                                                        < getDirectReplyCount(replyThread.items, comment.id)
                                                         ? 'Xem thêm phản hồi'
                                                         : 'Thu gọn phản hồi'}
                                                 </button>
@@ -912,6 +1231,7 @@ export default function Comments({
                                                     <button
                                                         type="button"
                                                         onClick={() => {
+                                                            setActiveReplyToReplyId(null);
                                                             setReplyDrafts((current) => {
                                                                 const next = { ...current };
                                                                 delete next[comment.id];
@@ -935,7 +1255,7 @@ export default function Comments({
                                                         }
                                                         onClick={() => handleCreateReplyComment({
                                                             commentID: comment.id,
-                                                            replyUserID: userId,
+                                                            replyUserID: comment.userID,
                                                             content: replyDrafts[comment.id],
                                                         }, comment)}
                                                     >

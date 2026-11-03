@@ -25,6 +25,11 @@ const VideoPlayer = forwardRef(function VideoPlayer({ videoUrl, onTimeUpdate, ch
                 playerRef.current.playVideo();
             }
         },
+
+        autoPlay: () => {
+            if (!playerRef.current) return;
+            playerRef.current.playVideo();
+        }
     }));
 
     function getYoutubeId(url) {

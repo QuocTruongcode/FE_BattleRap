@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BannerEvent, Header, Sidebar } from '../components/layout';
+import { Header, HeroBanner, Sidebar } from '../components/layout';
 import { VideoGrid } from '../components/video';
 import { RAGChatBot } from '../components/RAGChatBot';
 import { videoService } from '../services/api';
@@ -13,6 +13,7 @@ export default function Home() {
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const [isChatbotOpen, setIsChatbotOpen] = useState(false);
     const navigate = useNavigate();
+
 
 
     const { data: videos = [], isLoading, isError, error, refetch } = useQuery({
@@ -45,7 +46,6 @@ export default function Home() {
                 <Sidebar isCollapsed={isSidebarCollapsed} onToggle={() => setIsSidebarCollapsed((prev) => !prev)} />
 
                 <main className="home-main-content">
-                    {/* <BannerEvent /> */}
                     {isLoading ? (
                         <p className="home-video-status" aria-live="polite">Đang tải video...</p>
                     ) : isError ? (
@@ -56,11 +56,17 @@ export default function Home() {
                             <button type="button" onClick={() => refetch()}>Thử lại</button>
                         </section>
                     ) : (
-                        <VideoGrid
-                            videos={videos}
-                            searchQuery={searchQuery}
-                            onVideoSelect={openWatch}
-                        />
+                        <>
+                            <HeroBanner
+                                videos={videos.slice(0, 10)}
+                                onVideoSelect={openWatch}
+                            />
+                            <VideoGrid
+                                videos={videos}
+                                searchQuery={searchQuery}
+                                onVideoSelect={openWatch}
+                            />
+                        </>
                     )}
                 </main>
             </div>

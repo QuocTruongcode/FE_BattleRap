@@ -9,6 +9,8 @@ import {
     FaBook,
     FaYoutube, FaProjectDiagram,
     FaRobot,
+    FaTrophy,
+
 } from "react-icons/fa";
 import { FaMicrophoneLines } from "react-icons/fa6";
 const ROUTED_ITEMS = [
@@ -17,6 +19,7 @@ const ROUTED_ITEMS = [
     { icon: <FaProjectDiagram />, label: 'Tri thức Rap', to: '/knowledgeGraph' },
     { icon: <FaRobot />, label: 'Trợ lý ảo', to: '/chatbot' },
     { icon: <FaMicrophoneLines />, label: 'Battler', to: '/CRUDbattler' },
+    { icon: <FaTrophy />, label: 'Xếp hạng', to: '/rankBattler' },
     { icon: <FaFire />, label: 'Thịnh hành', to: '/CRUDdrama' },
 
 ];

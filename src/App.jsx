@@ -18,6 +18,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute'
 import { barReaction } from '../src/services/api' // 👈 đổi đúng tên service bạn đang dùng
 import { RAGChatBot } from './components/RAGChatBot'
 import PageDrama from './pages/PageDrama'
+import RankBattler from './pages/RankBattler'
 import MyChart from './components/layout/ReChart'
 import TableSummary from './components/layout/TableSummary'
 // Component con, nằm TRONG BrowserRouter + AuthProvider nên mới dùng được useLocation() và useAuth()
@@ -145,6 +146,13 @@ function AppContent() {
         }
       />
 
+
+      <Route
+        path="/rankBattler"
+        element={
+          <RankBattler />
+        }
+      />
 
     </Routes>
   )

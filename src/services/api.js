@@ -413,6 +413,11 @@ export const explanation = {
         });
     },
 
+    remove(id) {
+        return apiRequest(`/api/explanations/${id}`, {
+            method: 'DELETE',
+        });
+    },
 };
 
 export const historyChatBot = {
@@ -563,6 +568,13 @@ export const CommentVideo = {
     getCommentsByVideo(videoID) {
         return apiRequest(
             `/api/comments/video/${videoID}`, {
+        }
+        );
+    },
+
+    getCommentsByBar(barID) {
+        return apiRequest(
+            `/api/comments/bar/${barID}`, {
         }
         );
     },

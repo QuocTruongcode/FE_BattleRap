@@ -7,7 +7,7 @@ import {
 } from "../../constants/const.js";
 import { useLyricStore } from "../../stores/useLyricStore.js"
 export default function LyricPanel({ lyrics, getCurrentTime, selectedId,
-    onSelectLine, usePlainCss = false, onActiveLineChange,
+    onSelectLine, onJoinBarComments, usePlainCss = false, onActiveLineChange,
     selectedReactionID, activeLineId, selectedReactionsByLine = {}, reactionBarByVideo = [] }) {
     const activeRef = useRef(null);
     const [activeId, setActiveId] = useState(null);
@@ -77,7 +77,10 @@ export default function LyricPanel({ lyrics, getCurrentTime, selectedId,
     return (
         // console.log("Check activeId: ", activeId),
         <div className={classes.lyricSection}>
-            <div className={classes.lyricHeader}>Lyric</div>
+            <div className={classes.lyricHeader}>
+                Lyric
+                <small className={styles.doubleClickHint}>*Click đúp vào bar để tua video</small>
+            </div>
             <div className={classes.lyricList}>
                 {lyrics.map((line) => {
                     const savedReaction = reactionBarByVideo.find(
@@ -113,6 +116,7 @@ export default function LyricPanel({ lyrics, getCurrentTime, selectedId,
                                 line.explanation ? classes.hasNote : '',
                             ].join(' ')}
                             onClick={() => onSelectLine(line)}
+                            onDoubleClick={() => onJoinBarComments?.(line.time)}
                         >
                             {isActiveLine && (
                                 <span

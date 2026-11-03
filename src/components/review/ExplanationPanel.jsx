@@ -15,7 +15,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { ImageGallery } from '../review/index'
 import { RAGChatBot } from '../RAGChatBot/index';
 import { FaArrowLeft } from "react-icons/fa";
-
+import CommentByBarID from '../comment/CommentByBarID';
 const normalizeMarkdown = (markdown) => {
     if (typeof markdown !== 'string') return markdown;
 
@@ -24,7 +24,7 @@ const normalizeMarkdown = (markdown) => {
         .replace(/\*{4}([^*\n]+)\*{4}/g, '**$1**');
 };
 
-export default function ExplanationPanel({ line, onClose }) {
+export default function ExplanationPanel({ line, onClose, onJoinComments }) {
     const [panelWidth, setPanelWidth] = useState(380);
     const [isResizing, setIsResizing] = useState(false);
     const resizeStartX = useRef(0);
@@ -43,11 +43,12 @@ export default function ExplanationPanel({ line, onClose }) {
     const [chatbotLineId, setChatbotLineId] = useState(null);
 
     useEffect(() => {
-        if (
-            LLMReply != null &&
-            mdxEditorRef.current?.getMarkdown() !== LLMReply
-        ) {
-            mdxEditorRef.current?.setMarkdown(LLMReply);
+        const editor = mdxEditorRef.current;
+        if (!editor) return;
+
+        const next = LLMReply ?? '';
+        if (editor.getMarkdown() !== next) {
+            editor.setMarkdown(next);
         }
     }, [LLMReply]);
 
@@ -79,7 +80,10 @@ export default function ExplanationPanel({ line, onClose }) {
                     }
                     return;
                 }
-                setIdExp(null);
+                if (isActive) {
+                    setIdExp(null);
+                    setImages([]);
+                }
 
             } catch (requestError) {
                 if (isActive) {
@@ -228,11 +232,26 @@ export default function ExplanationPanel({ line, onClose }) {
         }
 
     }
+    const handleDeleteExp = async () => {
+        if (!idExp || !window.confirm('Bạn có chắc muốn xóa giải thích này không?')) {
+            return;
+        }
+
+        try {
+            await explanation.remove(idExp);
+            setIdExp(null);
+            setLLMReply(null);
+            setImages([]);
+            alert('Xóa giải thích thành công');
+        } catch (requestError) {
+            alert('Có lỗi xảy ra khi xóa giải thích: ' + requestError.message);
+        }
+    };
     const isChatbotVisible = chatbotLineId === line?.id;
     return (
-        // console.log("Check image: ", images),
+        console.log("Check line: ", line),
         // console.log("check id Exp: ", idExp),
-        // console.log("Check LLMReply: ", LLMReply),
+        console.log("Check LLMReply: ", LLMReply),
         <div
             className={`explanation-panel ${!line ? 'hidden' : ''} ${isResizing ? 'is-resizing' : ''}`}
             style={{ '--explanation-panel-width': `${panelWidth}px` }}
@@ -270,21 +289,25 @@ export default function ExplanationPanel({ line, onClose }) {
                             </div>
                             <div className="panel-body">
                                 <div className="quote-box">{line.content}</div>
+                                <div className="panel-warning">
+                                    <i>*Giải thích được sinh bởi AI có thể chưa đầy đủ. Vui lòng đưa ra giải thích của bạn ở phần bình luận xin cảm ơn và trân trọng.</i>
+                                </div>
 
-                                {isLoading ? (
+
+                                {isLoading && !canEdit ? (
                                     <div className="panel-section">
                                         <p style={{ color: '#aaa' }}>Chưa có giải thích...</p>
                                     </div>
-                                ) : error ? (
+                                ) : error && !canEdit ? (
                                     <div className="panel-section">
                                         <p style={{ color: '#f88' }}>{error}</p>
                                     </div>
-                                ) : LLMReply ? (
+                                ) : LLMReply || canEdit ? (
                                     <div className="panel-section"
                                         onKeyDown={(e) => e.stopPropagation()}>
                                         <MDXEditor
                                             ref={mdxEditorRef}
-                                            markdown={LLMReply}
+                                            markdown={LLMReply ?? ''}
                                             readOnly={!canEdit}
                                             onChange={canEdit ? (newMarkdown) => setLLMReply(newMarkdown) : undefined}
                                             plugins={[
@@ -298,14 +321,22 @@ export default function ExplanationPanel({ line, onClose }) {
                                             ]}
                                         />
                                     </div>
-                                ) : (
-                                    <div className="panel-section">
-                                        <p style={{ color: '#aaa' }}>Chưa có giải thích cho câu này.</p>
-                                    </div>
-                                )}
+                                )
+                                    : (
+                                        <div className="panel-section">
+                                            <p style={{ color: '#aaa' }}>Chưa có giải thích cho câu này.</p>
+                                        </div>
+                                    )
+                                }
 
                                 <ImageGallery images={images} alt="Ảnh giải thích"></ImageGallery>
 
+                                <CommentByBarID
+                                    key={line.id}
+                                    barID={line.id}
+                                    barTime={line.time}
+                                    onJoinComments={onJoinComments}
+                                />
                             </div>
                         </>
                     )}
@@ -322,6 +353,11 @@ export default function ExplanationPanel({ line, onClose }) {
                             <button type="button" className="feedback-button" onClick={() => fetchAndExplainBar(line, true)}>
                                 Cần hỏi thêm
                             </button>
+                            {idExp && barContext.id === line?.id && (
+                                <button type="button" className="feedback-button" onClick={handleDeleteExp}>
+                                    Xóa giải thích
+                                </button>
+                            )}
                         </div>
                     </div>
                 ) : !isChatbotVisible && (

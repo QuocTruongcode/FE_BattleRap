@@ -1,0 +1,33 @@
+.ranking-page {
+    min-height: 100vh;
+    padding: 32px;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.ranking-page__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+    gap: 28px;
+    width: min(100%, 1280px);
+    margin: 0 auto;
+}
+
+.ranking-page__status,
+.ranking-page__error {
+    margin: 0;
+    padding: 32px;
+    color: #f1dce0;
+    text-align: center;
+}
+
+.ranking-page__error {
+    color: #ff8b98;
+}
+
+@media (max-width: 600px) {
+    .ranking-page {
+        padding: 16px;
+    }
+}

@@ -29,6 +29,54 @@
     user-select: none;
 }
 
+.video-comments--bar {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 16px;
+    border: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0;
+}
+
+.video-comments--bar .video-comments__join {
+    margin: 0 0 20px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #ff596b;
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+    transition: color 150ms ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.video-comments--bar .video-comments__join:hover,
+.video-comments--bar .video-comments__join:focus-visible {
+    color: #ff8794;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.video-comments--bar .video-comments__item-actions span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #cfaab1;
+    font-size: 13px;
+    line-height: 1;
+}
+
+.video-comments--bar .video-comments__item-actions svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    stroke-width: 1.8;
+}
+
 .video-comments__resize-handle {
     position: absolute;
     z-index: 2;
