@@ -65,7 +65,7 @@ export default function EditBar() {
     // ── Mutation: lưu nháp (bulk create/update) ───────────────────────────────
     const saveMutation = useMutation({
         mutationFn: async (bars) => {
-            console.log("Saving bars to API:", bars);
+            // console.log("Saving bars to API:", bars);
             return barService.create(bars);
         },
         onSuccess: () => {
@@ -118,7 +118,7 @@ export default function EditBar() {
                     videoId: videoId,
                     barttelID: resolvedBarttelID ?? null,
                 });
-                console.log("API update result:", res);
+                // console.log("API update result:", res);
                 // Cập nhật trực tiếp cache, không cần gọi lại API
                 queryClient.setQueryData(['bars', videoId], (oldData = []) =>
                     oldData.map(b => b.id === id ? { ...b, time, content, barttelID: resolvedBarttelID ?? b.barttelID ?? null } : b)
@@ -144,7 +144,7 @@ export default function EditBar() {
             // TODO: gọi barService.delete(id) nếu muốn xoá ngay
             try {
                 const res = await barService.deleteBar(id);
-                console.log("API delete result:", res);
+                // console.log("API delete result:", res);
                 if (res.success) {
                     setPendingBars(prev => [
                         ...prev.filter(b => b.id !== id),
@@ -188,7 +188,7 @@ export default function EditBar() {
     const handleSaveDraft = useCallback(() => {
         const toSave = pendingBars.filter(b => !b._deleted);
         if (!toSave.length) return;
-        console.log("Saving draft bars:", toSave);
+        // console.log("Saving draft bars:", toSave);
         saveMutation.mutate(toSave);
     }, [pendingBars, saveMutation]);
 
@@ -224,8 +224,8 @@ export default function EditBar() {
         // console.log("Check all quẻy Key",
         //     queryClient.getQueryCache().getAll().map(q => q.queryKey)
         // ),
-        console.log("battlerIDSelected: ", battlerIDSelected),
-        console.log("Check savedBars in editbar: ", savedBars),
+        // console.log("battlerIDSelected: ", battlerIDSelected),
+        // console.log("Check savedBars in editbar: ", savedBars),
         <div className="edit-bar-page">
             {/* Top bar */}
             <div className="edit-bar-topbar">

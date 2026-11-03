@@ -21,6 +21,7 @@ import PageDrama from './pages/PageDrama'
 import RankBattler from './pages/RankBattler'
 import MyChart from './components/layout/ReChart'
 import TableSummary from './components/layout/TableSummary'
+import { Toaster } from 'react-hot-toast'
 // Component con, nằm TRONG BrowserRouter + AuthProvider nên mới dùng được useLocation() và useAuth()
 function AppContent() {
   const location = useLocation()
@@ -42,7 +43,7 @@ function AppContent() {
       ReactionType: reactionType,
     }))
 
-    console.log('Retrying pending reactions:', payload)
+    // console.log('Retrying pending reactions:', payload)
 
     barReaction.bulkCreate(payload)
       .then(() => {
@@ -110,8 +111,15 @@ function AppContent() {
       />
 
       <Route
+
         path="/chatbot"
-        element={<RAGChatBot />}
+        element={
+          <ProtectedRoute allowedRoles={['U0']}>
+            <RAGChatBot />
+          </ProtectedRoute>
+
+        }
+
       />
 
       <Route
@@ -163,6 +171,7 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <AppContent />
+        <Toaster position="top-right" />
       </AuthProvider>
     </BrowserRouter>
   )

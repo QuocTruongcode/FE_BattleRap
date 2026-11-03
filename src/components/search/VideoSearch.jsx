@@ -43,7 +43,7 @@ export default function VideoSearch({ handleSelectVideo }) {
             .search(trimmed, { signal: controller.signal })
             .then((data) => {  // 👈 data ở đây ĐÃ LÀ response.data, không cần res.data
                 if (queryRef.current !== q) return;
-                console.log("Check data từ BE: ", data.data); // 👈 đặt ở đây mới đúng, vì data lúc này đã là giá trị thật
+                // console.log("Check data từ BE: ", data.data); // 👈 đặt ở đây mới đúng, vì data lúc này đã là giá trị thật
 
                 setResults(Array.isArray(data.data) ? data.data : []);
 
@@ -57,7 +57,7 @@ export default function VideoSearch({ handleSelectVideo }) {
                 setError(err.message || String(err));
                 setLoading(false);
             });
-        console.log("Check res: ", res)
+        // console.log("Check res: ", res)
     }, []);
 
     useEffect(() => {
@@ -84,7 +84,7 @@ export default function VideoSearch({ handleSelectVideo }) {
         !loading && !error && query.trim().length >= MIN_LENGTH && results.length === 0;
 
     return (
-        console.log("Check result: ", results),
+        // console.log("Check result: ", results),
         <div className="video-search">
             <div className="search-input-wrap">
                 <input

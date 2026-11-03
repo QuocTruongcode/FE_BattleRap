@@ -151,7 +151,7 @@ export default function BarInputPanel({
     const canSubmit = content.trim().length > 0 && lockedTime != null;
 
     return (
-        console.log("editingBar: ", editingBar),
+        // console.log("editingBar: ", editingBar),
         <div className="bar-input-panel">
             {/* Header thông tin thời gian */}
             <div className="bip-time-row">

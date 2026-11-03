@@ -56,7 +56,7 @@ export default function CRUDKnowledgeGraph() {
     });
 
     const handleSelectBar = (bar) => {
-        console.log('Selected bar:', bar);
+        // console.log('Selected bar:', bar);
         setBarSelected(bar);
     };
 

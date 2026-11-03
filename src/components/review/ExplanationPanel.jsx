@@ -69,7 +69,7 @@ export default function ExplanationPanel({ line, onClose, onJoinComments }) {
                 // Each await completes before the next API call starts.
                 const explanationResponse = await explanation.getExplanationByBarId(line.id);
                 const exp = explanationResponse?.data;
-                console.log("Check exp: ", exp);
+                // console.log("Check exp: ", exp);
                 if (exp && exp.length > 0) {
                     if (isActive) {
                         setBarContext({ id: exp[0].barId, error: null });
@@ -112,7 +112,7 @@ export default function ExplanationPanel({ line, onClose, onJoinComments }) {
                 return;
             }
 
-            console.log("Check result explainBar: ", result)
+            // console.log("Check result explainBar: ", result)
 
             const data = result?.data ?? result;
             const content = data?.content ?? '';
@@ -133,7 +133,7 @@ export default function ExplanationPanel({ line, onClose, onJoinComments }) {
 -Giải thích vắn tắt ${LLMReply}
 `.trim();
 
-            console.log("Check userMessage: ", userMessage)
+            // console.log("Check userMessage: ", userMessage)
             setBarContext({
                 id: line.id,
                 error: null,
@@ -141,7 +141,7 @@ export default function ExplanationPanel({ line, onClose, onJoinComments }) {
 
             // This request starts only after getExplanationByBarId and explainBar finish.
             const llmResponse = await explanation.callLLMAnalysisBar({ message: userMessage });
-            console.log("Check LLM response message: ", llmResponse.message.explanation);
+            // console.log("Check LLM response message: ", llmResponse.message.explanation);
             setImages(llmResponse.message.cleanedImages)
             // const internetContext = llmResponse.message.searchResults;
 
@@ -249,9 +249,9 @@ export default function ExplanationPanel({ line, onClose, onJoinComments }) {
     };
     const isChatbotVisible = chatbotLineId === line?.id;
     return (
-        console.log("Check line: ", line),
+        // console.log("Check line: ", line),
         // console.log("check id Exp: ", idExp),
-        console.log("Check LLMReply: ", LLMReply),
+        // console.log("Check LLMReply: ", LLMReply),
         <div
             className={`explanation-panel ${!line ? 'hidden' : ''} ${isResizing ? 'is-resizing' : ''}`}
             style={{ '--explanation-panel-width': `${panelWidth}px` }}

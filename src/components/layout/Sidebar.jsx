@@ -25,14 +25,14 @@ const ROUTED_ITEMS = [
 ];
 
 const STATIC_ITEMS = [
-    { icon: <FaYoutube />, label: 'Đăng ký' },
-    { icon: <FaBook />, label: 'Thư viện' },
+    // { icon: <FaYoutube />, label: 'Đăng ký' },
+    // { icon: <FaBook />, label: 'Thư viện' },
 ];
 
 export default function Sidebar({ isCollapsed, onToggle }) {
     const { user } = useAuth();
     const visibleRoutedItems = ROUTED_ITEMS.filter(
-        (item) => user?.UserType !== 'U2' || !['/crud', '/knowledgeGraph'].includes(item.to)
+        (item) => user?.UserType !== 'U2' || !['/crud', '/knowledgeGraph', '/CRUDbattler', '/chatbot', '/CRUDdrama'].includes(item.to)
     );
     // console.log('Sidebar isCollapsed, user:', isCollapsed);
     // console.log('Sidebar render, user:', user?.UserType);

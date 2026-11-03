@@ -67,10 +67,10 @@ export default function VideoWatch() {
 
             } catch (err) {
 
-                console.log(
-                    'API ERROR:',
-                    err
-                );
+                // console.log(
+                //     'API ERROR:',
+                //     err
+                // );
 
                 throw err;
             }
@@ -158,10 +158,10 @@ export default function VideoWatch() {
         // console.log("Check currentTimeRef: ", currentTimeRef),
         // console.log("Check reactionBarByVideo: ", reactionBarByVideo),
         // console.log("check user: ", user),
-        console.log("check selectedReactionsByLine: ", selectedReactionsByLine),
+        // console.log("check selectedReactionsByLine: ", selectedReactionsByLine),
         // style={{backgroundImage: `url("${video.thumbnailUrl}")`
-        console.log("Check video: ", video),
-        console.log("Check activeLineIdRef: ", activeLineIdRef.current),
+        // console.log("Check video: ", video),
+        // console.log("Check activeLineIdRef: ", activeLineIdRef.current),
         <div className="watch-page" style={
             video?.thumbnailUrl
                 ? { "--thumb": `url("${video.thumbnailUrl}")` }

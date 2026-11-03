@@ -36,6 +36,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { historyChatBot, AIChatContext } from '../../services/api'
 import { useNavigate } from 'react-router-dom';
 import { handleAction } from '../../styles/utils/chatActions';
+import toast from 'react-hot-toast';
 const starterMessages = [
     {
         id: 'welcome',
@@ -77,7 +78,7 @@ export default function RAGChatBot({ onSendMessage }) {
             try {
                 const req = await historyChatBot.getConversationIDByUserID();
                 conversations = req.data
-                console.log("Check conversations: ", req.data)
+                // console.log("Check conversations: ", req.data)
             } catch (error) {
                 console.error('Không thể tải lịch sử cuộc trò chuyện:', error);
             }
@@ -147,6 +148,11 @@ export default function RAGChatBot({ onSendMessage }) {
     const handleSend = async () => {
         const content = input.trim();
         if (!content || isTyping) return;
+        if (user?.UserType !== 'U0') {
+            toast.error('Xin lỗi, chatbot hiện chỉ được dùng cho admin do chưa đủ kinh phí. Phiên bản cho người dùng sẽ sớm được ra mắt');
+            return;
+        }
+
         setIsTyping(true);
         const userMessage = {
             // id: `user-${Date.now()}`,
@@ -165,7 +171,7 @@ export default function RAGChatBot({ onSendMessage }) {
                 question: userMessage.content,
             };
             const response = await AIChatContext.askWithContext(payload);
-            console.log("Check response: ", response)
+            // console.log("Check response: ", response)
             if (response?.data?.action !== null) {
                 handleAction(response.data.action, { navigate });
             }
@@ -220,7 +226,7 @@ export default function RAGChatBot({ onSendMessage }) {
         const old_onversation = await historyChatBot.getConversation(getConversationID)
         setconversationID(old_onversation.data[0].conversationID)
         setMessages(old_onversation.data)
-        console.log("Check old_onversation: ", old_onversation)
+        // console.log("Check old_onversation: ", old_onversation)
     }
 
 
@@ -231,7 +237,7 @@ export default function RAGChatBot({ onSendMessage }) {
         // console.log("check conversationID: ", conversationID),
         // console.log("check messages: ", messages),
 
-        // // console.log("check user: ", user),
+        // console.log("check user: ", user),
         // console.log("check conversation: ", conversation),
 
         <section className="rag-chatbot" aria-label="RAG ChatBot">

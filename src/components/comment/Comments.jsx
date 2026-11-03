@@ -71,7 +71,7 @@ const getDirectReplyCount = (replies, commentID) => replies.filter((reply) => {
 
 const getCommentList = (response) => {
     const comments = Array.isArray(response) ? response : response?.data;
-    console.log("Check full comment: ", comments)
+    // console.log("Check full comment: ", comments)
     if (!Array.isArray(comments)) {
         throw new Error('Dữ liệu bình luận trả về không hợp lệ.');
     }
@@ -682,13 +682,13 @@ export default function Comments({
 
         try {
             const response = await ReaactionComment.getReplyCommentsByComment(commentID);
-            console.log("Check response: ", response)
+            // console.log("Check response: ", response)
             const replies = Array.isArray(response) ? response : response?.data;
             if (!Array.isArray(replies)) {
                 throw new Error('Dữ liệu phản hồi bình luận trả về không hợp lệ.');
             }
 
-            console.log("Check replies: ", replies)
+            // console.log("Check replies: ", replies)
 
 
             setReplyThreads((current) => ({
@@ -736,7 +736,7 @@ export default function Comments({
 
     return (
         // console.log("Check activeReplyCommentId: ", activeReplyCommentId),
-        console.log("Check replyThreads: ", replyThreads),
+        // console.log("Check replyThreads: ", replyThreads),
         <section
             className={`video-comments ${className} ${isResizing ? 'is-resizing' : ''}`.trim()}
             style={{ '--comments-panel-width': `${panelWidth}px` }}

@@ -95,7 +95,7 @@ export default function RhymePanel({ videoId, onClose }) {
     };
 
     return (
-        console.log('RhymePanel render: ', html),
+        // console.log('RhymePanel render: ', html),
         <section
             className={`watch-analysis-result ${isResizing ? 'is-resizing' : ''}`}
             style={{ '--watch-analysis-width': `${panelWidth}px` }}

@@ -285,7 +285,7 @@ export default function VideoCrud() {
 
     const handleSaveVectorDB = async (videoID) => {
         try {
-            console.log("Check videoID: ", videoID)
+            // console.log("Check videoID: ", videoID)
             const req = await ChunkService.upsertChunkVideoAndBar(videoID)
             if (req.success === true) {
                 alert("Lưu data xuóng vectorDB thành công!")

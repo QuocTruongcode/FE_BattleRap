@@ -28,7 +28,7 @@ function EventVideoTitleSearch({ selectedTitle, videoID, onSelect }) {
             setError(null);
             try {
                 const response = await searchService.search(keyword, { signal: controller.signal });
-                console.log("Check response: ", response)
+                // console.log("Check response: ", response)
                 if (controller.signal.aborted) return;
                 if (!Array.isArray(response?.data)) {
                     throw new Error('Dữ liệu video tìm kiếm trả về không hợp lệ.');
@@ -54,7 +54,7 @@ function EventVideoTitleSearch({ selectedTitle, videoID, onSelect }) {
     }, [query, selectedTitle, videoID]);
 
     return (
-        console.log("Check selectedTitle: ", selectedTitle),
+        // console.log("Check selectedTitle: ", selectedTitle),
 
         <div className="crud-drama-video-title-search">
             <label className="crud-drama-field">
@@ -174,9 +174,9 @@ export default function CRUDDrama({
             setIsSubmittingDramaEvent(true);
             if (formValue.urlPost.trim()) {
                 setIsSubmittingDramaEvent(true);
-                console.log("Check url: ", formValue.urlPost.trim())
+                // console.log("Check url: ", formValue.urlPost.trim())
                 const APost = await FacebookPosts.scrapeAPost({ url: formValue.urlPost.trim() })
-                console.log("Check APost: ", APost)
+                // console.log("Check APost: ", APost)
                 onSubmit?.(APost.data);
             }
             else {
@@ -201,7 +201,7 @@ export default function CRUDDrama({
         event.preventDefault();
         try {
             const dramaItems = await Drama.create({ title: dramaQuery });
-            console.log('Drama created:', dramaItems);
+            // console.log('Drama created:', dramaItems);
             setDramaID(dramaItems.data.id);
 
         } catch (e) {
@@ -234,7 +234,7 @@ export default function CRUDDrama({
                 postId: post.postId,
             }));
             const dramaItems = await Drama.bulkCreate(dramaEvents);
-            console.log('Drama events saved:', dramaItems);
+            // console.log('Drama events saved:', dramaItems);
             alert('Lưu drama event thành công.');
 
 
@@ -250,7 +250,7 @@ export default function CRUDDrama({
         try {
             const links = Posts.map((post) => post.link ?? post.url);
             const comments = await Drama.scrapeFacebookComments({ links });
-            console.log("Check comments: ", comments.data);
+            // console.log("Check comments: ", comments.data);
             return comments.data;
         } catch {
             alert("Việc lấy comment thất bại")
@@ -321,7 +321,7 @@ export default function CRUDDrama({
                 return;
             }
             const reviewed = await Drama.getDramaByID(dramaID)
-            console.log("Check reviewed drama: ", reviewed.data.summary)
+            // console.log("Check reviewed drama: ", reviewed.data.summary)
             if (reviewed?.data?.summary === null) {
                 setReviewDraft("Chưa có đánh giá drama này, vui lòng nhấn Review bằng AI để tạo đánh giá drama.")
                 setIsReviewModalOpen(true);
@@ -367,7 +367,7 @@ export default function CRUDDrama({
                 return;
             }
             const res = await Drama.update(dramaID, { summary: reviewContent });
-            console.log('Drama review updated:', res);
+            // console.log('Drama review updated:', res);
             // setReviewDrama(reviewContent);
             // setReviewDraft(reviewContent);
         } catch (error) {
@@ -390,7 +390,7 @@ export default function CRUDDrama({
     return (
         // console.log("Check reviewDraft: ", reviewDraft),
         // console.log("Check reviewDrama: ", reviewDrama),
-        console.log("Check dramaEvent: ", dramaEvent),
+        // console.log("Check dramaEvent: ", dramaEvent),
         <div className="crud-drama-forms">
             <ModalReview
                 isOpen={isReviewModalOpen}
@@ -401,7 +401,7 @@ export default function CRUDDrama({
                 progressMessage="Đang đánh giá drama bằng AI"
                 onSave={() => {
                     // setIsReviewModalOpen(false);
-                    console.log("Saved: ");
+                    // console.log("Saved: ");
                     // onClick={() => updateDramaReview(dramaID, reviewDraft);
                     updateDramaReview(dramaID, reviewDraft);
                 }}

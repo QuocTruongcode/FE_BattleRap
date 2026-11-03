@@ -34,7 +34,7 @@ export default function Home() {
     };
 
     return (
-        console.log("Check videos: ", videos),
+        // console.log("Check videos: ", videos),
         <div className="home-container">
             <Header
                 onSearch={handleSearch}

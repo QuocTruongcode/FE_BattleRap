@@ -31,7 +31,7 @@ export default function PreviewVideo({
     }, [previewUrl, startDelay]);
 
     return (
-        console.log("Preview đang chạy: "),
+        // console.log("Preview đang chạy: "),
         <video
             ref={videoRef}
             className={className}

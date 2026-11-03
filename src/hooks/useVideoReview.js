@@ -61,7 +61,7 @@ export function useVideoReview() {
                     alert('Có lỗi trong quá trình lấy đánh giá từ AI. Vui lòng thử lại sau.');
                 } else {
                     const newContent = data.textList.message || 'Không có đánh giá từ AI';
-                    console.log('AI Review Result:', newContent);
+                    // console.log('AI Review Result:', newContent);
                     const markDownContent =
                         '**Bối cảnh trận đấu**\n' + newContent.match_review.context +
                         '\n\n' +

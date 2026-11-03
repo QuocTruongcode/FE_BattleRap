@@ -50,7 +50,7 @@ export default function ReactionBar({ onSelect, onSpaceKey }) {
     }, [onSelect, onSpaceKey]);
 
     const handleSelect = (reactionId) => {
-        console.log('Selected reaction 2:', reactionId);
+        // console.log('Selected reaction 2:', reactionId);
         onSelect?.(reactionId);
     };
 

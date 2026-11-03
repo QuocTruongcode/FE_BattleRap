@@ -100,9 +100,9 @@ export default function HeroBanner({ videos = [], onVideoSelect }) {
     };
 
     return (
-        console.log("check playingPreviewKey: ", playingPreviewKey),
+        // console.log("check playingPreviewKey: ", playingPreviewKey),
 
-        console.log("check isPreviewPlaying: ", isPreviewPlaying),
+        // console.log("check isPreviewPlaying: ", isPreviewPlaying),
 
         <section
             ref={heroRef}
