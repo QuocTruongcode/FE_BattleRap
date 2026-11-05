@@ -984,28 +984,6 @@ export default function Comments({
                                                             <div className="video-comments__item-actions">
                                                                 <button
                                                                     type="button"
-                                                                    className={commentReactions[String(reply.id)] === 'like' ? 'is-active' : ''}
-                                                                    aria-label="Thích bình luận"
-                                                                    title="Thích"
-                                                                    aria-pressed={commentReactions[String(reply.id)] === 'like'}
-                                                                    onClick={() => handleCommentReaction(reply, 'like')}
-                                                                >
-                                                                    <LuThumbsUp aria-hidden="true" />
-                                                                    <span>{reply.like}</span>
-                                                                </button>
-                                                                <button
-                                                                    type="button"
-                                                                    className={commentReactions[String(reply.id)] === 'dissLike' ? 'is-active' : ''}
-                                                                    aria-label="Không thích bình luận"
-                                                                    title="Không thích"
-                                                                    aria-pressed={commentReactions[String(reply.id)] === 'dissLike'}
-                                                                    onClick={() => handleCommentReaction(reply, 'dissLike')}
-                                                                >
-                                                                    <LuThumbsDown aria-hidden="true" />
-                                                                    <span>{reply.dissLike}</span>
-                                                                </button>
-                                                                <button
-                                                                    type="button"
                                                                     className="video-comments__reply"
                                                                     aria-expanded={
                                                                         String(activeReplyToReplyId)
