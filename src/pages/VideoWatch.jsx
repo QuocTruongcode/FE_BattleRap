@@ -386,7 +386,7 @@ export default function VideoWatch() {
                 </div>
             </aside>
 
-            {(!video || typeof video.linkVideo !== 'string' || !video.linkVideo.trim()) && (
+            {video && (typeof video.linkVideo !== 'string' || !video.linkVideo.trim()) && (
                 <VideoAccessModal video={video} onClose={() => navigate('/')} />
             )}
 
