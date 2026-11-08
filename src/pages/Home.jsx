@@ -6,6 +6,8 @@ import { videoService } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { FaRobot } from 'react-icons/fa';
+import RankingTopTen from '../components/Ranking/RankingTopTen.jsx';
+import useRankingData from '../components/Ranking/useRankingData.js';
 import './Home.css';
 
 export default function Home() {
@@ -24,6 +26,11 @@ export default function Home() {
         },
         staleTime: Infinity,
     });
+    const {
+        topBattlers,
+        isLoading: isRankingLoading,
+        error: rankingError,
+    } = useRankingData();
 
     const handleSearch = (query) => {
         setSearchQuery(query);
@@ -60,6 +67,11 @@ export default function Home() {
                             <HeroBanner
                                 videos={videos.slice(0, 10)}
                                 onVideoSelect={openWatch}
+                            />
+                            <RankingTopTen
+                                battlers={topBattlers}
+                                isLoading={isRankingLoading}
+                                error={rankingError}
                             />
                             <VideoGrid
                                 videos={videos}

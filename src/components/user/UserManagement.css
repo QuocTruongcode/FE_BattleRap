@@ -1,0 +1,172 @@
+.user-management {
+    width: 100%;
+    padding: 28px;
+    box-sizing: border-box;
+    color: #0f172a;
+}
+
+.user-management__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.user-management__header h1 {
+    margin: 4px 0 0;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.user-management__eyebrow {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.user-management__count {
+    color: #475569;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.user-management__table-wrap {
+    overflow-x: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+}
+
+.user-management__table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.user-management__table th,
+.user-management__table td {
+    padding: 15px 18px;
+    border-bottom: 1px solid #e2e8f0;
+    white-space: nowrap;
+}
+
+.user-management__table th {
+    background: #f8fafc;
+    color: #475569;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.user-management__table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.user-management__edit-form {
+    display: grid;
+    grid-template-columns: 56px minmax(140px, 1fr) minmax(180px, 1.2fr) minmax(160px, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-management__edit-form input,
+.user-management__edit-form select {
+    width: 100%;
+    min-width: 0;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #fff;
+    color: #0f172a;
+    font: inherit;
+    box-sizing: border-box;
+}
+
+.user-management__edit-form input:focus,
+.user-management__edit-form select:focus {
+    outline: 2px solid rgba(37, 99, 235, 0.2);
+    border-color: #2563eb;
+}
+
+.user-management__id {
+    font-weight: 700;
+}
+
+.user-management__actions {
+    display: flex;
+    gap: 8px;
+}
+
+.user-management__button {
+    padding: 9px 14px;
+    border: 0;
+    border-radius: 8px;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.user-management__button:disabled {
+    cursor: wait;
+    opacity: 0.65;
+}
+
+.user-management__button--edit {
+    background: #e0f2fe;
+    color: #075985;
+}
+
+.user-management__button--save {
+    background: #2563eb;
+    color: #fff;
+}
+
+.user-management__button--cancel {
+    background: #f1f5f9;
+    color: #334155;
+}
+
+.user-management__empty,
+.user-management__status {
+    padding: 32px;
+    color: #64748b;
+    text-align: center;
+}
+
+.user-management__status--error {
+    color: #b91c1c;
+}
+
+@media (max-width: 900px) {
+    .user-management {
+        padding: 20px;
+    }
+
+    .user-management__edit-form {
+        grid-template-columns: 48px repeat(2, minmax(150px, 1fr));
+    }
+
+    .user-management__actions {
+        grid-column: 2 / -1;
+    }
+}
+
+@media (max-width: 560px) {
+    .user-management__header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .user-management__edit-form {
+        grid-template-columns: 1fr;
+    }
+
+    .user-management__actions {
+        grid-column: auto;
+    }
+}

@@ -1,16 +1,20 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import {
     useParams,
-    useNavigate
+    useNavigate,
+    useSearchParams,
 } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { VideoPlayer, BunnyPlayer } from '../components/video';
+import { FaYoutube } from 'react-icons/fa';
+import { FaCloud } from 'react-icons/fa6';
+import { BunnyPlayer, VideoPlayer } from '../components/video';
 import { LyricPanel } from '../components/bar';
 import { ExplanationPanel } from '../components/review';
 import RhymePanel from '../components/review/RhymePanel';
 import { videoService, barService, barReaction } from '../services/api';
 import '../components/bar/LyricsPanel.css';
 import './VideoWatch.css';
+import { VideoAccessModal } from '../components/common';
 import { ReactionBar } from '../components/bar-reaction';
 import { VideoStage } from '../components/video';
 import { useAuth } from "../contexts/AuthContext"; // context bạn đang có user, loading
@@ -24,11 +28,59 @@ export default function VideoWatch() {
     const [activeAnalysis, setActiveAnalysis] = useState('explanation');
     const [selectedReactionID, setSelectedReactionID] = useState(null);
     const [selectedReactionsByLine, setSelectedReactionsByLine] = useState({});
+    const [playbackSelection, setPlaybackSelection] = useState(null);
 
     const activeLineIdRef = useRef(null);
     const playerRef = useRef(null);
+    const playerReadyRef = useRef(false);
+    const pendingSeekTimeRef = useRef(null);
     const { videoId } = useParams();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const startTimeParam = searchParams.get('t');
+    const requestedStartTime = Number(startTimeParam);
+    const hasRequestedStartTime = startTimeParam !== null
+        && startTimeParam.trim() !== ''
+        && Number.isFinite(requestedStartTime)
+        && requestedStartTime >= 0;
+    const shouldSeekOnReadyRef = useRef(hasRequestedStartTime);
+
+    useEffect(() => {
+        playerReadyRef.current = false;
+        pendingSeekTimeRef.current = null;
+    }, [videoId]);
+
+    useEffect(() => {
+        shouldSeekOnReadyRef.current = hasRequestedStartTime;
+        if (hasRequestedStartTime && playerReadyRef.current) {
+            playerRef.current?.seekTo(requestedStartTime);
+            shouldSeekOnReadyRef.current = false;
+        }
+    }, [videoId, hasRequestedStartTime, requestedStartTime]);
+
+    const handlePlayerReady = useCallback(() => {
+        playerReadyRef.current = true;
+        if (pendingSeekTimeRef.current !== null) {
+            playerRef.current?.seekTo(pendingSeekTimeRef.current);
+            pendingSeekTimeRef.current = null;
+            return;
+        }
+        if (!shouldSeekOnReadyRef.current) return;
+
+        playerRef.current?.seekTo(requestedStartTime);
+        shouldSeekOnReadyRef.current = false;
+    }, [requestedStartTime]);
+
+    const handlePlaybackSourceChange = (source) => {
+        if (source === playbackSource || (source === 'cloud' && !video?.storageId)) return;
+
+        pendingSeekTimeRef.current = playerReadyRef.current
+            ? currentTimeRef.current
+            : shouldSeekOnReadyRef.current ? requestedStartTime : currentTimeRef.current;
+        shouldSeekOnReadyRef.current = false;
+        playerReadyRef.current = false;
+        setPlaybackSelection({ videoId, source });
+    };
 
     const handleTimeUpdate = useCallback((time) => {
         currentTimeRef.current = time; // ghi liên tục mỗi 100ms, KHÔNG re-render
@@ -84,6 +136,10 @@ export default function VideoWatch() {
         gcTime: 30 * 60 * 1000
 
     });
+
+    const playbackSource = playbackSelection?.videoId === videoId
+        ? playbackSelection.source
+        : video?.storageId ? 'cloud' : 'youtube';
 
     const { data: savedBars = [] } = useQuery({
         queryKey: ['bars', videoId],
@@ -154,13 +210,25 @@ export default function VideoWatch() {
         </div>
     );
 
+    // if (isLoading) {
+    //     // return <div className="watch-page-status" role="status">Đang tải trận đấu...</div>;
+    // }
+
+    // if (error) {
+    //     return (
+    //         <div className="watch-page-status" role="alert">
+    //             Không tải được trận đấu: {error.message || 'Vui lòng thử lại sau.'}
+    //         </div>
+    //     );
+    // }
+
     return (
         // console.log("Check currentTimeRef: ", currentTimeRef),
         // console.log("Check reactionBarByVideo: ", reactionBarByVideo),
         // console.log("check user: ", user),
         // console.log("check selectedReactionsByLine: ", selectedReactionsByLine),
         // style={{backgroundImage: `url("${video.thumbnailUrl}")`
-        // console.log("Check video: ", video),
+        console.log("Check video: ", video),
         // console.log("Check activeLineIdRef: ", activeLineIdRef.current),
         <div className="watch-page" style={
             video?.thumbnailUrl
@@ -174,17 +242,23 @@ export default function VideoWatch() {
 
             <div className="watch-main">
 
-                {video?.storageId ? (
+                {playbackSource === 'cloud' && video?.storageId ? (
                     <HlsPlayer
                         ref={playerRef}
                         storageId={video.storageId}
                         onTimeUpdate={handleTimeUpdate}
+                        onReady={handlePlayerReady}
                         fullscreenChildren={summaryLayout}
                     >
                         <ReactionBar onSpaceKey={handleSpaceKey} onSelect={handleSelectReaction} />
                     </HlsPlayer>
-                ) : video?.linkBunny ? (
-                    <BunnyPlayer ref={playerRef} videoUrl={video.linkBunny} onTimeUpdate={handleTimeUpdate}>
+                ) : !video?.linkVideo && video?.linkBunny ? (
+                    <BunnyPlayer
+                        ref={playerRef}
+                        videoUrl={video.linkBunny}
+                        onTimeUpdate={handleTimeUpdate}
+                        onReady={handlePlayerReady}
+                    >
                         <ReactionBar onSpaceKey={handleSpaceKey} onSelect={handleSelectReaction} />
                     </BunnyPlayer>
                 ) : (
@@ -192,11 +266,35 @@ export default function VideoWatch() {
                         ref={playerRef}
                         videoUrl={video?.linkVideo}
                         onTimeUpdate={handleTimeUpdate}
+                        onReady={handlePlayerReady}
                         fullscreenChildren={summaryLayout}
                     >
                         <ReactionBar onSpaceKey={handleSpaceKey} onSelect={handleSelectReaction} />
                     </VideoPlayer>
                 )}
+
+                <div className="watch-player-source-controls" role="group" aria-label="Chọn nguồn phát video">
+                    <button
+                        type="button"
+                        className={`watch-player-source-button${playbackSource === 'youtube' ? ' is-active' : ''}`}
+                        onClick={() => handlePlaybackSourceChange('youtube')}
+                        aria-label="Phát bằng YouTube"
+                        aria-pressed={playbackSource === 'youtube'}
+                    >
+                        <FaYoutube aria-hidden="true" />
+                    </button>
+                    <button
+                        type="button"
+                        className={`watch-player-source-button${playbackSource === 'cloud' ? ' is-active' : ''}`}
+                        onClick={() => handlePlaybackSourceChange('cloud')}
+                        disabled={!video?.storageId}
+                        aria-label="Phát bằng Cloud"
+                        aria-pressed={playbackSource === 'cloud'}
+                        title={!video?.storageId ? 'Video chưa có storageId' : 'Phát bằng Cloud'}
+                    >
+                        <FaCloud aria-hidden="true" />
+                    </button>
+                </div>
 
                 <LyricPanel
                     lyrics={savedBars}
@@ -243,9 +341,22 @@ export default function VideoWatch() {
                     >
                         Bình luận
                     </button>
+                    <button
+                        type="button"
+                        role="tab"
+                        aria-selected={activeAnalysis === 'results'}
+                        className={activeAnalysis === 'results' ? 'is-active' : ''}
+                        onClick={() => setActiveAnalysis('results')}
+                    >
+                        Kết quả
+                    </button>
                 </nav>
                 <div className="watch-analysis-content">
-                    {activeAnalysis === 'explanation' ? (
+                    {activeAnalysis === 'results' ? (
+                        <div className="watch-analysis-results">
+                            {summaryLayout}
+                        </div>
+                    ) : activeAnalysis === 'explanation' ? (
                         selectedLine ? (
                             <ExplanationPanel
                                 line={selectedLine}
@@ -275,6 +386,9 @@ export default function VideoWatch() {
                 </div>
             </aside>
 
+            {(!video || typeof video.linkVideo !== 'string' || !video.linkVideo.trim()) && (
+                <VideoAccessModal video={video} onClose={() => navigate('/')} />
+            )}
 
         </div>
     );

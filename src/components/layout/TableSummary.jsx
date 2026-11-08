@@ -108,82 +108,93 @@ export default function TableSummary({
     );
 
     return (
+        // console.log("savedBars: ", savedBars),
         <section className="table-summary-wrap" aria-label="Tổng hợp điểm battler">
             {battlers.length > 0 ? (
                 <div className="table-summary">
                     {battlers.map(({ id, bars }, index) => {
-                    const query = battlerQueries[index];
-                    const battler = query.data ? getBattlerFromResponse(query.data) : null;
-                    const rapName = battler?.RapName ?? battler?.rapName ?? 'Battler';
-                    const fullName = battler?.FullName ?? battler?.fullName ?? '';
-                    const counts = bars.reduce(
-                        (result, bar) => {
+                        const query = battlerQueries[index];
+                        const battler = query.data ? getBattlerFromResponse(query.data) : null;
+                        const rapName = battler?.RapName ?? battler?.rapName ?? 'Battler';
+                        const fullName = battler?.FullName ?? battler?.fullName ?? '';
+                        const totalBayesianAverage = savedBars.reduce((total, bar) => {
+                            const barBattlerId = bar.barttelID ?? bar.battlerId;
+                            if (String(barBattlerId) !== String(id)) return total;
+
                             const score = Number(bar.bayesianAverange);
-                            if (!Number.isFinite(score)) return result;
+                            return Number.isFinite(score) ? total + score : total;
+                        }, 0);
+                        const counts = bars.reduce(
+                            (result, bar) => {
+                                const score = Number(bar.bayesianAverange);
+                                if (!Number.isFinite(score)) return result;
 
-                            if (score > 9) result[REACTION_KEY_MAP.genius] += 1;
-                            else if (score > 7) result[REACTION_KEY_MAP.great] += 1;
-                            else if (score > 2 && score <= 4) result[REACTION_KEY_MAP.boring] += 1;
-                            else if (score > 0 && score <= 2) result[REACTION_KEY_MAP.bad] += 1;
+                                if (score > 9) result[REACTION_KEY_MAP.genius] += 1;
+                                else if (score > 7) result[REACTION_KEY_MAP.great] += 1;
+                                else if (score > 2 && score <= 4) result[REACTION_KEY_MAP.boring] += 1;
+                                else if (score > 0 && score <= 2) result[REACTION_KEY_MAP.bad] += 1;
 
-                            return result;
-                        },
-                        {
-                            [REACTION_KEY_MAP.genius]: 0,
-                            [REACTION_KEY_MAP.great]: 0,
-                            [REACTION_KEY_MAP.boring]: 0,
-                            [REACTION_KEY_MAP.bad]: 0,
-                        },
-                    );
+                                return result;
+                            },
+                            {
+                                [REACTION_KEY_MAP.genius]: 0,
+                                [REACTION_KEY_MAP.great]: 0,
+                                [REACTION_KEY_MAP.boring]: 0,
+                                [REACTION_KEY_MAP.bad]: 0,
+                            },
+                        );
 
-                    return (
-                        <article
-                            className="table-summary__player"
-                            key={id}
-                            style={{ '--player-accent': index === 0 ? '#596cff' : '#ff4545' }}
-                        >
-                            <header className="table-summary__header">
-                                {query.isPending ? (
-                                    <span className="table-summary__subtitle">Đang tải battler...</span>
-                                ) : query.isError ? (
-                                    <span className="table-summary__error">Không tải được battler</span>
-                                ) : (
-                                    <>
-                                        <strong className="table-summary__name">{rapName}</strong>
-                                        {fullName && (
-                                            <span className="table-summary__subtitle">{fullName}</span>
-                                        )}
-                                    </>
-                                )}
-                            </header>
-
-                            <ul className="table-summary__reactions">
-                                {SUMMARY_REACTIONS.map((summaryReaction) => {
-                                    const reaction = REACTIONS_ICONS.find(
-                                        (item) => item.id === summaryReaction.id,
-                                    );
-                                    const Icon = reaction?.icon;
-
-                                    return (
-                                        <li className="table-summary__reaction" key={summaryReaction.id}>
-                                            {Icon && (
-                                                <Icon
-                                                    className="table-summary__icon"
-                                                    aria-hidden="true"
-                                                    style={{ color: reaction.color }}
-                                                />
+                        return (
+                            <article
+                                className="table-summary__player"
+                                key={id}
+                                style={{ '--player-accent': index === 0 ? '#596cff' : '#ff4545' }}
+                            >
+                                <header className="table-summary__header">
+                                    {query.isPending ? (
+                                        <span className="table-summary__subtitle">Đang tải battler...</span>
+                                    ) : query.isError ? (
+                                        <span className="table-summary__error">Không tải được battler</span>
+                                    ) : (
+                                        <>
+                                            <strong className="table-summary__name">{rapName}</strong>
+                                            {fullName && (
+                                                <span className="table-summary__subtitle">{fullName}</span>
                                             )}
-                                            <span className="table-summary__label">
-                                                {summaryReaction.label}
-                                                <small>{summaryReaction.range}</small>
+                                            <span className="table-summary__total-score">
+                                                Tổng điểm: {totalBayesianAverage.toFixed(1)}
                                             </span>
-                                            <span className="table-summary__count">{counts[summaryReaction.id]}</span>
-                                        </li>
-                                    );
-                                })}
-                            </ul>
-                        </article>
-                    );
+                                        </>
+                                    )}
+                                </header>
+
+                                <ul className="table-summary__reactions">
+                                    {SUMMARY_REACTIONS.map((summaryReaction) => {
+                                        const reaction = REACTIONS_ICONS.find(
+                                            (item) => item.id === summaryReaction.id,
+                                        );
+                                        const Icon = reaction?.icon;
+
+                                        return (
+                                            <li className="table-summary__reaction" key={summaryReaction.id}>
+                                                {Icon && (
+                                                    <Icon
+                                                        className="table-summary__icon"
+                                                        aria-hidden="true"
+                                                        style={{ color: reaction.color }}
+                                                    />
+                                                )}
+                                                <span className="table-summary__label">
+                                                    {summaryReaction.label}
+                                                    <small>{summaryReaction.range}</small>
+                                                </span>
+                                                <span className="table-summary__count">{counts[summaryReaction.id]}</span>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            </article>
+                        );
                     })}
                 </div>
             ) : (

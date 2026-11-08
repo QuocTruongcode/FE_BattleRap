@@ -10,6 +10,8 @@ import {
     FaYoutube, FaProjectDiagram,
     FaRobot,
     FaTrophy,
+    FaUsers,
+    FaRegCommentDots
 
 } from "react-icons/fa";
 import { FaMicrophoneLines } from "react-icons/fa6";
@@ -21,6 +23,8 @@ const ROUTED_ITEMS = [
     { icon: <FaMicrophoneLines />, label: 'Battler', to: '/CRUDbattler' },
     { icon: <FaTrophy />, label: 'Xếp hạng', to: '/rankBattler' },
     { icon: <FaFire />, label: 'Thịnh hành', to: '/CRUDdrama' },
+    { icon: <FaUsers />, label: 'Người dùng', to: '/users', adminOnly: true },
+    { icon: <FaRegCommentDots />, label: 'Đánh giá sản phẩm', to: 'https://docs.google.com/forms/d/e/1FAIpQLSfsu5wALn5RakY72bzWsrplhMvqLbaAfKu0A7e5u90atiDLkg/viewform?usp=dialog' },
 
 ];
 
@@ -32,12 +36,13 @@ const STATIC_ITEMS = [
 export default function Sidebar({ isCollapsed, onToggle }) {
     const { user } = useAuth();
     const visibleRoutedItems = ROUTED_ITEMS.filter(
-        (item) => user?.UserType !== 'U2' || !['/crud', '/knowledgeGraph', '/CRUDbattler', '/chatbot', '/CRUDdrama'].includes(item.to)
+        (item) => (!item.adminOnly || user?.UserType === 'U0')
+            && (user?.UserType !== 'U2' || !['/crud', '/knowledgeGraph', '/CRUDbattler', '/chatbot', '/CRUDdrama'].includes(item.to))
     );
     // console.log('Sidebar isCollapsed, user:', isCollapsed);
     // console.log('Sidebar render, user:', user?.UserType);
     return (
-        <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+        <aside className={`sidebar ${!isCollapsed ? 'collapsed' : ''}`}>
 
             <nav className="sidebar-nav">
                 {visibleRoutedItems.map((item) => (
@@ -51,7 +56,7 @@ export default function Sidebar({ isCollapsed, onToggle }) {
                         title={item.label}
                     >
                         <span className="sidebar-icon">{item.icon}</span>
-                        {!isCollapsed && <span className="sidebar-label">{item.label}</span>}
+                        {isCollapsed && <span className="sidebar-label">{item.label}</span>}
                     </NavLink>
                 ))}
 
@@ -63,7 +68,7 @@ export default function Sidebar({ isCollapsed, onToggle }) {
                         type="button"
                     >
                         <span className="sidebar-icon">{item.icon}</span>
-                        {!isCollapsed && <span className="sidebar-label">{item.label}</span>}
+                        {isCollapsed && <span className="sidebar-label">{item.label}</span>}
                     </button>
                 ))}
             </nav>

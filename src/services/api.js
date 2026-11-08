@@ -630,6 +630,46 @@ export const R2Storage = {
     },
 }
 
+export const Userservice = {
+    getAll() {
+        return apiRequest('/api/users');
+    },
+
+    getById(id) {
+        return apiRequest(`/api/users/${id}`);
+    },
+
+    update(id, payload) {
+        return apiRequest(`/api/users/${id}`, {
+            method: 'PUT',
+            body: payload,
+        });
+    },
+
+    // remove(id) {
+    //     return apiRequest(`/api/users/${id}`, {
+    //         method: 'DELETE',
+    //     });
+    // },
+};
+
+export const AllCodeservice = {
+    getAll() {
+        return apiRequest('/api/allcodes');
+    },
+
+    getByType(type) {
+        return apiRequest(`/api/allcodes/type/${type}`);
+    },
+
+
+
+    // remove(id) {
+    //     return apiRequest(`/api/users/${id}`, {
+    //         method: 'DELETE',
+    //     });
+    // },
+};
 
 export default {
     apiRequest,
@@ -653,5 +693,7 @@ export default {
     ChunkService,
     CommentVideo,
     ReaactionComment,
-    R2Storage
+    R2Storage,
+    Userservice,
+    AllCodeservice
 };

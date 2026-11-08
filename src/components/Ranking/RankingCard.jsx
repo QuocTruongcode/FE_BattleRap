@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { LuTrophy } from 'react-icons/lu';
+import { FaMedal } from 'react-icons/fa6';
 import { REACTION_KEY_MAP, REACTIONS_ICONS } from '../../constants/const';
+import RankingCardDetails from './RankingCardDetails';
 import './RankingCard.css';
 
 const geniusReaction = REACTIONS_ICONS.find(({ id }) => id === REACTION_KEY_MAP.genius);
@@ -25,7 +27,11 @@ export default function RankingCard({
     imageAlt,
     rank,
     barsScored = [],
+    videos = [],
     className = '',
+    variant = 'default',
+    isSelected = false,
+    onSelect,
 }) {
     const [showDetails, setShowDetails] = useState(false);
     const scoredBars = getScoredBars(barsScored);
@@ -34,6 +40,54 @@ export default function RankingCard({
     const totalScore = scoredBars.reduce((total, bar) => total + bar.score, 0);
     const GeniusIcon = geniusReaction.icon;
     const GreatIcon = greatReaction.icon;
+
+    if (variant === 'compact') {
+        return (
+            <article className={`ranking-card-entry ranking-card-entry--compact ${className}`.trim()}>
+                <button
+                    type="button"
+                    className="ranking-card-compact"
+                    onClick={onSelect}
+                    aria-expanded={isSelected}
+                    aria-label={`${battlerName}, hạng ${rank}. ${isSelected ? 'Ẩn' : 'Xem'} thống kê`}
+                >
+                    <div className="ranking-card-compact__avatar">
+                        {image ? (
+                            <img src={image} alt={imageAlt || battlerName} />
+                        ) : (
+                            <span aria-hidden="true">{battlerName.slice(0, 1)}</span>
+                        )}
+                    </div>
+
+                    <div className="ranking-card-compact__stats" aria-label={`Thống kê ${battlerName}`}>
+                        <div className="ranking-card-compact__stat" aria-label={`${geniusCount} câu thiên tài`}>
+                            <GeniusIcon aria-hidden="true" style={{ color: geniusReaction.color }} />
+                            <span>{geniusCount}</span>
+                        </div>
+                        <div className="ranking-card-compact__score" aria-label={`Tổng điểm ${totalScore.toFixed(1)}`}>
+                            {totalScore.toFixed(1)}
+                        </div>
+                        <div className="ranking-card-compact__stat" aria-label={`${goodCount} câu tốt`}>
+                            <GreatIcon aria-hidden="true" style={{ color: greatReaction.color }} />
+                            <span>{goodCount}</span>
+                        </div>
+                    </div>
+
+                    <p className="ranking-card-compact__name" title={battlerName}>{battlerName}</p>
+                </button>
+                {rank != null && (
+                    <p className={`ranking-card-compact__rank${rank <= 3 ? ` ranking-card-compact__rank--medal ranking-card-compact__rank--${rank}` : ''}`}>
+                        {rank <= 3 ? (
+                            <>
+                                <FaMedal aria-hidden="true" />
+                                <span className="ranking-card-compact__rank-label">TOP {rank}</span>
+                            </>
+                        ) : `TOP ${rank}`}
+                    </p>
+                )}
+            </article>
+        );
+    }
 
     return (
         <article className={`ranking-card-entry ${className}`.trim()}>
@@ -91,20 +145,7 @@ export default function RankingCard({
             </button>
 
             {showDetails && (
-                <ul className="ranking-card__details" aria-label={`Điểm các bar của ${battlerName}`}>
-                    {scoredBars.length ? scoredBars.map((bar) => {
-                        const reaction = bar.score > 9 ? geniusReaction : greatReaction;
-                        const RatingIcon = reaction.icon;
-                        return (
-                            <li key={bar.key}>
-                                <RatingIcon aria-hidden="true" style={{ color: reaction.color }} />
-                                <span>{bar.score.toFixed(2)}</span>
-                            </li>
-                        );
-                    }) : (
-                        <li className="ranking-card__details-empty">Chưa có bar được chấm điểm.</li>
-                    )}
-                </ul>
+                <RankingCardDetails battlerName={battlerName} barsScored={barsScored} videos={videos} />
             )}
         </article>
     );

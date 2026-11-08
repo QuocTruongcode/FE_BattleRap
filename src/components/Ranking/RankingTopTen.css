@@ -1,0 +1,127 @@
+.ranking-top-ten {
+    display: block;
+    min-width: 0;
+    overflow: visible;
+}
+
+.ranking-top-ten__navigation {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.ranking-top-ten__navigation-button {
+    display: grid;
+    width: 34px;
+    height: 34px;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    background: rgba(18, 87, 67, 0.88);
+    color: #fff;
+    cursor: pointer;
+}
+
+.ranking-top-ten__navigation-button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.ranking-top-ten__navigation-button:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+}
+
+.ranking-top-ten__navigation-button svg {
+    width: 20px;
+    height: 20px;
+}
+
+.ranking-top-ten__page {
+    min-width: 42px;
+    color: #fff;
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+}
+
+.ranking-top-ten__cards {
+    display: grid;
+    align-items: flex-start;
+    grid-template-columns: repeat(9, minmax(0, 1fr));
+    gap: 12px;
+    width: 100%;
+}
+
+.ranking-top-ten__cards--next {
+    animation: ranking-top-ten-slide-from-right 220ms ease-out;
+}
+
+.ranking-top-ten__cards--previous {
+    animation: ranking-top-ten-slide-from-left 220ms ease-out;
+}
+
+@keyframes ranking-top-ten-slide-from-right {
+    from {
+        opacity: 0.6;
+        transform: translateX(24px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes ranking-top-ten-slide-from-left {
+    from {
+        opacity: 0.6;
+        transform: translateX(-24px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.ranking-top-ten__cards > .ranking-card-entry--compact {
+    min-width: 0;
+    max-width: none;
+}
+
+@media (max-width: 700px) {
+    .ranking-top-ten__cards {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ranking-top-ten__cards--next,
+    .ranking-top-ten__cards--previous {
+        animation: none;
+    }
+}
+
+.ranking-top-ten__details {
+    margin-top: 12px;
+}
+
+.ranking-top-ten__details-title {
+    margin: 0;
+    color: #fff;
+    font-size: 1.15rem;
+}
+
+.ranking-top-ten__status {
+    margin: 0 auto 24px;
+    padding: 12px 24px;
+    color: #f1dce0;
+    text-align: center;
+}
+
+.ranking-top-ten__status--error {
+    color: #ff8b98;
+}

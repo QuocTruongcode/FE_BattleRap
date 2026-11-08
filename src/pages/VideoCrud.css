@@ -269,6 +269,26 @@
 
 .video-list {
   display: grid;
+  gap: var(--spacing-12);
+}
+
+.video-status-section {
+  margin-top: var(--spacing-20);
+}
+
+.video-status-section__title {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-8);
+  margin: 0 0 var(--spacing-12);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-lg);
+}
+
+.video-status-section__title span {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
 }
 
 .video-row {

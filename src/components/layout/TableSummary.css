@@ -103,6 +103,14 @@
     line-height: 15px;
 }
 
+.table-summary__total-score {
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 15px;
+    font-variant-numeric: tabular-nums;
+}
+
 .table-summary__reactions {
     display: grid;
     gap: 5px;

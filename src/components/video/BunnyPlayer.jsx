@@ -1,16 +1,20 @@
 import { useEffect, useRef, forwardRef, useImperativeHandle, memo, useState } from 'react';
 import VideoStage from './VideoStage';
 
-const BunnyPlayer = forwardRef(function BunnyPlayer({ videoUrl, onTimeUpdate, children }, ref) {
+const BunnyPlayer = forwardRef(function BunnyPlayer({ videoUrl, onTimeUpdate, onReady, children }, ref) {
     const [isPlaying, setIsPlaying] = useState(false); // local, không cần đẩy ra ngoài
     const iframeRef = useRef(null);
     const playerRef = useRef(null);
     const stageRef = useRef(null);
     const onTimeUpdateRef = useRef(onTimeUpdate);
+    const onReadyRef = useRef(onReady);
 
     useEffect(() => {
         onTimeUpdateRef.current = onTimeUpdate;
     }, [onTimeUpdate]);
+    useEffect(() => {
+        onReadyRef.current = onReady;
+    }, [onReady]);
 
     useImperativeHandle(ref, () => ({
         seekTo: (time) => {
@@ -36,12 +40,11 @@ const BunnyPlayer = forwardRef(function BunnyPlayer({ videoUrl, onTimeUpdate, ch
             playerRef.current = new window.playerjs.Player(iframeRef.current);
 
             playerRef.current.on('ready', () => {
-                playerRef.current.on('ready', () => {
-                    playerRef.current.on('timeupdate', (data) => onTimeUpdateRef.current?.(data.seconds));
-                    playerRef.current.on('play', () => setIsPlaying(true));
-                    playerRef.current.on('pause', () => setIsPlaying(false));
-                    playerRef.current.on('ended', () => setIsPlaying(false));
-                });
+                onReadyRef.current?.();
+                playerRef.current.on('timeupdate', (data) => onTimeUpdateRef.current?.(data.seconds));
+                playerRef.current.on('play', () => setIsPlaying(true));
+                playerRef.current.on('pause', () => setIsPlaying(false));
+                playerRef.current.on('ended', () => setIsPlaying(false));
             });
         };
 

@@ -3,7 +3,7 @@ import Hls from 'hls.js';
 import VideoStage from './VideoStage';
 
 const HlsPlayer = forwardRef(function HlsPlayer(
-    { storageId, onTimeUpdate, children, fullscreenChildren },
+    { storageId, onTimeUpdate, onReady, children, fullscreenChildren },
     ref
 ) {
     const [isPlaying, setIsPlaying] = useState(false);
@@ -85,11 +85,13 @@ const HlsPlayer = forwardRef(function HlsPlayer(
         const onPlay = () => { startTick(); setIsPlaying(true); };
         const onPause = () => { stopTick(); setIsPlaying(false); };
         const onSeeked = () => onTimeUpdateRef.current?.(video.currentTime); // kéo thanh tua khi đang pause
+        const onLoadedMetadata = () => onReady?.();
 
         video.addEventListener('play', onPlay);
         video.addEventListener('pause', onPause);
         video.addEventListener('ended', onPause);
         video.addEventListener('seeked', onSeeked);
+        video.addEventListener('loadedmetadata', onLoadedMetadata);
 
         return () => {
             stopTick();
@@ -97,8 +99,9 @@ const HlsPlayer = forwardRef(function HlsPlayer(
             video.removeEventListener('pause', onPause);
             video.removeEventListener('ended', onPause);
             video.removeEventListener('seeked', onSeeked);
+            video.removeEventListener('loadedmetadata', onLoadedMetadata);
         };
-    }, []);
+    }, [onReady]);
 
     return (
         <VideoStage

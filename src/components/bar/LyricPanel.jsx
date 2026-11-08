@@ -150,10 +150,10 @@ export default function LyricPanel({ lyrics, getCurrentTime, selectedId,
                                 </span>
                             )}
                             <span className={classes.lyricStats}>
-                                <span style={{ color: getAverageScoreColor(reactionStats.averageScore) }}>
-                                    {reactionStats.averageScore == null
+                                <span style={{ color: getAverageScoreColor(line.bayesianAverange) }}>
+                                    {line.bayesianAverange == null || line.bayesianAverange === ''
                                         ? '-'
-                                        : Number(reactionStats.averageScore).toFixed(1)} đ
+                                        : Number(line.bayesianAverange).toFixed(1)} đ
                                 </span>
                                 /
                                 <span>{reactionStats.totalReaction ?? '-'} Ratings</span>

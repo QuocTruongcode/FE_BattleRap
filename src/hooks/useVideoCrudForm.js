@@ -7,6 +7,10 @@ export const emptyForm = {
     linkBunny: '',
     thumbnailUrl: '',
     review: '',
+    cleanScore: 0,
+    status: 0,
+    storageID: '',
+    key: '',
 };
 
 export function useVideoCrudForm() {
@@ -32,6 +36,10 @@ export function useVideoCrudForm() {
             linkBunny: video.linkBunny || '',
             thumbnailUrl: video.thumbnailUrl,
             review: video.review || '',
+            cleanScore: video.cleanScore ?? 0,
+            status: video.status ?? 0,
+            storageID: video.storageID || '',
+            key: video.key || '',
         });
     };
 

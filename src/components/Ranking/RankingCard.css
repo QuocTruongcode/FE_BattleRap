@@ -175,6 +175,127 @@
     list-style: none;
 }
 
+.ranking-card__details-layout {
+    display: grid;
+    grid-template-columns: minmax(180px, 0.8fr) minmax(0, 1.6fr);
+    gap: 16px;
+    margin-top: 12px;
+    align-items: start;
+}
+
+.ranking-card__details-panel {
+    min-width: 0;
+    padding: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    background: rgba(22, 13, 16, 0.92);
+}
+
+.ranking-card__details-heading {
+    margin: 0 0 10px;
+    color: #f1dce0;
+    font-size: 0.95rem;
+}
+
+.ranking-card__details-panel .ranking-card__details {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-rows: 28px;
+    max-height: 402px;
+    margin: 0;
+    gap: 6px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    overflow-y: auto;
+}
+
+.ranking-card__details-panel .ranking-card__details li {
+    justify-content: center;
+    gap: 4px;
+    padding: 3px;
+    font-size: 0.78rem;
+}
+
+.ranking-card__match-history {
+    display: grid;
+    gap: 12px;
+}
+
+.ranking-card__match {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+    padding: 8px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.ranking-card__match-thumbnail {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    border-radius: 6px;
+    object-fit: cover;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.ranking-card__match-thumbnail--empty {
+    display: grid;
+    place-items: center;
+    color: #cfaab1;
+    font-size: 0.75rem;
+}
+
+.ranking-card__match-content {
+    min-width: 0;
+}
+
+.ranking-card__match-content h4 {
+    margin: 0 0 6px;
+    color: #fff;
+    font-size: 0.9rem;
+    line-height: 1.3;
+}
+
+.ranking-card__match-bars {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-rows: 28px;
+    max-height: 402px;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow-y: auto;
+}
+
+.ranking-card__match-bars li {
+    display: inline-flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 3px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.07);
+    color: #f1dce0;
+    font-size: 0.78rem;
+    line-height: 1.2;
+    white-space: nowrap;
+    box-sizing: border-box;
+}
+
+.ranking-card__match-bars .ranking-card__bar-link {
+    white-space: nowrap;
+}
+
+.ranking-card__match-bars svg {
+    width: 14px;
+    height: 14px;
+    flex: 0 0 auto;
+}
+
 .ranking-card__details li {
     display: inline-flex;
     align-items: center;
@@ -186,6 +307,34 @@
     font-size: 0.9rem;
     font-variant-numeric: tabular-nums;
     font-weight: 700;
+}
+
+.ranking-card__bar-link {
+    display: inline-flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 0;
+    border: 0;
+    border-radius: inherit;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+}
+
+.ranking-card__bar-link:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.ranking-card__bar-link:not(:disabled):hover,
+.ranking-card__bar-link:not(:disabled):focus-visible {
+    background: rgba(255, 255, 255, 0.12);
+    outline: 1px solid rgba(255, 255, 255, 0.45);
 }
 
 .ranking-card__details li svg {
@@ -207,6 +356,163 @@
     line-height: 1.2;
 }
 
+.ranking-card-entry--compact {
+    flex: 1 0 112px;
+    max-width: 144px;
+    min-width: 112px;
+}
+
+.ranking-card-compact__rank {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    margin: 8px 0 0;
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    text-align: center;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
+}
+
+.ranking-card-compact__rank--medal svg {
+    width: 21px;
+    height: 21px;
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.4));
+}
+
+.ranking-card-compact__rank--1 svg {
+    color: #ffd700;
+}
+
+.ranking-card-compact__rank--2 svg {
+    color: #d7dce2;
+}
+
+.ranking-card-compact__rank--3 svg {
+    color: #cd7f32;
+}
+
+.ranking-card-compact__rank-label {
+    font-size: 0.68rem;
+}
+
+.ranking-card-compact {
+    position: relative;
+    display: flex;
+    width: 100%;
+    /* height: 190px; */
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 18px;
+    padding: 14px 8px 12px;
+    border: 0;
+    border-radius: 12px;
+    background: rgba(18, 87, 67, 0.88);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+    color: #fff;
+    font: inherit;
+    text-align: inherit;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.ranking-card-compact:hover,
+.ranking-card-compact[aria-expanded="true"] {
+    background: rgba(24, 112, 84, 0.96);
+}
+
+.ranking-card-compact:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+}
+
+.ranking-card-compact__avatar {
+    display: grid;
+    width: 76px;
+    aspect-ratio: 1;
+    flex-shrink: 0;
+    place-items: center;
+    overflow: hidden;
+    border: 3px solid rgba(255, 255, 255, 0.92);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.18);
+    box-sizing: border-box;
+}
+
+.ranking-card-compact__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ranking-card-compact__avatar span {
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+
+.ranking-card-compact__stats {
+    position: absolute;
+    z-index: 1;
+    top: 72px;
+    left: 8px;
+    display: grid;
+    width: calc(100% - 16px);
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 2px;
+}
+
+.ranking-card-compact__stat {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    font-size: 0.7rem;
+    font-weight: 800;
+}
+
+.ranking-card-compact__stat svg {
+    width: 17px;
+    height: 17px;
+    flex-shrink: 0;
+}
+
+.ranking-card-compact__score {
+    display: grid;
+    min-width: 46px;
+    height: 30px;
+    padding: 0 6px;
+    place-items: center;
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    border-radius: 6px;
+    background: #10b7a5;
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    box-sizing: border-box;
+}
+
+.ranking-card-compact__name {
+    display: -webkit-box;
+    width: 100%;
+    margin: 0;
+    overflow: hidden;
+    color: #fff;
+    font-size: 0.76rem;
+    font-weight: 800;
+    line-height: 1.2;
+    text-align: center;
+    text-overflow: ellipsis;
+    overflow-wrap: anywhere;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
 @media (max-width: 360px) {
     .ranking-card__content {
         right: 8px;
@@ -217,5 +523,21 @@
     .ranking-card__stats {
         gap: 4px;
         padding: 6px;
+    }
+}
+
+@media (max-width: 700px) {
+    .ranking-card__details-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .ranking-card__match {
+        grid-template-columns: 76px minmax(0, 1fr);
+        gap: 8px;
+        padding: 7px;
+    }
+
+    .ranking-card__match-thumbnail {
+        max-height: 70px;
     }
 }

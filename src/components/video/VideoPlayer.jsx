@@ -1,14 +1,18 @@
 import { useEffect, useRef, forwardRef, useImperativeHandle, memo, useState } from 'react';
 import VideoStage from './VideoStage';
-const VideoPlayer = forwardRef(function VideoPlayer({ videoUrl, onTimeUpdate, children, fullscreenChildren }, ref) {
+const VideoPlayer = forwardRef(function VideoPlayer({ videoUrl, onTimeUpdate, onReady, children, fullscreenChildren }, ref) {
     const [isPlaying, setIsPlaying] = useState(false); // local, không cần đẩy ra ngoài
     const playerRef = useRef(null);
     const intervalRef = useRef(null);
     const onTimeUpdateRef = useRef(onTimeUpdate);
+    const onReadyRef = useRef(onReady);
     const stageRef = useRef(null);
     useEffect(() => {
         onTimeUpdateRef.current = onTimeUpdate;
     }, [onTimeUpdate]);
+    useEffect(() => {
+        onReadyRef.current = onReady;
+    }, [onReady]);
 
     useImperativeHandle(ref, () => ({
         seekTo: (time) => {
@@ -70,7 +74,7 @@ const VideoPlayer = forwardRef(function VideoPlayer({ videoUrl, onTimeUpdate, ch
                 },
                 events: {
                     onReady: (e) => {
-                        // console.log('YouTube Player ready ✅', e.target);
+                        onReadyRef.current?.(e.target);
                     },
                     onStateChange: (e) => {
                         switch (e.data) {

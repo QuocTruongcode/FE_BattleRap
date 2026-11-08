@@ -21,6 +21,7 @@ import PageDrama from './pages/PageDrama'
 import RankBattler from './pages/RankBattler'
 import MyChart from './components/layout/ReChart'
 import TableSummary from './components/layout/TableSummary'
+import CRUDUser from './pages/CRUDUser'
 import { Toaster } from 'react-hot-toast'
 // Component con, nằm TRONG BrowserRouter + AuthProvider nên mới dùng được useLocation() và useAuth()
 function AppContent() {
@@ -127,6 +128,15 @@ function AppContent() {
         element={
           <ProtectedRoute allowedRoles={['U0']}>
             <CRUDBattler />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/users"
+        element={
+          <ProtectedRoute allowedRoles={['U0']}>
+            <CRUDUser />
           </ProtectedRoute>
         }
       />
