@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { redirectToLogin } from '../styles/utils/navigation'; // 👈 file mới, sẽ tạo bên dưới
+import { fetchEventSource } from '@microsoft/fetch-event-source';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '';
 const CHATBOT_URL = import.meta.env.VITE_CHATBOT_URL ?? '';
@@ -179,55 +180,80 @@ export const barService = {
 // reviewService.js
 
 export const reviewService = {
-    // Giữ cách gọi cũ cho các API bình thường khác
-
-    // Hàm mới dành riêng cho SSE — không return data, mà nhận callback
     getReviewsAI(videoId, matchID, { onStep, onResult, onError, onCancelled }) {
         const baseURL = import.meta.env.VITE_API_BASE_URL || "";
-
-        // 1. Tự sinh jobId ở phía client
         const jobId = crypto.randomUUID();
+        const controller = new AbortController();
 
-        // 2. Gửi kèm jobId lên server khi mở kết nối SSE
-        const source = new EventSource(
-            `${baseURL}/api/review?videoId=${videoId}&jobId=${jobId}&matchID=${matchID}`
-        );
+        const getHeaders = () => {
+            const token = localStorage.getItem('token');
+            return token ? { Authorization: `Bearer ${token}` } : {};
+        };
 
-        source.addEventListener('step', (e) => {
-            onStep?.(JSON.parse(e.data));
-        });
+        const url = `${baseURL}/api/review?videoId=${encodeURIComponent(videoId)}&jobId=${jobId}&matchID=${encodeURIComponent(matchID)}`;
 
-        source.addEventListener('result', (e) => {
-            onResult?.(JSON.parse(e.data));
-            source.close();
-        });
+        fetchEventSource(url, {
+            method: 'GET',
+            headers: getHeaders(),
+            signal: controller.signal,
+            openWhenHidden: true, // không tự ngắt/mở lại khi chuyển tab
 
-        source.addEventListener('error', (e) => {
-            onError?.(e.data ? JSON.parse(e.data) : { message: 'Mất kết nối' });
-            source.close();
-        });
+            async onopen(res) {
+                if (res.status === 401) {
+                    localStorage.removeItem('token');
+                    // redirectToLogin();
+                    throw new Error('Unauthorized');
+                }
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+            },
 
-        // 3. Lắng nghe event 'cancelled' — khi job bị hủy
-        source.addEventListener('cancelled', (e) => {
-            onCancelled?.(e.data ? JSON.parse(e.data) : { message: 'Đã hủy' });
-            source.close();
-        });
+            onmessage(ev) {
+                // ev.event là tên event; ev.data là chuỗi dữ liệu
+                const data = ev.data ? JSON.parse(ev.data) : null;
 
-        // 4. Hàm hủy — khớp với route POST /api/review/:jobId/cancel
+                switch (ev.event) {
+                    case 'step':
+                        onStep?.(data);
+                        break;
+                    case 'result':
+                        onResult?.(data);
+                        controller.abort();
+                        break;
+                    case 'cancelled':
+                        onCancelled?.(data ?? { message: 'Đã hủy' });
+                        controller.abort();
+                        break;
+                    case 'error':
+                        onError?.(data ?? { message: 'Có lỗi xảy ra' });
+                        controller.abort();
+                        break;
+                }
+            },
+
+            onerror(err) {
+                onError?.({ message: err.message || 'Mất kết nối' });
+                // throw để KHÔNG tự động retry
+                throw err;
+            },
+        }).catch(() => { /* đã xử lý trong onerror */ });
+
         const cancel = async () => {
             try {
                 await fetch(`${baseURL}/api/review/${jobId}/cancel`, {
-                    method: 'POST'
+                    method: 'POST',
+                    headers: getHeaders(), // thêm token cho request hủy
                 });
             } catch (err) {
                 console.error('Lỗi khi gọi API hủy:', err);
             } finally {
-                source.close();
+                controller.abort();
             }
         };
 
-        // Trả về cả source (để tự đóng khi unmount) và cancel (để bấm nút Hủy)
-        return { source, jobId, cancel };
+        // Trả về `controller` thay cho `source`
+        return { controller, jobId, cancel };
     },
 };
 
