@@ -179,6 +179,9 @@ export const barService = {
 
 // reviewService.js
 
+const CONNECT_TIMEOUT = 15_000; // 15s chưa kết nối được
+const IDLE_TIMEOUT = 180_000;    // 120s không có event nào
+
 export const reviewService = {
     getReviewsAI(videoId, matchID, { onStep, onResult, onError, onCancelled }) {
         const baseURL = import.meta.env.VITE_API_BASE_URL || "";
@@ -190,69 +193,98 @@ export const reviewService = {
             return token ? { Authorization: `Bearer ${token}` } : {};
         };
 
+        let timer = null;
+        let finished = false;
+
+        const stop = () => {
+            finished = true;
+            clearTimeout(timer);
+            controller.abort();
+        };
+
+        const fail = (message) => {
+            if (finished) return;
+            stop();
+            onError?.({ message });
+        };
+
+        const armTimer = (ms, message) => {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                fail(message);
+                // báo server dừng job để khỏi chạy phí
+                fetch(`${baseURL}/api/review/${jobId}/cancel`, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                }).catch(() => { });
+            }, ms);
+        };
+
         const url = `${baseURL}/api/review?videoId=${encodeURIComponent(videoId)}&jobId=${jobId}&matchID=${encodeURIComponent(matchID)}`;
+
+        armTimer(CONNECT_TIMEOUT, 'Không kết nối được tới server (timeout)');
 
         fetchEventSource(url, {
             method: 'GET',
             headers: getHeaders(),
             signal: controller.signal,
-            openWhenHidden: true, // không tự ngắt/mở lại khi chuyển tab
+            openWhenHidden: true,
 
             async onopen(res) {
                 if (res.status === 401) {
                     localStorage.removeItem('token');
-                    // redirectToLogin();
                     throw new Error('Unauthorized');
                 }
-                if (!res.ok) {
-                    throw new Error(`HTTP ${res.status}`);
-                }
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                // đã kết nối → chuyển sang đếm idle
+                armTimer(IDLE_TIMEOUT, 'Server không phản hồi trong thời gian dài (timeout)');
             },
 
             onmessage(ev) {
-                // ev.event là tên event; ev.data là chuỗi dữ liệu
-                const data = ev.data ? JSON.parse(ev.data) : null;
+                if (finished) return;
+                armTimer(IDLE_TIMEOUT, 'Server không phản hồi trong thời gian dài (timeout)');
 
+                if (ev.event === 'ping') return; // heartbeat
+
+                const data = ev.data ? JSON.parse(ev.data) : null;
                 switch (ev.event) {
                     case 'step':
                         onStep?.(data);
                         break;
                     case 'result':
+                        stop();
                         onResult?.(data);
-                        controller.abort();
                         break;
                     case 'cancelled':
+                        stop();
                         onCancelled?.(data ?? { message: 'Đã hủy' });
-                        controller.abort();
                         break;
                     case 'error':
+                        stop();
                         onError?.(data ?? { message: 'Có lỗi xảy ra' });
-                        controller.abort();
                         break;
                 }
             },
 
             onerror(err) {
-                onError?.({ message: err.message || 'Mất kết nối' });
-                // throw để KHÔNG tự động retry
-                throw err;
+                fail(err.message || 'Mất kết nối');
+                throw err; // không tự retry
             },
-        }).catch(() => { /* đã xử lý trong onerror */ });
+        }).catch(() => { });
 
         const cancel = async () => {
             try {
                 await fetch(`${baseURL}/api/review/${jobId}/cancel`, {
                     method: 'POST',
-                    headers: getHeaders(), // thêm token cho request hủy
+                    headers: getHeaders(),
                 });
             } catch (err) {
                 console.error('Lỗi khi gọi API hủy:', err);
             } finally {
-                controller.abort();
+                stop();
             }
         };
 
-        // Trả về `controller` thay cho `source`
         return { controller, jobId, cancel };
     },
 };
