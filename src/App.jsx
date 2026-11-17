@@ -15,7 +15,7 @@ import CRUDBattler from './pages/CRUDBattler'
 import Login from './pages/Login'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import ProtectedRoute from './components/auth/ProtectedRoute'
-import { barReaction } from '../src/services/api' // 👈 đổi đúng tên service bạn đang dùng
+import { AIRecommendationService, barReaction } from '../src/services/api' // 👈 đổi đúng tên service bạn đang dùng
 import { RAGChatBot } from './components/RAGChatBot'
 import PageDrama from './pages/PageDrama'
 import RankBattler from './pages/RankBattler'
@@ -23,11 +23,45 @@ import MyChart from './components/layout/ReChart'
 import TableSummary from './components/layout/TableSummary'
 import CRUDUser from './pages/CRUDUser'
 import { Toaster } from 'react-hot-toast'
+const AI_RECOMMENDATION_COOLDOWN_MS = 60 * 1000
+
 // Component con, nằm TRONG BrowserRouter + AuthProvider nên mới dùng được useLocation() và useAuth()
 function AppContent() {
   const location = useLocation()
   const { user } = useAuth()
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (!user?.userId) return
+
+    const requestKey = `ai_recommendations_last_request_${user.userId}`
+    const lastRequestedAt = Number(localStorage.getItem(requestKey))
+    const now = Date.now()
+
+    if (Number.isFinite(lastRequestedAt) && now - lastRequestedAt < AI_RECOMMENDATION_COOLDOWN_MS) {
+      return
+    }
+
+    localStorage.setItem(requestKey, String(now))
+
+    AIRecommendationService.getAIRecommendations()
+      .then((response) => {
+        const suggestions = response?.data?.suggestions ?? response?.suggestions
+        if (!Array.isArray(suggestions)) {
+          throw new TypeError('Phản hồi gợi ý AI không có mảng suggestions hợp lệ')
+        }
+
+        localStorage.setItem(
+          `ai_recommendations_${user.userId}`,
+          JSON.stringify(suggestions)
+        )
+        window.dispatchEvent(new Event('ai-recommendations-updated'))
+      })
+      .catch((err) => {
+        console.error('Không thể tải gợi ý AI:', err)
+      })
+
+  }, [user?.userId])
 
   useEffect(() => {
     if (!user?.userId) return

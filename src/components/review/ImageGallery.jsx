@@ -20,6 +20,7 @@ function normalizeImages(images) {
                     title: '',
                     keyword: '',
                     link: '',
+                    sourceIndex: index,
                 };
             }
 
@@ -29,12 +30,13 @@ function normalizeImages(images) {
                 title: image?.title || '',
                 keyword: image?.keyword || '',
                 link: getUrl(image?.link),
+                sourceIndex: index,
             };
         })
         .filter((image) => image.src);
 }
 
-export default function ImageGallery({ images = [], alt = 'Ảnh review' }) {
+export default function ImageGallery({ images = [], alt = 'Ảnh review', onRemove }) {
     const galleryImages = normalizeImages(images);
     const [activeIndex, setActiveIndex] = useState(0);
     const [isFullscreen, setIsFullscreen] = useState(false);
@@ -105,19 +107,31 @@ export default function ImageGallery({ images = [], alt = 'Ảnh review' }) {
                 </div>
             )}
 
-            {galleryImages.length > 1 && (
+            {(galleryImages.length > 1 || onRemove) && (
                 <div className="image-gallery-thumbnails" role="list" aria-label="Các ảnh khác">
                     {galleryImages.map((image, index) => (
-                        <button
-                            type="button"
-                            className={`image-gallery-thumbnail ${index === activeIndex ? 'is-active' : ''}`}
-                            key={`${image.src}-${index}`}
-                            onClick={() => selectImage(index)}
-                            aria-label={`Chọn ảnh ${index + 1}`}
-                            aria-current={index === activeIndex ? 'true' : undefined}
-                        >
-                            <img src={image.src} alt="" aria-hidden="true" />
-                        </button>
+                        <div className="image-gallery-thumbnail-item" role="listitem" key={`${image.src}-${index}`}>
+                            <button
+                                type="button"
+                                className={`image-gallery-thumbnail ${index === activeIndex ? 'is-active' : ''}`}
+                                onClick={() => selectImage(index)}
+                                aria-label={`Chọn ảnh ${index + 1}`}
+                                aria-current={index === activeIndex ? 'true' : undefined}
+                            >
+                                <img src={image.src} alt="" aria-hidden="true" />
+                            </button>
+                            {onRemove && (
+                                <button
+                                    type="button"
+                                    className="image-gallery-thumbnail-remove"
+                                    onClick={() => onRemove(image.sourceIndex)}
+                                    aria-label={`Xóa ảnh ${index + 1}`}
+                                    title="Xóa ảnh"
+                                >
+                                    ×
+                                </button>
+                            )}
+                        </div>
                     ))}
                 </div>
             )}

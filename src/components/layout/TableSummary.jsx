@@ -108,7 +108,7 @@ export default function TableSummary({
     );
 
     return (
-        // console.log("savedBars: ", savedBars),
+        console.log("savedBars: ", savedBars),
         <section className="table-summary-wrap" aria-label="Tổng hợp điểm battler">
             {battlers.length > 0 ? (
                 <div className="table-summary">

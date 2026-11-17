@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import {
     useParams,
     useNavigate,
+    useLocation,
     useSearchParams,
 } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -17,11 +18,15 @@ import './VideoWatch.css';
 import { VideoAccessModal } from '../components/common';
 import { ReactionBar } from '../components/bar-reaction';
 import { VideoStage } from '../components/video';
+import CardRating from '../components/Rating/CardRating';
 import { useAuth } from "../contexts/AuthContext"; // context bạn đang có user, loading
 import MyChart from '../components/layout/ReChart'
 import TableSummary from '../components/layout/TableSummary'
 import Comments from '../components/comment/Comments';
 import HlsPlayer from '../components/video/HlsPlayer';
+
+const RATING_OVERLAY_HISTORY_KEY = '__videoWatchRatingOverlay';
+
 export default function VideoWatch() {
     const currentTimeRef = useRef(0);
     const [selectedLine, setSelectedLine] = useState(null);
@@ -36,6 +41,11 @@ export default function VideoWatch() {
     const pendingSeekTimeRef = useRef(null);
     const { videoId } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
+    const ratingOverlayHistoryState = location.state?.[RATING_OVERLAY_HISTORY_KEY];
+    const isRatingOverlayOpen = ratingOverlayHistoryState?.videoId === videoId
+        && ratingOverlayHistoryState.open === true;
+    const ratingOverlayHistoryPreparedRef = useRef(null);
     const [searchParams] = useSearchParams();
     const startTimeParam = searchParams.get('t');
     const requestedStartTime = Number(startTimeParam);
@@ -44,6 +54,33 @@ export default function VideoWatch() {
         && Number.isFinite(requestedStartTime)
         && requestedStartTime >= 0;
     const shouldSeekOnReadyRef = useRef(hasRequestedStartTime);
+
+    useEffect(() => {
+        if (ratingOverlayHistoryState?.videoId === videoId) return;
+
+        const historyEntryKey = `${location.key}:${videoId}`;
+        if (ratingOverlayHistoryPreparedRef.current === historyEntryKey) return;
+        ratingOverlayHistoryPreparedRef.current = historyEntryKey;
+
+        const currentUrl = `${location.pathname}${location.search}${location.hash}`;
+        const currentState = location.state && typeof location.state === 'object'
+            ? location.state
+            : {};
+
+        navigate(currentUrl, {
+            replace: true,
+            state: {
+                ...currentState,
+                [RATING_OVERLAY_HISTORY_KEY]: { videoId, open: true },
+            },
+        });
+        navigate(currentUrl, {
+            state: {
+                ...currentState,
+                [RATING_OVERLAY_HISTORY_KEY]: { videoId, open: false },
+            },
+        });
+    }, [location, navigate, ratingOverlayHistoryState, videoId]);
 
     useEffect(() => {
         playerReadyRef.current = false;
@@ -155,7 +192,7 @@ export default function VideoWatch() {
     });
 
 
-    const { data: reactionBarByVideo = [] } = useQuery({
+    const { data: reactionBarByVideoData = [] } = useQuery({
         queryKey: ['bar-reactions', videoId, user?.userId],
         queryFn: async () => {
             if (!user?.userId) return [];
@@ -164,6 +201,19 @@ export default function VideoWatch() {
         },
         enabled: !!user?.userId && !!videoId,
         staleTime: 2 * 60 * 1000,
+    });
+
+    const savedBarsById = new Map(
+        savedBars.map(bar => [String(bar.id), bar])
+    );
+    const reactionBarByVideo = reactionBarByVideoData.map(reaction => {
+        const bar = savedBarsById.get(String(reaction.barID));
+
+        return {
+            ...reaction,
+            time: bar?.time ?? null,
+            battlerId: bar?.barttelID ?? bar?.battlerId ?? null,
+        };
     });
 
 
@@ -210,6 +260,22 @@ export default function VideoWatch() {
         </div>
     );
 
+    const closeRatingOverlay = () => {
+        const currentState = location.state && typeof location.state === 'object'
+            ? location.state
+            : {};
+        const currentUrl = `${location.pathname}${location.search}${location.hash}`;
+
+        navigate(currentUrl, {
+            replace: true,
+            state: {
+                ...currentState,
+                [RATING_OVERLAY_HISTORY_KEY]: { videoId, open: false },
+            },
+        });
+        navigate(1);
+    };
+
     // if (isLoading) {
     //     // return <div className="watch-page-status" role="status">Đang tải trận đấu...</div>;
     // }
@@ -224,11 +290,12 @@ export default function VideoWatch() {
 
     return (
         // console.log("Check currentTimeRef: ", currentTimeRef),
-        // console.log("Check reactionBarByVideo: ", reactionBarByVideo),
+        console.log("Check reactionBarByVideo: ", reactionBarByVideo),
         // console.log("check user: ", user),
         // console.log("check selectedReactionsByLine: ", selectedReactionsByLine),
         // style={{backgroundImage: `url("${video.thumbnailUrl}")`
         console.log("Check video: ", video),
+        // console.log("Check selectedLine: ", selectedLine),
         // console.log("Check activeLineIdRef: ", activeLineIdRef.current),
         <div className="watch-page" style={
             video?.thumbnailUrl
@@ -295,6 +362,13 @@ export default function VideoWatch() {
                         <FaCloud aria-hidden="true" />
                     </button>
                 </div>
+
+                {/* {video && (
+                    <CardRating
+                        video={video}
+                        reactionBarByVideo={reactionBarByVideo}
+                    />
+                )} */}
 
                 <LyricPanel
                     lyrics={savedBars}
@@ -388,6 +462,32 @@ export default function VideoWatch() {
 
             {video && (typeof video.linkVideo !== 'string' || !video.linkVideo.trim()) && (
                 <VideoAccessModal video={video} onClose={() => navigate('/')} />
+            )}
+
+            {isRatingOverlayOpen && (
+                <div
+                    className="watch-rating-overlay"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Thẻ đánh giá video"
+                    onClick={(event) => {
+                        if (event.target === event.currentTarget) closeRatingOverlay();
+                    }}
+                >
+                    <button
+                        type="button"
+                        className="watch-rating-overlay__close"
+                        aria-label="Về trang chủ"
+                        title="Về trang chủ"
+                        onClick={() => navigate('/', { replace: true })}
+                    >
+                        ×
+                    </button>
+                    <CardRating
+                        video={video}
+                        reactionBarByVideo={reactionBarByVideo}
+                    />
+                </div>
             )}
 
         </div>

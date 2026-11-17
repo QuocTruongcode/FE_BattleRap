@@ -91,6 +91,8 @@
 }
 
 .image-gallery-thumbnail {
+    display: block;
+    width: 100%;
     aspect-ratio: 1;
     min-width: 0;
     padding: 0;
@@ -120,6 +122,35 @@
 
 .image-gallery-thumbnail:hover {
     transform: translateY(-1px);
+}
+
+.image-gallery-thumbnail-item {
+    position: relative;
+    min-width: 0;
+}
+
+.image-gallery-thumbnail-remove {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgb(15 23 42 / 85%);
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+}
+
+.image-gallery-thumbnail-remove:hover,
+.image-gallery-thumbnail-remove:focus-visible {
+    background: #b42318;
+    outline: 2px solid #ffffff;
 }
 
 .image-gallery-lightbox {

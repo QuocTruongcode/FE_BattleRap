@@ -729,6 +729,14 @@ export const AllCodeservice = {
     // },
 };
 
+export const AIRecommendationService = {
+    getAIRecommendations() {
+        return apiRequest('/api/ai-recommendations/history/recommendation-markdown', {
+            timeout: 90000,
+        });
+    },
+
+};
 export default {
     apiRequest,
     videoService,
@@ -753,5 +761,6 @@ export default {
     ReaactionComment,
     R2Storage,
     Userservice,
-    AllCodeservice
+    AllCodeservice,
+    AIRecommendationService
 };

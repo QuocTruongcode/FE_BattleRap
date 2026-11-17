@@ -53,9 +53,14 @@ const quickPrompts = [
     { icon: FiSmile, label: 'Giải thích punchline' },
 ];
 
-export default function RAGChatBot({ onSendMessage }) {
+export default function RAGChatBot({
+    onSendMessage,
+    recommendationState,
+    videos = [],
+}) {
     const [messages, setMessages] = useState(starterMessages);
     const [input, setInput] = useState('');
+    const [selectedRecommendationKeyword, setSelectedRecommendationKeyword] = useState(null);
     const [isTyping, setIsTyping] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const textareaRef = useRef(null);
@@ -66,6 +71,22 @@ export default function RAGChatBot({ onSendMessage }) {
     const [conversation, setConversationState] = useState({});
     const conversationRef = useRef(conversation);
     const { user } = useAuth();
+    const recommendations = user?.userId && recommendationState?.userId === user.userId
+        && Array.isArray(recommendationState.suggestions)
+        ? recommendationState.suggestions
+        : [];
+    const selectedRecommendation = recommendations.length
+        ? recommendations[recommendationState.index % recommendations.length]
+        : null;
+    const contextVideoID = selectedRecommendation?.videoID ?? null;
+    const selectedVideo = contextVideoID == null
+        ? null
+        : videos.find((video) => String(video.id) === String(contextVideoID));
+    const recommendationIntroduction = selectedRecommendation?.videoIntroduction ?? selectedRecommendation?.introduction;
+    const videoIntroduction = typeof recommendationIntroduction === 'string' ? recommendationIntroduction : '';
+    const recommendationKeywords = (Array.isArray(selectedRecommendation?.keyWord) ? selectedRecommendation.keyWord : [])
+        .filter((keyword) => typeof keyword === 'string' && keyword.trim())
+        .map((keyword) => keyword.trim());
 
     const setconversation = (nextConversation) => {
         conversationRef.current = nextConversation;
@@ -98,6 +119,7 @@ export default function RAGChatBot({ onSendMessage }) {
 
     const handleInputChange = (event) => {
         setInput(event.target.value);
+        setSelectedRecommendationKeyword(null);
         resizeTextarea(event.target);
     };
 
@@ -105,6 +127,7 @@ export default function RAGChatBot({ onSendMessage }) {
         setMessages([]);
         setconversationID(crypto.randomUUID());
         setInput('');
+        setSelectedRecommendationKeyword(null);
         setIsTyping(false);
         textareaRef.current?.focus();
     };
@@ -163,13 +186,20 @@ export default function RAGChatBot({ onSendMessage }) {
         };
         setMessages((current) => [...current, userMessage]);
         setInput('');
+        setSelectedRecommendationKeyword(null);
         if (textareaRef.current) textareaRef.current.style.height = 'auto';
 
         try {
             const payload = {
                 conversationID,
                 question: userMessage.content,
+                ...(selectedRecommendationKeyword != null
+                    && recommendationKeywords.includes(selectedRecommendationKeyword)
+                    && selectedVideo?.title != null
+                    ? { title: selectedVideo.title }
+                    : {}),
             };
+            console.log("Check payload: ", payload)
             const response = await AIChatContext.askWithContext(payload);
             // console.log("Check response: ", response)
             if (response?.data?.action !== null) {
@@ -217,10 +247,15 @@ export default function RAGChatBot({ onSendMessage }) {
         }
     };
 
-    const usePrompt = (prompt) => {
+    const applyPrompt = (prompt) => {
         setInput(prompt);
+        setSelectedRecommendationKeyword(
+            recommendationKeywords.includes(prompt) ? prompt : null,
+        );
         textareaRef.current?.focus();
     };
+
+    const watchVideoID = contextVideoID;
 
     const getConversation = async (getConversationID) => {
         const old_onversation = await historyChatBot.getConversation(getConversationID)
@@ -236,7 +271,7 @@ export default function RAGChatBot({ onSendMessage }) {
         // console.log("input question: ", input),
         // console.log("check conversationID: ", conversationID),
         // console.log("check messages: ", messages),
-
+        console.log("check selectedVideo in chatbot: ", selectedVideo.title),
         // console.log("check user: ", user),
         // console.log("check conversation: ", conversation),
 
@@ -289,6 +324,28 @@ export default function RAGChatBot({ onSendMessage }) {
                 </header>
 
                 <div className="rag-chatbot__conversation">
+                    {(selectedVideo || videoIntroduction) && (
+                        <div className="rag-chatbot__video-context">
+                            {selectedVideo && (
+                                <div className="rag-chatbot__video-card">
+                                    {selectedVideo.thumbnailUrl && (
+                                        <img
+                                            className="rag-chatbot__video-thumbnail"
+                                            src={selectedVideo.thumbnailUrl}
+                                            alt={selectedVideo.title || 'Thumbnail video'}
+                                        />
+                                    )}
+                                    <div className="rag-chatbot__video-info">
+                                        <strong>{selectedVideo.title || 'Video liên quan'}</strong>
+                                        <span>{selectedVideo.totalReaction ?? '-'} Ratings</span>
+                                    </div>
+                                </div>
+                            )}
+                            {videoIntroduction && (
+                                <p className="rag-chatbot__video-introduction">{videoIntroduction}</p>
+                            )}
+                        </div>
+                    )}
                     {messages.length === 0 && (
                         <div className="rag-chatbot__welcome">
                             <div className="rag-chatbot__welcome-mark"><FiMessageSquare /></div>
@@ -296,7 +353,7 @@ export default function RAGChatBot({ onSendMessage }) {
                             <p>Khám phá dữ liệu Battle Rap bằng hội thoại tự nhiên.</p>
                             <div className="rag-chatbot__quick-prompts">
                                 {quickPrompts.map(({ icon: Icon, label }) => (
-                                    <button key={label} onClick={() => usePrompt(label)}><Icon /> {label}</button>
+                                    <button key={label} onClick={() => applyPrompt(label)}><Icon /> {label}</button>
                                 ))}
                             </div>
                         </div>
@@ -338,7 +395,21 @@ export default function RAGChatBot({ onSendMessage }) {
                     {isTyping && <div className="rag-chatbot__typing"><span /><span /><span /></div>}
                     <div ref={messagesEndRef} />
                 </div>
-
+                <div className="rag-chatbot__composer-shortcuts" aria-label="Gợi ý từ khóa">
+                    <button
+                        type="button"
+                        className="rag-chatbot__watch-now"
+                        onClick={() => watchVideoID != null && navigate(`/watch/${watchVideoID}`)}
+                        disabled={watchVideoID == null}
+                    >
+                        Xem ngay
+                    </button>
+                    {recommendationKeywords.map((keyword) => (
+                        <button type="button" key={keyword} onClick={() => applyPrompt(keyword)}>
+                            {keyword}
+                        </button>
+                    ))}
+                </div>
                 <div className="rag-chatbot__composer-wrap">
                     <div className="rag-chatbot__composer">
                         <button className="rag-chatbot__composer-button" title="Đính kèm tệp" aria-label="Đính kèm tệp"><FiPaperclip /></button>
@@ -355,6 +426,7 @@ export default function RAGChatBot({ onSendMessage }) {
                             {input.trim() ? <FiArrowUp /> : <FiSend />}
                         </button>
                     </div>
+
                     <div className="rag-chatbot__composer-hint"><span><FiGlobe /> RAG đã bật</span><span>RapMind có thể mắc lỗi. Hãy kiểm tra thông tin quan trọng.</span></div>
                 </div>
             </main>

@@ -207,6 +207,9 @@ export default function ExplanationPanel({ line, onClose, onJoinComments }) {
 
     const isLoading = Boolean(line?.id) && barContext.id !== line.id;
     const error = barContext.id === line?.id ? barContext.error : null;
+    const handleRemoveImage = (imageIndex) => {
+        setImages((currentImages) => currentImages.filter((_, index) => index !== imageIndex));
+    };
     // console.log("is loading: ", isLoading)
     const handleSubmitExp = async () => {
         try {
@@ -252,6 +255,7 @@ export default function ExplanationPanel({ line, onClose, onJoinComments }) {
         // console.log("Check line: ", line),
         // console.log("check id Exp: ", idExp),
         // console.log("Check LLMReply: ", LLMReply),
+        console.log("Check images: ", images),
         <div
             className={`explanation-panel ${!line ? 'hidden' : ''} ${isResizing ? 'is-resizing' : ''}`}
             style={{ '--explanation-panel-width': `${panelWidth}px` }}
@@ -329,7 +333,11 @@ export default function ExplanationPanel({ line, onClose, onJoinComments }) {
                                     )
                                 }
 
-                                <ImageGallery images={images} alt="Ảnh giải thích"></ImageGallery>
+                                <ImageGallery
+                                    images={images}
+                                    alt="Ảnh giải thích"
+                                    onRemove={canEdit ? handleRemoveImage : undefined}
+                                />
 
                                 <CommentByBarID
                                     key={line.id}
