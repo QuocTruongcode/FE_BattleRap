@@ -67,6 +67,6 @@ export const REACTION_POINT = {
     R2: 10,
     R1: 8,
     R0: 5,
-    R11: 2,
-    R12: 0,
+    R11: -4,
+    R12: -8,
 };

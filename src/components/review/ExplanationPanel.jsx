@@ -34,6 +34,8 @@ export default function ExplanationPanel({ line, onClose, onJoinComments }) {
         error: null,
     });
     const [LLMReply, setLLMReply] = useState(null);
+    const [isExplainingBar, setIsExplainingBar] = useState(false);
+    const isExplainingBarRef = useRef(false);
     const mdxEditorRef = useRef(null);
     const [isExpanded, setIsExpanded] = useState(true);
     const [idExp, setIdExp] = useState(null);
@@ -106,6 +108,12 @@ export default function ExplanationPanel({ line, onClose, onJoinComments }) {
 
     // hàm lấy context và gửi lên LLM để phân tích
     const fetchAndExplainBar = async (line, isActive) => {
+        if (isExplainingBarRef.current) {
+            return;
+        }
+
+        isExplainingBarRef.current = true;
+        setIsExplainingBar(true);
         try {
             const result = await barService.explainBar(line.id);
             if (!isActive) {
@@ -165,6 +173,9 @@ export default function ExplanationPanel({ line, onClose, onJoinComments }) {
             }
         } catch (error) {
             alert('Có lỗi xảy ra khi lấy giải thích từ LLM: ' + error.message);
+        } finally {
+            isExplainingBarRef.current = false;
+            setIsExplainingBar(false);
         }
 
     };
@@ -222,7 +233,6 @@ export default function ExplanationPanel({ line, onClose, onJoinComments }) {
             if (idExp) {
                 await explanation.update(idExp, payload);
                 alert("Cập nhật exp thành công")
-
             }
             else {
                 await explanation.create(payload);
@@ -253,7 +263,7 @@ export default function ExplanationPanel({ line, onClose, onJoinComments }) {
     const isChatbotVisible = chatbotLineId === line?.id;
     return (
         // console.log("Check line: ", line),
-        // console.log("check id Exp: ", idExp),
+        console.log("check id Exp: ", idExp),
         // console.log("Check LLMReply: ", LLMReply),
         console.log("Check images: ", images),
         <div
@@ -358,8 +368,15 @@ export default function ExplanationPanel({ line, onClose, onJoinComments }) {
                             <button type="button" className="agree-button" onClick={() => handleSubmitExp()}>
                                 Đồng ý
                             </button>
-                            <button type="button" className="feedback-button" onClick={() => fetchAndExplainBar(line, true)}>
-                                Cần hỏi thêm
+                            <button
+                                type="button"
+                                className="feedback-button"
+                                disabled={isExplainingBar}
+                                aria-busy={isExplainingBar}
+                                onClick={() => fetchAndExplainBar(line, true)}
+                            >
+                                {isExplainingBar && <span className="feedback-button-spinner" aria-hidden="true" />}
+                                {isExplainingBar ? 'Đang xử lý...' : 'Cần hỏi thêm'}
                             </button>
                             {idExp && barContext.id === line?.id && (
                                 <button type="button" className="feedback-button" onClick={handleDeleteExp}>
