@@ -20,6 +20,7 @@
 .rag-chatbot__brand-mark svg { width: 17px; }
 .rag-chatbot__sidebar-toggle { margin-left: auto; }
 .rag-chatbot__icon-button, .rag-chatbot__composer-button { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 8px; color: var(--rag-muted); }
+.rag-chatbot__icon-button { flex: 0 0 34px; cursor: pointer; }
 .rag-chatbot__icon-button:hover, .rag-chatbot__composer-button:hover { background: #e9eae7; color: var(--rag-ink); }
 .rag-chatbot__new-chat { display: flex; align-items: center; gap: 10px; width: 100%; padding: 11px 12px; border: 1px solid #d8ded8; border-radius: 9px; color: var(--rag-accent); background: #fff; font-weight: 600; text-align: left; }
 .rag-chatbot__new-chat:hover { border-color: var(--rag-accent); background: var(--rag-accent-light); }
@@ -37,7 +38,7 @@
 .rag-chatbot__profile svg { margin-left: auto; color: var(--rag-muted); }
 .rag-chatbot__avatar { display: grid; place-items: center; width: 27px; height: 27px; border-radius: 50%; color: #fff; background: #c47754; font-size: 11px; }
 
-.rag-chatbot__main { display: flex; min-width: 0; flex: 1; flex-direction: column; background: #fff; }
+.rag-chatbot__main { display: flex; min-width: 0; flex: 1; flex-direction: column; background: #fff; container-name: rag-main; container-type: inline-size; }
 .rag-chatbot__header { display: flex; align-items: center; height: 68px; padding: 0 28px; border-bottom: 1px solid var(--rag-line); }
 .rag-chatbot__model-selector { display: flex; align-items: center; gap: 8px; margin-left: 10px; font-size: 14px; font-weight: 700; }
 .rag-chatbot__model-selector > svg { color: var(--rag-muted); font-size: 15px; }
@@ -264,4 +265,20 @@
 .rag-chatbot__markdown-content td {
     padding: 6px 8px;
     border: 1px solid #090506;
+}
+
+@container rag-main (max-width: 420px) {
+    .rag-chatbot__header {
+        padding: 0 12px;
+    }
+
+    .rag-chatbot__header-actions,
+    .rag-chatbot__model-badge,
+    .rag-chatbot__model-selector > svg {
+        display: none;
+    }
+
+    .rag-chatbot__model-selector {
+        margin-left: 6px;
+    }
 }

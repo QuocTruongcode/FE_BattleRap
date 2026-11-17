@@ -45,13 +45,18 @@ const starterMessages = [
     },
 ];
 
-let conversations = [];
-
 const quickPrompts = [
     { icon: FiSearch, label: 'Tìm kiếm bar nổi bật' },
     { icon: FiFileText, label: 'Tóm tắt một trận đấu' },
     { icon: FiSmile, label: 'Giải thích punchline' },
 ];
+
+const formatConversationUpdatedAt = (updatedAt) => {
+    const date = new Date(updatedAt);
+    return Number.isNaN(date.getTime())
+        ? 'Ngày không xác định'
+        : date.toLocaleString('vi-VN', { dateStyle: 'short', timeStyle: 'short' });
+};
 
 export default function RAGChatBot({
     onSendMessage,
@@ -70,6 +75,7 @@ export default function RAGChatBot({
 
     const [conversation, setConversationState] = useState({});
     const conversationRef = useRef(conversation);
+    const [conversations, setConversations] = useState([]);
     const { user } = useAuth();
     const recommendations = user?.userId && recommendationState?.userId === user.userId
         && Array.isArray(recommendationState.suggestions)
@@ -98,8 +104,10 @@ export default function RAGChatBot({
         const loadConversation = async () => {
             try {
                 const req = await historyChatBot.getConversationIDByUserID();
-                conversations = req.data
-                // console.log("Check conversations: ", req.data)
+                if (!Array.isArray(req.data)) {
+                    throw new Error('Dữ liệu lịch sử cuộc trò chuyện không hợp lệ.');
+                }
+                setConversations(req.data);
             } catch (error) {
                 console.error('Không thể tải lịch sử cuộc trò chuyện:', error);
             }
@@ -257,11 +265,18 @@ export default function RAGChatBot({
 
     const watchVideoID = contextVideoID;
 
-    const getConversation = async (getConversationID) => {
-        const old_onversation = await historyChatBot.getConversation(getConversationID)
-        setconversationID(old_onversation.data[0].conversationID)
-        setMessages(old_onversation.data)
-        // console.log("Check old_onversation: ", old_onversation)
+    const getConversation = async (conversationId) => {
+        try {
+            const oldConversation = await historyChatBot.getConversation(conversationId);
+            if (!Array.isArray(oldConversation.data)) {
+                throw new Error('Dữ liệu cuộc trò chuyện không hợp lệ.');
+            }
+            setconversationID(oldConversation.data[0]?.conversationID ?? conversationId);
+            setMessages(oldConversation.data);
+        } catch (error) {
+            console.error('Không thể tải cuộc trò chuyện:', error);
+            toast.error(error.message || 'Không thể tải cuộc trò chuyện.');
+        }
     }
 
 
@@ -271,7 +286,7 @@ export default function RAGChatBot({
         // console.log("input question: ", input),
         // console.log("check conversationID: ", conversationID),
         // console.log("check messages: ", messages),
-        console.log("check selectedVideo in chatbot: ", selectedVideo.title),
+        console.log("check selectedVideo in chatbot: ", selectedVideo?.title),
         // console.log("check user: ", user),
         // console.log("check conversation: ", conversation),
 
@@ -293,10 +308,9 @@ export default function RAGChatBot({
                 <div className="rag-chatbot__history">
                     <span className="rag-chatbot__section-label">Gần đây</span>
                     {conversations.map((conversation) => (
-                        <button className="rag-chatbot__history-item" key={conversation.id} title={conversation.title} onClick={() => getConversation(conversation)}>
+                        <button className="rag-chatbot__history-item" key={conversation.conversationID} title={formatConversationUpdatedAt(conversation.updatedAt)} onClick={() => getConversation(conversation.conversationID)}>
                             <FiMessageSquare />
-                            <span>{conversation}</span>
-                            <small>{conversation.time}</small>
+                            <span>{formatConversationUpdatedAt(conversation.updatedAt)}</span>
                         </button>
                     ))}
                 </div>
@@ -309,7 +323,7 @@ export default function RAGChatBot({
 
             <main className="rag-chatbot__main">
                 <header className="rag-chatbot__header">
-                    <button className="rag-chatbot__icon-button" onClick={() => setIsSidebarOpen((open) => !open)} title="Hiện thanh bên" aria-label="Hiện thanh bên">
+                    <button className="rag-chatbot__icon-button" onClick={() => setIsSidebarOpen((open) => !open)} title={isSidebarOpen ? 'Thu gọn lịch sử trò chuyện' : 'Hiện lịch sử trò chuyện'} aria-label={isSidebarOpen ? 'Thu gọn lịch sử trò chuyện' : 'Hiện lịch sử trò chuyện'}>
                         {isSidebarOpen ? <FiMenu /> : <FiSidebar />}
                     </button>
                     <div className="rag-chatbot__model-selector">
