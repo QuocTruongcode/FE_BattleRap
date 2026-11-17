@@ -78,7 +78,7 @@ function ContentLogin() {
             {loading && <p className="content-login__status">Đang đăng nhập...</p>}
             {error && <p className="content-login__error">{error}</p>}
 
-            <button
+            {/* <button
                 className="google-login-button"
                 type="button"
                 style={{ backgroundColor: '#000300', color: '#fff' }}
@@ -87,7 +87,7 @@ function ContentLogin() {
             >
                 <HiOutlineUserCircle className="google-login-button__icon" size={27} aria-hidden="true" />
                 <span>Sử dụng không cần tài khoản</span>
-            </button>
+            </button> */}
         </div>
     )
 }
