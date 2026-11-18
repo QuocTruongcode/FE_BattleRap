@@ -260,7 +260,7 @@ export default function CardRating({ video, reactionBarByVideo = [] }) {
                             <div className="card-rating__battler" key={id}>
                                 <div className="card-rating__battler-portrait">
                                     {image ? (
-                                        <img className="card-rating__battler-image" src={image} crossOrigin="anonymous" alt={rapName} />
+                                        <img className="card-rating__battler-image" src={image} alt={rapName} />
                                     ) : (
                                         <div className="card-rating__battler-image card-rating__battler-image--empty" aria-hidden="true">
                                             {rapName.slice(0, 1)}
