@@ -289,6 +289,8 @@ export default function CardRating({ video, reactionBarByVideo = [] }) {
                 <LuShare2 aria-hidden="true" />
                 {sharing ? 'Đang tạo ảnh...' : 'Chia sẻ ảnh'}
             </button>
+
+            <div className='note'>*Reload lại trang để nhận được kết quả mới nhất</div>
         </section>
     );
 }

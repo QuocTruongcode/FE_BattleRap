@@ -10,7 +10,22 @@ export default function LyricPanel({ lyrics, getCurrentTime, selectedId,
     onSelectLine, onJoinBarComments, usePlainCss = false, onActiveLineChange,
     selectedReactionID, activeLineId, selectedReactionsByLine = {}, reactionBarByVideo = [] }) {
     const activeRef = useRef(null);
+    const lastLineClickRef = useRef(null);
     const [activeId, setActiveId] = useState(null);
+
+    const handleLineClick = (line, event) => {
+        const now = event.timeStamp;
+        const previousClick = lastLineClickRef.current;
+        const isDoubleClick = previousClick?.lineId === line.id
+            && now - previousClick.time <= 400;
+
+        lastLineClickRef.current = isDoubleClick
+            ? null
+            : { lineId: line.id, time: now };
+
+        onSelectLine(line);
+        if (isDoubleClick) onJoinBarComments?.(line.time);
+    };
 
     const computeActiveLine = useCallback((time) => {
         for (let i = lyrics.length - 1; i >= 0; i--) {
@@ -115,8 +130,7 @@ export default function LyricPanel({ lyrics, getCurrentTime, selectedId,
                                 isSelectedLine ? classes.selected : '',
                                 line.explanation ? classes.hasNote : '',
                             ].join(' ')}
-                            onClick={() => onSelectLine(line)}
-                            onDoubleClick={() => onJoinBarComments?.(line.time)}
+                            onClick={(event) => handleLineClick(line, event)}
                         >
                             {isActiveLine && (
                                 <span

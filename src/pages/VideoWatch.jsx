@@ -128,14 +128,14 @@ export default function VideoWatch() {
 
     const handleSelectLine = (line) => {
         setSelectedLine(line);
-        setIsMobileAnalysisOpen(true);
+        setTimeout(() => setIsMobileAnalysisOpen(true), 1000);
     };
 
     const handleJoinBarComments = (barTime) => {
         setActiveAnalysis('comments');
         playerRef.current?.seekTo(barTime);
         playerRef.current?.autoPlay();
-
+        console.log("Check barTime: ", barTime)
     };
 
     const { user } = useAuth(); // lấy user
@@ -292,11 +292,11 @@ export default function VideoWatch() {
 
     return (
         // console.log("Check currentTimeRef: ", currentTimeRef),
-        console.log("Check reactionBarByVideo: ", reactionBarByVideo),
+        // console.log("Check RATING_OVERLAY_HISTORY_KEY: ", RATING_OVERLAY_HISTORY_KEY),
         // console.log("check user: ", user),
         // console.log("check selectedReactionsByLine: ", selectedReactionsByLine),
         // style={{backgroundImage: `url("${video.thumbnailUrl}")`
-        console.log("Check video: ", video),
+        // console.log("Check video: ", video),
         // console.log("Check selectedLine: ", selectedLine),
         // console.log("Check activeLineIdRef: ", activeLineIdRef.current),
         <div className="watch-page" style={

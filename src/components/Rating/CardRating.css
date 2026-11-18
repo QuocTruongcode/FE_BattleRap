@@ -543,3 +543,10 @@
     width: 18px;
     height: 18px;
 }
+
+.note {
+    margin-top: 8px;
+    font-size: 18px;
+    color: rgb(255, 255, 255);
+    text-align: center;
+}

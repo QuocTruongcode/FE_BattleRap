@@ -31,6 +31,9 @@ const BunnyPlayer = forwardRef(function BunnyPlayer({ videoUrl, onTimeUpdate, on
                 playerRef.current.play();
             }
         },
+        autoPlay: () => {
+            playerRef.current?.play();
+        },
     }));
 
     useEffect(() => {

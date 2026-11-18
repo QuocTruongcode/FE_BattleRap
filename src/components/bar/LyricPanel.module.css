@@ -36,6 +36,7 @@
     border-radius: 8px;
     background: #f5f5f7;
     cursor: pointer;
+    touch-action: manipulation;
     transition: background 0.15s ease, transform 0.1s ease;
 }
 
