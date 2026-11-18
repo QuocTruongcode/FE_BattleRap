@@ -109,7 +109,7 @@
   display: flex;
   align-items: flex-end;
   gap: 12px;
-  animation: home-chatbot-widget-float 2.8s ease-in-out infinite;
+  animation: home-chatbot-widget-float 4.8s ease-in-out infinite;
 }
 
 .home-chatbot-toggle {
@@ -224,7 +224,7 @@
   padding: 0 5px;
   border: 2px solid #fff;
   border-radius: 999px;
-  background: #e62f4b;
+  background: #42badf;
   color: #fff;
   font-size: 11px;
   font-weight: 700;
@@ -337,15 +337,35 @@
   }
 
   .home-chatbot-widget-motion {
-    flex-direction: column-reverse;
+    flex-direction: row;
     align-items: flex-end;
+    gap: 8px;
+  }
+
+  .home-chatbot-widget-motion.is-chatbot-open {
+    flex-direction: column-reverse;
     gap: 10px;
+  }
+
+  .home-chatbot-recommendation {
+    width: fit-content;
+    max-width: min(280px, calc(100vw - 84px));
+    margin-bottom: 0;
+    padding: 10px 12px;
+    font-size: clamp(12px, 3.8vw, 14px);
+    line-height: 1.35;
   }
 
   .home-chatbot-popover {
     width: min(420px, calc(100vw - 32px));
     height: min(640px, calc(100dvh - 104px));
     min-height: min(360px, calc(100dvh - 104px));
+  }
+}
+
+@media (max-width: 760px) {
+  .home-main-content > .hero-banner {
+    max-height: none;
   }
 }
 

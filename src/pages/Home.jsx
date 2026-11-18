@@ -219,7 +219,7 @@ export default function Home() {
             <Header
                 onSearch={handleSearch}
                 onToggleSidebar={() => setIsSidebarCollapsed((prev) => !prev)}
-                isSidebarCollapsed={isSidebarCollapsed}
+                isSidebarCollapsed={!isSidebarCollapsed}
             />
 
             <div className="home-content">
@@ -257,7 +257,7 @@ export default function Home() {
             </div>
 
             <div ref={chatbotWidgetRef} className="home-chatbot-widget">
-                <div className="home-chatbot-widget-motion">
+                <div className={`home-chatbot-widget-motion${isChatbotOpen ? ' is-chatbot-open' : ''}`}>
                     {isChatbotOpen && (
                         <div className="home-chatbot-popover">
                             <RAGChatBot

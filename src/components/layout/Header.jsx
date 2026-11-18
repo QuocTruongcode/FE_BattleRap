@@ -36,6 +36,7 @@ export default function Header({ onSearch, onToggleSidebar, isSidebarCollapsed }
                         onClick={onToggleSidebar}
                         title={isSidebarCollapsed ? 'Mở rộng sidebar' : 'Thu gọn sidebar'}
                         aria-label={isSidebarCollapsed ? 'Mở rộng sidebar' : 'Thu gọn sidebar'}
+                        aria-expanded={!isSidebarCollapsed}
                     >
                         <span className="header-toggle-icon" aria-hidden="true">
                             <span></span>

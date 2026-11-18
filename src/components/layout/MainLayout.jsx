@@ -13,7 +13,7 @@ export default function MainLayout({ children, onSearch }) {
             <Header
                 onSearch={onSearch}
                 onToggleSidebar={toggleSidebar}
-                isSidebarCollapsed={isSidebarCollapsed}
+                isSidebarCollapsed={!isSidebarCollapsed}
             />
             <div className="home-content">
                 <Sidebar isCollapsed={isSidebarCollapsed} />

@@ -237,7 +237,27 @@
 }
 
 @media (max-width: 480px) {
+  .home-content {
+    position: relative;
+  }
+
   .sidebar {
-    display: none;
+    position: absolute;
+    z-index: 20;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: min(82vw, 280px);
+    height: 100%;
+    padding: 12px;
+    transform: translateX(0);
+    transition: transform 200ms ease;
+    box-shadow: 8px 0 20px rgba(0, 0, 0, 0.35);
+  }
+
+  .sidebar.collapsed {
+    width: min(82vw, 280px);
+    min-height: 0;
+    transform: translateX(-100%);
   }
 }

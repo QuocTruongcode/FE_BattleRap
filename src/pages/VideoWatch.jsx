@@ -31,6 +31,7 @@ export default function VideoWatch() {
     const currentTimeRef = useRef(0);
     const [selectedLine, setSelectedLine] = useState(null);
     const [activeAnalysis, setActiveAnalysis] = useState('explanation');
+    const [isMobileAnalysisOpen, setIsMobileAnalysisOpen] = useState(false);
     const [selectedReactionID, setSelectedReactionID] = useState(null);
     const [selectedReactionsByLine, setSelectedReactionsByLine] = useState({});
     const [playbackSelection, setPlaybackSelection] = useState(null);
@@ -127,6 +128,7 @@ export default function VideoWatch() {
 
     const handleSelectLine = (line) => {
         setSelectedLine(line);
+        setIsMobileAnalysisOpen(true);
     };
 
     const handleJoinBarComments = (barTime) => {
@@ -386,7 +388,18 @@ export default function VideoWatch() {
 
             </div>
 
-            <aside className="watch-analysis-panel">
+            <aside className={`watch-analysis-panel${isMobileAnalysisOpen ? ' is-open' : ''}`}>
+                <div className="watch-analysis-mobile-header">
+                    <span>Phân tích bar</span>
+                    <button
+                        type="button"
+                        className="watch-analysis-mobile-close"
+                        aria-label="Đóng phần phân tích"
+                        onClick={() => setIsMobileAnalysisOpen(false)}
+                    >
+                        ×
+                    </button>
+                </div>
                 <nav className="watch-analysis-tabs" role="tablist" aria-label="Phân tích bar">
                     <button
                         type="button"

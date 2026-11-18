@@ -70,7 +70,7 @@
   display: block;
   height: 100px;
   width: auto;
-  max-width: 220px;
+  max-width: 100px;
   object-fit: contain;
   filter: brightness(1.1);
 }

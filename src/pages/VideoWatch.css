@@ -938,6 +938,149 @@
     backdrop-filter: blur(10px);
 }
 
+.watch-analysis-mobile-header {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .watch-page {
+        height: 100dvh;
+        min-height: 100dvh;
+        overflow: hidden;
+    }
+
+    .watch-page .watch-main {
+        min-height: 0;
+        flex: 1 1 auto;
+        overflow: hidden;
+    }
+
+    .watch-page .lyricSection {
+        height: auto;
+        min-height: 0;
+        flex: 1 1 0;
+    }
+
+    .watch-page .lyricHeader {
+        flex: 0 0 auto;
+    }
+
+    .watch-page .lyricList {
+        min-height: 0;
+        flex: 1 1 auto;
+    }
+
+    .watch-page .watch-analysis-panel {
+        position: fixed;
+        z-index: 40;
+        right: 3px;
+        bottom: calc(8px + env(safe-area-inset-bottom));
+        left: 3px;
+        box-sizing: border-box;
+        width: auto;
+        max-width: none;
+        min-width: 0;
+        height: min(60dvh, 520px);
+        max-height: min(65dvh, 620px);
+        min-height: 0;
+        flex: 0 1 auto;
+        overflow: hidden;
+        padding: 0;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 14px;
+        background: rgba(0, 0, 0, 0.98);
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transform: translateY(calc(100% + 24px));
+        transition:
+            transform 280ms cubic-bezier(0.2, 0.75, 0.25, 1),
+            opacity 220ms ease,
+            visibility 0s linear 280ms;
+    }
+
+    .watch-page .watch-analysis-panel.is-open {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transform: translateY(0);
+        transition:
+            transform 280ms cubic-bezier(0.2, 0.75, 0.25, 1),
+            opacity 220ms ease,
+            visibility 0s;
+    }
+
+    .watch-analysis-mobile-header {
+        display: flex;
+        min-height: 38px;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 12px 0 16px;
+        color: #f1dce0;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .watch-analysis-mobile-close {
+        display: grid;
+        width: 32px;
+        height: 32px;
+        place-items: center;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background: transparent;
+        color: #f1dce0;
+        font-size: 24px;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    .watch-analysis-mobile-close:hover,
+    .watch-analysis-mobile-close:focus-visible {
+        background: rgba(255, 255, 255, 0.12);
+        outline: 2px solid #ff3048;
+        outline-offset: 1px;
+    }
+
+    .watch-page .watch-analysis-tabs {
+        position: relative;
+        flex: 0 0 42px;
+    }
+
+    .watch-page .watch-analysis-content {
+        min-height: 0;
+        flex: 1 1 auto;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+
+    .watch-page .watch-analysis-content > .explanation-panel,
+    .watch-page .watch-analysis-result,
+    .watch-page .video-comments--panel {
+        max-height: none;
+        min-height: 0;
+        flex: 1 1 auto;
+    }
+
+    .watch-page .explanation-panel .explanation-feedback {
+        display: none;
+    }
+
+    .watch-page .watch-analysis-empty {
+        min-height: 120px;
+    }
+}
+
+@media (max-width: 768px) and (prefers-reduced-motion: reduce) {
+    .watch-page .watch-analysis-panel,
+    .watch-page .watch-analysis-panel.is-open {
+        transition: none;
+    }
+}
+
 .watch-rating-overlay .card-rating {
     margin: auto;
 }
