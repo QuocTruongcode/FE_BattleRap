@@ -263,9 +263,9 @@ export default function ExplanationPanel({ line, onClose, onJoinComments }) {
     const isChatbotVisible = chatbotLineId === line?.id;
     return (
         // console.log("Check line: ", line),
-        console.log("check id Exp: ", idExp),
+        // console.log("check id Exp: ", idExp),
         // console.log("Check LLMReply: ", LLMReply),
-        console.log("Check images: ", images),
+        // console.log("Check images: ", images),
         <div
             className={`explanation-panel ${!line ? 'hidden' : ''} ${isResizing ? 'is-resizing' : ''}`}
             style={{ '--explanation-panel-width': `${panelWidth}px` }}

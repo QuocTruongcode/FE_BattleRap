@@ -19,7 +19,7 @@ export default function PreviewVideo({
         const timeoutId = window.setTimeout(() => {
             video.play().catch((error) => {
                 if (error.name !== 'AbortError') {
-                    console.error('Không thể tự phát video xem trước:', error);
+                    // console.error('Không thể tự phát video xem trước:', error);
                 }
             });
         }, startDelay);

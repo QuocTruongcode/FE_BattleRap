@@ -109,7 +109,7 @@ export default function RAGChatBot({
                 }
                 setConversations(req.data);
             } catch (error) {
-                console.error('Không thể tải lịch sử cuộc trò chuyện:', error);
+                // console.error('Không thể tải lịch sử cuộc trò chuyện:', error);
             }
         };
 
@@ -207,7 +207,7 @@ export default function RAGChatBot({
                     ? { title: selectedVideo.title }
                     : {}),
             };
-            console.log("Check payload: ", payload)
+            // console.log("Check payload: ", payload)
             const response = await AIChatContext.askWithContext(payload);
             // console.log("Check response: ", response)
             if (response?.data?.action !== null) {
@@ -274,7 +274,7 @@ export default function RAGChatBot({
             setconversationID(oldConversation.data[0]?.conversationID ?? conversationId);
             setMessages(oldConversation.data);
         } catch (error) {
-            console.error('Không thể tải cuộc trò chuyện:', error);
+            // console.error('Không thể tải cuộc trò chuyện:', error);
             toast.error(error.message || 'Không thể tải cuộc trò chuyện.');
         }
     }
@@ -286,7 +286,7 @@ export default function RAGChatBot({
         // console.log("input question: ", input),
         // console.log("check conversationID: ", conversationID),
         // console.log("check messages: ", messages),
-        console.log("check selectedVideo in chatbot: ", selectedVideo?.title),
+        // console.log("check selectedVideo in chatbot: ", selectedVideo?.title),
         // console.log("check user: ", user),
         // console.log("check conversation: ", conversation),
 

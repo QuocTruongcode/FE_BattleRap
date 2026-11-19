@@ -23,7 +23,7 @@ import MyChart from './components/layout/ReChart'
 import TableSummary from './components/layout/TableSummary'
 import CRUDUser from './pages/CRUDUser'
 import { Toaster } from 'react-hot-toast'
-const AI_RECOMMENDATION_COOLDOWN_MS = 60 * 1000
+const AI_RECOMMENDATION_COOLDOWN_MS = 10 * 60 * 1000
 
 // Component con, nằm TRONG BrowserRouter + AuthProvider nên mới dùng được useLocation() và useAuth()
 function AppContent() {
@@ -58,7 +58,7 @@ function AppContent() {
         window.dispatchEvent(new Event('ai-recommendations-updated'))
       })
       .catch((err) => {
-        console.error('Không thể tải gợi ý AI:', err)
+        // console.error('Không thể tải gợi ý AI:', err)
       })
 
   }, [user?.userId])

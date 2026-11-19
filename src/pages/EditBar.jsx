@@ -125,7 +125,7 @@ export default function EditBar() {
                 );
 
             } catch (error) {
-                console.error("Failed to update bar via API:", error);
+                // console.error("Failed to update bar via API:", error);
                 alert('Cập nhật bar thất bại, vui lòng thử lại!');
             }
 

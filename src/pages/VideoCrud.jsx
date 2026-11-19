@@ -219,7 +219,7 @@ export default function VideoCrud() {
                 return [...current, nextBattler];
             });
         } catch (error) {
-            console.error('Create video battler error:', error);
+            // console.error('Create video battler error:', error);
         }
     };
 
@@ -239,7 +239,7 @@ export default function VideoCrud() {
         try {
             await Video_battler.remove(editingId, battlerId);
         } catch (error) {
-            console.error('Remove video battler error:', error);
+            // console.error('Remove video battler error:', error);
             setSelectedBattlers(previousSelected);
             alert('Xóa battler khỏi video thất bại. Vui lòng thử lại.');
         }
@@ -271,7 +271,7 @@ export default function VideoCrud() {
                 setSelectedBattlers(normalized.slice(0, 2));
             })
             .catch((error) => {
-                console.error('Get battlers by video error:', error);
+                // console.error('Get battlers by video error:', error);
                 if (isMounted) setSelectedBattlers([]);
             });
 
@@ -300,7 +300,7 @@ export default function VideoCrud() {
                     setBattlerResults(list);
                 })
                 .catch((error) => {
-                    console.error('Search battler error:', error);
+                    // console.error('Search battler error:', error);
                     setBattlerResults([]);
                 });
         }, 400);
@@ -625,71 +625,71 @@ export default function VideoCrud() {
                             </div>
 
                             {filteredVideos.length > 0 ? videoStatusGroups.map(({ status, title }) => {
-                                                const statusVideos = filteredVideos.filter((video) => (
-                                                    getKnownVideoStatus(video) === status
-                                                ));
-                                                if (statusVideos.length === 0) return null;
-                                                return (
-                                                    <section className="video-status-section" key={title}>
-                                                        <h3 className="video-status-section__title">
-                                                            {title} <span>({statusVideos.length})</span>
-                                                        </h3>
-                                                        <div className="video-list">
-                                                            {statusVideos.map((video) => (
-                                                                <article
-                                                                    className="video-row"
-                                                                    key={video.id}
-                                                                    onClick={(event) => handleOpenEditBar(video, event)}
-                                                                >
-                                                                    <img className="video-thumb" src={video.thumbnailUrl} alt={video.title} />
+                                const statusVideos = filteredVideos.filter((video) => (
+                                    getKnownVideoStatus(video) === status
+                                ));
+                                if (statusVideos.length === 0) return null;
+                                return (
+                                    <section className="video-status-section" key={title}>
+                                        <h3 className="video-status-section__title">
+                                            {title} <span>({statusVideos.length})</span>
+                                        </h3>
+                                        <div className="video-list">
+                                            {statusVideos.map((video) => (
+                                                <article
+                                                    className="video-row"
+                                                    key={video.id}
+                                                    onClick={(event) => handleOpenEditBar(video, event)}
+                                                >
+                                                    <img className="video-thumb" src={video.thumbnailUrl} alt={video.title} />
 
-                                                                    <div className="video-row-content">
-                                                                        <h3 title={video.title}>{video.title}</h3>
-                                                                        <a href={video.linkVideo} target="_blank" rel="noreferrer">
-                                                                            {video.linkVideo}
-                                                                        </a>
-                                                                        <p>{video.thumbnailUrl}</p>
-                                                                    </div>
+                                                    <div className="video-row-content">
+                                                        <h3 title={video.title}>{video.title}</h3>
+                                                        <a href={video.linkVideo} target="_blank" rel="noreferrer">
+                                                            {video.linkVideo}
+                                                        </a>
+                                                        <p>{video.thumbnailUrl}</p>
+                                                    </div>
 
-                                                                    <div className="row-actions">
-                                                                        <button
-                                                                            type="button"
-                                                                            className="secondary-button"
-                                                                            onClick={(event) => handleEdit(video, event)}
-                                                                        >
-                                                                            Sửa
-                                                                        </button>
-                                                                        {status !== null && (
-                                                                            <button
-                                                                                type="button"
-                                                                                className="secondary-button"
-                                                                                onClick={(event) => handleToggleVideoStatus(video, event)}
-                                                                                disabled={updateMutation.isPending}
-                                                                            >
-                                                                                {status === 0 ? 'Ẩn' : 'Hiện'}
-                                                                            </button>
-                                                                        )}
-                                                                        <button
-                                                                            type="button"
-                                                                            className="danger-button"
-                                                                            onClick={(event) => {
-                                                                                event.stopPropagation();
-                                                                                handleDelete(video.id);
-                                                                            }}
-                                                                        >
-                                                                            Xóa
-                                                                        </button>
-                                                                    </div>
-                                                                </article>
-                                                            ))}
-                                                        </div>
-                                                    </section>
-                                                );
+                                                    <div className="row-actions">
+                                                        <button
+                                                            type="button"
+                                                            className="secondary-button"
+                                                            onClick={(event) => handleEdit(video, event)}
+                                                        >
+                                                            Sửa
+                                                        </button>
+                                                        {status !== null && (
+                                                            <button
+                                                                type="button"
+                                                                className="secondary-button"
+                                                                onClick={(event) => handleToggleVideoStatus(video, event)}
+                                                                disabled={updateMutation.isPending}
+                                                            >
+                                                                {status === 0 ? 'Ẩn' : 'Hiện'}
+                                                            </button>
+                                                        )}
+                                                        <button
+                                                            type="button"
+                                                            className="danger-button"
+                                                            onClick={(event) => {
+                                                                event.stopPropagation();
+                                                                handleDelete(video.id);
+                                                            }}
+                                                        >
+                                                            Xóa
+                                                        </button>
+                                                    </div>
+                                                </article>
+                                            ))}
+                                        </div>
+                                    </section>
+                                );
                             }) : (
-                                                <div className="empty-state">
-                                                    <h3>Không có video phù hợp</h3>
-                                                    <p>Thử xóa bộ lọc tìm kiếm hoặc thêm một video mới.</p>
-                                                </div>
+                                <div className="empty-state">
+                                    <h3>Không có video phù hợp</h3>
+                                    <p>Thử xóa bộ lọc tìm kiếm hoặc thêm một video mới.</p>
+                                </div>
                             )}
                         </section>
                     </div>

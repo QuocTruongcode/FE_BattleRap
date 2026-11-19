@@ -186,7 +186,7 @@ export default function CardRating({ video, reactionBarByVideo = [] }) {
             }
         } catch (err) {
             if (err.name !== 'AbortError') {
-                console.error(err);
+                // console.error(err);
                 alert('Không thể tạo ảnh, vui lòng thử lại.');
             }
         } finally {

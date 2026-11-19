@@ -95,11 +95,11 @@ export default function Home() {
                     try {
                         localStorage.setItem(key, JSON.stringify(savedSuggestions));
                     } catch (error) {
-                        console.error('Không thể chuẩn hóa gợi ý AI trong localStorage:', error);
+                        // console.error('Không thể chuẩn hóa gợi ý AI trong localStorage:', error);
                     }
                 }
             } catch (error) {
-                console.error('Không thể đọc gợi ý AI từ localStorage:', error);
+                // console.error('Không thể đọc gợi ý AI từ localStorage:', error);
                 setRecommendationState({ userId: user.userId, suggestions: [], index: 0 });
             }
         };

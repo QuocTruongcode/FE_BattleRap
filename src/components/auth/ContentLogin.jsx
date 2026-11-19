@@ -30,7 +30,7 @@ function ContentLogin() {
             refreshAuth();
             navigate('/')
         } catch (err) {
-            console.error('Đăng nhập thất bại:', err);
+            // console.error('Đăng nhập thất bại:', err);
             setError('Đăng nhập thất bại, vui lòng thử lại.');
         } finally {
             setLoading(false);
@@ -50,7 +50,7 @@ function ContentLogin() {
         } catch (err) {
             navigate('/Login');
 
-            console.error('Đăng nhập guest thất bại:', err);
+            // console.error('Đăng nhập guest thất bại:', err);
             setError('Đăng nhập thất bại, vui lòng thử lại.');
         } finally {
             setLoading(false);

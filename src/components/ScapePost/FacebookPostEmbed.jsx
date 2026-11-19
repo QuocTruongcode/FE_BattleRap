@@ -71,7 +71,7 @@ export default function FacebookPostEmbed({ href, width = 500 }) {
             })
             .catch((sdkError) => {
                 if (!cancelled) {
-                    console.error('Facebook post embed failed:', sdkError);
+                    // console.error('Facebook post embed failed:', sdkError);
                     setError({
                         href,
                         message: 'Không tải được Facebook SDK. Bạn có thể mở bài viết bằng link bên dưới.',

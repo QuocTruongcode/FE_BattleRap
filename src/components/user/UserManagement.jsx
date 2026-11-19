@@ -118,7 +118,7 @@ export default function UserManagement() {
     }
 
     return (
-        console.log("Check users: ", users),
+        // console.log("Check users: ", users),
         <section className="user-management">
             <header className="user-management__header">
                 <div>

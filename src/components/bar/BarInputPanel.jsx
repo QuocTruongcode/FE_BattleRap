@@ -99,7 +99,7 @@ export default function BarInputPanel({
                 });
             })
             .catch((error) => {
-                console.error('Get battlers by video error:', error);
+                // console.error('Get battlers by video error:', error);
                 if (isMounted) {
                     setBattlerOptions([]);
                     setSelectedBattlerId('');

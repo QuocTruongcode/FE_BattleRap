@@ -20,7 +20,7 @@ export default function Ranking() {
     }
 
     return (
-        console.log("Check batlers: ", battlers),
+        // console.log("Check batlers: ", battlers),
         <div
             className="ranking-page"
             style={{ backgroundImage: `url("${backgroundRank}")` }}

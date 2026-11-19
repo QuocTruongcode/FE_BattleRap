@@ -39,7 +39,7 @@ function EventVideoTitleSearch({ selectedTitle, videoID, onSelect }) {
                 setVideoResults(videos);
             } catch (searchError) {
                 if (controller.signal.aborted) return;
-                console.error('Failed to search video titles:', searchError);
+                // console.error('Failed to search video titles:', searchError);
                 setVideoResults([]);
                 setError('Tìm video thất bại. Vui lòng thử lại.');
             } finally {
@@ -188,7 +188,7 @@ export default function CRUDDrama({
             }
 
         } catch (e) {
-            console.error('Failed to scrape Facebook posts:', e);
+            // console.error('Failed to scrape Facebook posts:', e);
             alert('Lấy bài đăng thất bại.');
         } finally {
             setIsSubmittingDramaEvent(false);
@@ -205,7 +205,7 @@ export default function CRUDDrama({
             setDramaID(dramaItems.data.id);
 
         } catch (e) {
-            console.error('Failed to create drama items:', e);
+            // console.error('Failed to create drama items:', e);
             alert('Tạo drama thất bại.');
 
         };
@@ -239,7 +239,7 @@ export default function CRUDDrama({
 
 
         } catch (e) {
-            console.error('Failed to save drama events:', e);
+            // console.error('Failed to save drama events:', e);
             alert('Lưu drama event thất bại.');
         } finally {
             setIsSubmittingDramaEvent(false);
@@ -274,7 +274,7 @@ export default function CRUDDrama({
             }
             setDramaSearchResults(drama.data);
         } catch (e) {
-            console.error('Failed to search dramas:', e);
+            // console.error('Failed to search dramas:', e);
             alert('Có lỗi xảy ra khi tìm kiếm. Vui lòng thử lại sau.');
         } finally {
             setIsSearchingDramas(false);
@@ -305,7 +305,7 @@ export default function CRUDDrama({
             await Drama.deleteDramaEvent(eventID);
             setDramaEvent((currentEvents) => currentEvents.filter((event) => event.id !== eventID));
         } catch (e) {
-            console.error('Failed to delete drama event:', e);
+            // console.error('Failed to delete drama event:', e);
             alert('Xóa drama event thất bại.');
         } finally {
             setDeletingDramaEventID(null);
@@ -332,7 +332,7 @@ export default function CRUDDrama({
 
             setIsReviewModalOpen(true);
         } catch (error) {
-            console.error('Review drama error:', error);
+            // console.error('Review drama error:', error);
             alert('Có lỗi xảy ra khi xem đánh giá drama.');
         } finally {
             // setIsSubmittingDramaEvent(true);
@@ -353,7 +353,7 @@ export default function CRUDDrama({
             }
             setReviewDraft(review.data.message);
         } catch (error) {
-            console.error('AI review drama error:', error);
+            // console.error('AI review drama error:', error);
             alert('Có lỗi xảy ra khi đánh giá drama bằng AI.');
         } finally {
             setIsReviewingDrama(false);
@@ -371,7 +371,7 @@ export default function CRUDDrama({
             // setReviewDrama(reviewContent);
             // setReviewDraft(reviewContent);
         } catch (error) {
-            console.error('Update drama review error:', error);
+            // console.error('Update drama review error:', error);
             alert('Có lỗi xảy ra khi cập nhật đánh giá drama.');
         }
     };
