@@ -34,7 +34,8 @@
 }
 
 .user-management__table-wrap {
-    overflow-x: auto;
+    max-height: calc(100vh - 220px);
+    overflow: auto;
     border: 1px solid #e2e8f0;
     border-radius: 14px;
     background: #fff;
@@ -55,6 +56,9 @@
 }
 
 .user-management__table th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
     background: #f8fafc;
     color: #475569;
     font-size: 0.8rem;
