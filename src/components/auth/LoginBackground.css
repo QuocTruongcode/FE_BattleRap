@@ -61,17 +61,99 @@ background:
 		--login-background-min-height: 100dvh;
 		overflow-x: hidden;
 		overflow-y: auto;
+		background-image: none;
+	}
+
+	.login-background::before {
+		position: absolute;
+		inset: 0 0 auto;
+		height: 52.88vw;
+		background-image: var(--login-background-image);
+		background-position: center top;
+		background-repeat: no-repeat;
+		background-size: 100% 100%;
+		clip-path: inset(0 0 100%);
+		content: '';
+		animation: login-background-image-reveal 850ms ease-out forwards;
+	}
+
+	.login-background__shade {
+		z-index: 0;
+		background:
+			linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.5) 45%, rgba(0, 0, 0, 0.92) 100%),
+			linear-gradient(90deg, rgba(0, 0, 0, 0.3), transparent 50%, rgba(0, 0, 0, 0.3));
 	}
 
 	.login-background__content {
+		align-items: flex-start;
 		padding:
-			max(2.5rem, env(safe-area-inset-top))
+			calc(37.88vw + max(2.5rem, env(safe-area-inset-top)))
 			max(1rem, env(safe-area-inset-left))
 			max(6rem, calc(env(safe-area-inset-bottom) + 4rem));
+	}
+
+	.content-login__word {
+		display: inline-block;
+		opacity: 0;
+		transform: translateY(0.5em);
+		animation: content-login-word-reveal 450ms ease-out forwards;
+	}
+
+	.content-login__word--1 {
+		animation-delay: 850ms;
+	}
+
+	.content-login__word--2 {
+		animation-delay: 1.15s;
+	}
+
+	.content-login__word--3 {
+		animation-delay: 1.45s;
+	}
+
+	.content-login__word--4 {
+		animation-delay: 1.75s;
+	}
+
+	.google-login-wrapper {
+		opacity: 0;
+		transform: translateY(0.5rem);
+		animation: content-login-button-reveal 500ms ease-out 2.2s forwards;
 	}
 
 	.login-background__edge {
 		bottom: -5rem;
 		height: 6.5rem;
+	}
+}
+
+@keyframes login-background-image-reveal {
+	to {
+		clip-path: inset(0);
+	}
+}
+
+@keyframes content-login-word-reveal {
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes content-login-button-reveal {
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@media (max-width: 600px) and (prefers-reduced-motion: reduce) {
+	.login-background::before,
+	.content-login__word,
+	.google-login-wrapper {
+		animation: none;
+		clip-path: none;
+		opacity: 1;
+		transform: none;
 	}
 }

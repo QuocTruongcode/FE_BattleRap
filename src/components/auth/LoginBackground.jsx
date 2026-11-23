@@ -13,7 +13,7 @@ function LoginBackground({ children }) {
             <div className="login-background__content">
                 <ContentLogin />
             </div>
-            <div className="login-background__edge" aria-hidden="true" />
+            {/* <div className="login-background__edge" aria-hidden="true" /> */}
         </main>
     )
 }
