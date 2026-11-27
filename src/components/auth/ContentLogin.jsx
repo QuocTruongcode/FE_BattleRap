@@ -109,7 +109,7 @@ function ContentLogin() {
                 <div className="content-login__app-done">
                     <p>Đăng nhập thành công. Hãy quay lại ứng dụng.</p>
                     <button type="button" onClick={() => (window.location.href = appLink)}>
-                        Mở lại ứng dụng
+                        <i>Mở lại ứng dụng</i>
                     </button>
                     <p>Bạn có thể đóng tab này sau khi app đã mở.</p>
                 </div>
@@ -121,7 +121,7 @@ function ContentLogin() {
         if (isApp) {
             // Trong Electron: GoogleLogin bị Google chặn, mở trình duyệt hệ thống thay thế
             return (
-                <div className="google-login-wrapper">
+                <div className="google-login-wrapper google-login-wrapper--electron">
                     <button
                         type="button"
                         className="google-login-button"

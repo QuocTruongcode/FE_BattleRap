@@ -71,7 +71,21 @@
     display: flex;
     justify-content: center;
     margin: 12px 0;
-    transform: scale(1.25); /* phóng to 25% */
+    transform: scale(1); /* phóng to 25% */
+    align-items: center;
+    width: 100%;
+}
+
+.google-login-wrapper--electron {
+    flex-direction: column;
+}
+
+.google-login-wrapper--electron .google-login-button {
+    margin-top: 0;
+}
+
+.google-login-wrapper--electron .content-login__status {
+    width: 100%;
 }
 
 .google-login-wrapper:hover{
@@ -89,6 +103,7 @@
     color: #666;
     font-size: 14px;
     margin-top: 8px;
+    text-align: center;
 }
 
 @media (max-width: 600px) {
@@ -147,4 +162,20 @@
         padding: 0 10px;
         font-size: 14px;
     }
+}
+
+.content-login__app-done{
+    text-align: center;
+}
+
+.content-login__app-done, p{
+    color: #19fd00;
+}
+
+.content-login__app-done, button{
+    color: #210be4;
+
+}
+.google-login-wrapper, button {
+    text-align: center;
 }
